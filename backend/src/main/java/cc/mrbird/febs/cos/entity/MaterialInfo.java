@@ -11,14 +11,14 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
- * 用户管理
+ * 物品积分
  *
  * @author FanK
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class UserInfo implements Serializable {
+public class MaterialInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -29,49 +29,24 @@ public class UserInfo implements Serializable {
     private Integer id;
 
     /**
-     * 会员编号
-     */
-    private String code;
-
-    /**
-     * 用户姓名
+     * 物品名称
      */
     private String name;
 
     /**
-     * 邮箱地址
+     * 物品介绍
      */
-    private String mail;
+    private String content;
 
     /**
-     * 联系电话
+     * 图片
      */
-    private String phone;
+    private String image;
 
     /**
-     * 省份
+     * 所需积分
      */
-    private String province;
-
-    /**
-     * 市区
-     */
-    private String city;
-
-    /**
-     * 区
-     */
-    private String area;
-
-    /**
-     * 详细地址
-     */
-    private String address;
-
-    /**
-     * 所属账户
-     */
-    private Long userId;
+    private BigDecimal integral;
 
     /**
      * 创建时间
@@ -79,17 +54,9 @@ public class UserInfo implements Serializable {
     private String createDate;
 
     /**
-     * 用户头像
+     * 销量
      */
-    private String images;
+    private Integer saleNum;
 
-    /**
-     * 是否为会员（0.否 1.是）
-     */
-    private Integer isMember;
 
-    /**
-     * 积分余额
-     */
-    private BigDecimal integral;
 }

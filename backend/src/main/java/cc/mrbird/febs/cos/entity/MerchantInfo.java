@@ -1,6 +1,7 @@
 package cc.mrbird.febs.cos.entity;
 
 import java.math.BigDecimal;
+import java.time.LocalTime;
 import java.time.LocalDateTime;
 import java.io.Serializable;
 
@@ -11,14 +12,14 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
- * 用户管理
+ * 商家管理
  *
  * @author FanK
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class UserInfo implements Serializable {
+public class MerchantInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -29,39 +30,14 @@ public class UserInfo implements Serializable {
     private Integer id;
 
     /**
-     * 会员编号
-     */
-    private String code;
-
-    /**
-     * 用户姓名
+     * 商铺名称
      */
     private String name;
 
     /**
-     * 邮箱地址
+     * 商铺编号
      */
-    private String mail;
-
-    /**
-     * 联系电话
-     */
-    private String phone;
-
-    /**
-     * 省份
-     */
-    private String province;
-
-    /**
-     * 市区
-     */
-    private String city;
-
-    /**
-     * 区
-     */
-    private String area;
+    private String code;
 
     /**
      * 详细地址
@@ -69,9 +45,39 @@ public class UserInfo implements Serializable {
     private String address;
 
     /**
-     * 所属账户
+     * 负责人
      */
-    private Long userId;
+    private String principal;
+
+    /**
+     * 联系方式
+     */
+    private String phone;
+
+    /**
+     * 介绍
+     */
+    private String content;
+
+    /**
+     * 营业星期
+     */
+    private String operateDay;
+
+    /**
+     * 开始营业时间
+     */
+    private String operateStartTime;
+
+    /**
+     * 营业结束时间
+     */
+    private String operateEndTime;
+
+    /**
+     * 图片
+     */
+    private String images;
 
     /**
      * 创建时间
@@ -79,17 +85,19 @@ public class UserInfo implements Serializable {
     private String createDate;
 
     /**
-     * 用户头像
+     * 菜系
      */
-    private String images;
+    private String dishes;
 
     /**
-     * 是否为会员（0.否 1.是）
+     * 经度
      */
-    private Integer isMember;
+    private BigDecimal longitude;
 
     /**
-     * 积分余额
+     * 纬度
      */
-    private BigDecimal integral;
+    private BigDecimal latitude;
+
+
 }

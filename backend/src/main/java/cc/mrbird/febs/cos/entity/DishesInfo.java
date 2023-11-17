@@ -11,14 +11,14 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 /**
- * 用户管理
+ * 菜品管理
  *
  * @author FanK
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class UserInfo implements Serializable {
+public class DishesInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -29,49 +29,54 @@ public class UserInfo implements Serializable {
     private Integer id;
 
     /**
-     * 会员编号
+     * 菜品编号
      */
     private String code;
 
     /**
-     * 用户姓名
+     * 菜品名称
      */
     private String name;
 
     /**
-     * 邮箱地址
+     * 菜品描述
      */
-    private String mail;
+    private String content;
 
     /**
-     * 联系电话
+     * 原料
      */
-    private String phone;
+    private String rawMaterial;
 
     /**
-     * 省份
+     * 份量
      */
-    private String province;
+    private Integer portion;
 
     /**
-     * 市区
+     * 口味
      */
-    private String city;
+    private String taste;
 
     /**
-     * 区
+     * 价格
      */
-    private String area;
+    private BigDecimal unitPrice;
 
     /**
-     * 详细地址
+     * 销量
      */
-    private String address;
+    private Integer saleNum;
 
     /**
-     * 所属账户
+     * 状态（0.下架 1.上架）
      */
-    private Long userId;
+    private String status;
+
+    /**
+     * 所属商家
+     */
+    private Integer merchantId;
 
     /**
      * 创建时间
@@ -79,17 +84,24 @@ public class UserInfo implements Serializable {
     private String createDate;
 
     /**
-     * 用户头像
+     * 图片
      */
     private String images;
 
     /**
-     * 是否为会员（0.否 1.是）
+     * 热量
      */
-    private Integer isMember;
+    private BigDecimal heat;
 
     /**
-     * 积分余额
+     * 蛋白质
      */
-    private BigDecimal integral;
+    private BigDecimal protein;
+
+    /**
+     * 脂肪
+     */
+    private BigDecimal fat;
+
+
 }

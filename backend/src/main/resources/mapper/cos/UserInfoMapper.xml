@@ -16,7 +16,9 @@
         address,
         user_id,
         create_date,
-        images
+        images,
+        is_member,
+        integral
         from
         user_info
         where
