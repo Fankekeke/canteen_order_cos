@@ -24,19 +24,9 @@ public class OrderInfoController {
     private final IOrderInfoService orderInfoService;
 
     /**
-     * 主页数据统计
-     *
-     * @return 结果
-     */
-    @GetMapping("/homeData")
-    public R homeData() {
-        return R.ok(orderInfoService.homeData());
-    }
-
-    /**
      * 分页获取订单信息
      *
-     * @param page      分页对象
+     * @param page        分页对象
      * @param orderInfo 订单信息
      * @return 结果
      */
@@ -75,7 +65,6 @@ public class OrderInfoController {
     @PostMapping
     public R save(OrderInfo orderInfo) {
         orderInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
-        orderInfo.setCode("OD-" + System.currentTimeMillis());
         return R.ok(orderInfoService.save(orderInfo));
     }
 
@@ -100,5 +89,4 @@ public class OrderInfoController {
     public R deleteByIds(@PathVariable("ids") List<Integer> ids) {
         return R.ok(orderInfoService.removeByIds(ids));
     }
-
 }
