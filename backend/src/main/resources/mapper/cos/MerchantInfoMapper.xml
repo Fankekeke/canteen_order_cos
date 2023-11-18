@@ -2,4 +2,37 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cc.mrbird.febs.cos.dao.MerchantInfoMapper">
 
+    <!-- 分页获取商家信息 -->
+    <select id="selectMerchantPage" resultType="java.util.LinkedHashMap">
+        select
+            id,
+            name,
+            code,
+            address,
+            principal,
+            phone,
+            content,
+            operate_day,
+            operate_start_time,
+            operate_end_time,
+            images,
+            create_date,
+            dishes,
+            longitude,
+            latitude
+        from
+            merchant_info
+        where 1 = 1
+        <if test="merchantInfo.code != null and merchantInfo.code != ''">
+            AND code LIKE CONCAT('%',#{merchantInfo.code},'%')
+        </if>
+        <if test="merchantInfo.name != null and merchantInfo.name != ''">
+            AND name LIKE CONCAT('%',#{merchantInfo.name},'%')
+        </if>
+        <if test="merchantInfo.principal != null and merchantInfo.principal != ''">
+            AND principal LIKE CONCAT('%',#{merchantInfo.principal},'%')
+        </if>
+        order by create_date desc
+
+    </select>
 </mapper>

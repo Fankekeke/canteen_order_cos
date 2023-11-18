@@ -33,6 +33,8 @@ public class MaterialInfo implements Serializable {
      */
     private String name;
 
+    private String code;
+
     /**
      * 物品介绍
      */
