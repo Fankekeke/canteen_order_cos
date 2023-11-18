@@ -4,6 +4,46 @@
 
     <!-- 分页获取订单信息 -->
     <select id="selectOrderPage" resultType="java.util.LinkedHashMap">
+        select
+            oi.id,
+            oi.code,
+            oi.user_id,
+            oi.merchant_id,
+            oi.order_price,
+            oi.after_order_price,
+            oi.discount,
+            oi.integral,
+            oi.status,
+            oi.`type`,
+            oi.kilometre,
+            oi.distribution_price,
+            oi.create_date,
+            oi.service_date,
+            oi.address_id,
+            oi.staff_id,
+            ui.name as userName,
+            ui.images as userImages,
+            mi.name as merchantName,
+            mi.images as merchantImages
+        from
+            order_info oi
+                left join user_info ui on
+                (ui.id = oi.user_id)
+                left join merchant_info mi on
+                (mi.id = oi.merchant_id)
+        where
+            1 = 1
+        <if test="orderInfo.code != null and orderInfo.code != ''">
+            AND oi.name LIKE CONCAT('%',#{orderInfo.code},'%')
+        </if>
+        <if test="orderInfo.userName != null and orderInfo.userName != ''">
+            AND ui.name LIKE CONCAT('%',#{orderInfo.userName},'%')
+        </if>
+        <if test="orderInfo.merchantName != null and orderInfo.merchantName != ''">
+            AND mi.name LIKE CONCAT('%',#{orderInfo.merchantName},'%')
+        </if>
+        order by
+            oi.create_date desc
 
     </select>
 </mapper>

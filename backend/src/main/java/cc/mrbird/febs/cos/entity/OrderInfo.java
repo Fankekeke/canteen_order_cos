@@ -104,4 +104,10 @@ public class OrderInfo implements Serializable {
      * 员工ID
      */
     private Integer staffId;
+
+    @TableField(exist = false)
+    private String merchantName;
+
+    @TableField(exist = false)
+    private String userName;
 }
