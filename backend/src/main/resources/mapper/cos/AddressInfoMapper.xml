@@ -15,6 +15,8 @@
             ai.contact_person,
             ai.contact_method,
             ai.user_id,
+            ai.longitude,
+            ai.latitude,
             ui.name,
             ui.code as userCode,
             ui.images

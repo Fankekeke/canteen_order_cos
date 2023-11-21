@@ -3,8 +3,12 @@ package cc.mrbird.febs.cos.controller;
 
 import cc.mrbird.febs.common.utils.R;
 import cc.mrbird.febs.cos.entity.DishesInfo;
+import cc.mrbird.febs.cos.entity.MerchantInfo;
+import cc.mrbird.febs.cos.entity.UserInfo;
 import cc.mrbird.febs.cos.service.IDishesInfoService;
+import cc.mrbird.febs.cos.service.IMerchantInfoService;
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +26,8 @@ import java.util.List;
 public class DishesInfoController {
 
     private final IDishesInfoService dishesInfoService;
+
+    private final IMerchantInfoService merchantInfoService;
 
     /**
      * 分页获取菜品信息
@@ -64,6 +70,12 @@ public class DishesInfoController {
      */
     @PostMapping
     public R save(DishesInfo dishesInfo) {
+        // 获取所属商家
+        MerchantInfo merchantInfo = merchantInfoService.getOne(Wrappers.<MerchantInfo>lambdaQuery().eq(MerchantInfo::getUserId, dishesInfo.getMerchantId()));
+        if (merchantInfo != null) {
+            dishesInfo.setMerchantId(merchantInfo.getId());
+        }
+        dishesInfo.setCode("DIS-" + System.currentTimeMillis());
         dishesInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
         return R.ok(dishesInfoService.save(dishesInfo));
     }

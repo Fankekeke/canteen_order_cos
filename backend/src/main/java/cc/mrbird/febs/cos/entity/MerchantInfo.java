@@ -99,5 +99,10 @@ public class MerchantInfo implements Serializable {
      */
     private BigDecimal latitude;
 
+    /**
+     * 商家管理员ID
+     */
+    private Integer userId;
+
 
 }
