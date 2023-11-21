@@ -7,6 +7,14 @@
           <div :class="advanced ? null: 'fold'">
             <a-col :md="6" :sm="24">
               <a-form-item
+                label="记录编号"
+                :labelCol="{span: 5}"
+                :wrapperCol="{span: 18, offset: 1}">
+                <a-input v-model="queryParams.code"/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="6" :sm="24">
+              <a-form-item
                 label="用户名称"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
@@ -15,18 +23,10 @@
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="订单编号"
+                label="物品名称"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.orderCode"/>
-              </a-form-item>
-            </a-col>
-            <a-col :md="6" :sm="24">
-              <a-form-item
-                label="商家名称"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.merchantName"/>
+                <a-input v-model="queryParams.materialName"/>
               </a-form-item>
             </a-col>
           </div>
@@ -55,9 +55,9 @@
           <template>
             <a-tooltip>
               <template slot="title">
-                {{ record.content }}
+                {{ record.remark }}
               </template>
-              {{ record.content.slice(0, 10) }} ...
+              {{ record.remark.slice(0, 10) }} ...
             </a-tooltip>
           </template>
         </template>
@@ -73,15 +73,15 @@ import moment from 'moment'
 moment.locale('zh-cn')
 
 export default {
-  name: 'evaluate',
+  name: 'exchange',
   components: {RangeDate},
   data () {
     return {
       advanced: false,
-      evaluateAdd: {
+      exchangeAdd: {
         visiable: false
       },
-      evaluateEdit: {
+      exchangeEdit: {
         visiable: false
       },
       queryParams: {},
@@ -108,10 +108,10 @@ export default {
     }),
     columns () {
       return [{
-        title: '用户编号',
-        dataIndex: 'orderCode'
+        title: '记录编号',
+        dataIndex: 'code'
       }, {
-        title: '评价用户',
+        title: '兑换记录用户',
         dataIndex: 'userName',
         customRender: (text, row, index) => {
           if (text !== null) {
@@ -133,8 +133,8 @@ export default {
           </a-popover>
         }
       }, {
-        title: '订单编号',
-        dataIndex: 'orderCode',
+        title: '邮箱地址',
+        dataIndex: 'mail',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -143,54 +143,8 @@ export default {
           }
         }
       }, {
-        title: '订单价格',
-        dataIndex: 'orderPrice',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text + '元'
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '折后价格',
-        dataIndex: 'afterOrderPrice',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text + '元'
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '评价得分',
-        dataIndex: 'score',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text + '分'
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '评价内容',
-        dataIndex: 'remark',
-        scopedSlots: { customRender: 'contentShow' }
-      }, {
-        title: '评价图片',
-        dataIndex: 'userImages',
-        customRender: (text, record, index) => {
-          if (!record.images) return <a-avatar shape="square" icon="user" />
-          return <a-popover>
-            <template slot="content">
-              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
-            </template>
-            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
-          </a-popover>
-        }
-      }, {
-        title: '所属商家',
-        dataIndex: 'merchantName',
+        title: '收货地址',
+        dataIndex: 'address',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -199,20 +153,7 @@ export default {
           }
         }
       }, {
-        title: '订单类型',
-        dataIndex: 'type',
-        customRender: (text, row, index) => {
-          switch (text) {
-            case 0:
-              return <a-tag>堂食</a-tag>
-            case 1:
-              return <a-tag>外送</a-tag>
-            default:
-              return '- -'
-          }
-        }
-      }, {
-        title: '获得积分',
+        title: '消耗积分',
         dataIndex: 'integral',
         customRender: (text, row, index) => {
           if (text !== null) {
@@ -222,7 +163,29 @@ export default {
           }
         }
       }, {
-        title: '评价时间',
+        title: '兑换物品',
+        dataIndex: 'materialName',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '物品图片',
+        dataIndex: 'materialImages',
+        customRender: (text, record, index) => {
+          if (!record.materialImages) return <a-avatar shape="square" icon="user" />
+          return <a-popover>
+            <template slot="content">
+              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.materialImages.split(',')[0] } />
+            </template>
+            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.materialImages.split(',')[0] } />
+          </a-popover>
+        }
+      }, {
+        title: '兑换记录时间',
         dataIndex: 'createDate',
         customRender: (text, row, index) => {
           if (text !== null) {
@@ -245,26 +208,26 @@ export default {
       this.advanced = !this.advanced
     },
     add () {
-      this.evaluateAdd.visiable = true
+      this.exchangeAdd.visiable = true
     },
-    handleevaluateAddClose () {
-      this.evaluateAdd.visiable = false
+    handleexchangeAddClose () {
+      this.exchangeAdd.visiable = false
     },
-    handleevaluateAddSuccess () {
-      this.evaluateAdd.visiable = false
-      this.$message.success('新增评价成功')
+    handleexchangeAddSuccess () {
+      this.exchangeAdd.visiable = false
+      this.$message.success('新增兑换记录成功')
       this.search()
     },
     edit (record) {
-      this.$refs.evaluateEdit.setFormValues(record)
-      this.evaluateEdit.visiable = true
+      this.$refs.exchangeEdit.setFormValues(record)
+      this.exchangeEdit.visiable = true
     },
-    handleevaluateEditClose () {
-      this.evaluateEdit.visiable = false
+    handleexchangeEditClose () {
+      this.exchangeEdit.visiable = false
     },
-    handleevaluateEditSuccess () {
-      this.evaluateEdit.visiable = false
-      this.$message.success('修改评价成功')
+    handleexchangeEditSuccess () {
+      this.exchangeEdit.visiable = false
+      this.$message.success('修改兑换记录成功')
       this.search()
     },
     handleDeptChange (value) {
@@ -282,7 +245,7 @@ export default {
         centered: true,
         onOk () {
           let ids = that.selectedRowKeys.join(',')
-          that.$delete('/cos/evaluate-info/' + ids).then(() => {
+          that.$delete('/cos/exchange-info/' + ids).then(() => {
             that.$message.success('删除成功')
             that.selectedRowKeys = []
             that.search()
@@ -355,7 +318,7 @@ export default {
       if (params.type === undefined) {
         delete params.type
       }
-      this.$get('/cos/order-evaluate/page', {
+      this.$get('/cos/order-exchange/page', {
         ...params
       }).then((r) => {
         let data = r.data.data

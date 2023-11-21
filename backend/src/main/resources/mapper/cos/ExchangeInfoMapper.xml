@@ -31,7 +31,7 @@
         <if test="exchangeInfo.userName != null and exchangeInfo.userName != ''">
             AND ui.name LIKE CONCAT('%',#{exchangeInfo.userName},'%')
         </if>
-        <if test="exchangeInfo.materialName != null and exchangeInfo.materialName != ''">
+            <if test="exchangeInfo.materialName != null and exchangeInfo.materialName != ''">
             AND mi.name LIKE CONCAT('%',#{exchangeInfo.materialName},'%')
         </if>
         order by
