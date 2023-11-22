@@ -2,7 +2,7 @@
   <a-drawer
     title="新增商家"
     :maskClosable="false"
-    width=800
+    width=1000
     placement="right"
     :closable="false"
     @close="onClose"
@@ -11,26 +11,26 @@
     <a-form :form="form" layout="vertical">
       <a-row :gutter="20">
         <a-col :span="12">
-          <a-form-item label='联系人' v-bind="formItemLayout">
+          <a-form-item label='商家名称' v-bind="formItemLayout">
             <a-input v-decorator="[
-            'contactPerson',
-            { rules: [{ required: true, message: '请输入联系人!' }] }
+            'name',
+            { rules: [{ required: true, message: '请输入商家名称!' }] }
             ]"/>
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label='联系方式' v-bind="formItemLayout">
+          <a-form-item label='负责人' v-bind="formItemLayout">
             <a-input v-decorator="[
-            'contactMethod',
-            { rules: [{ required: true, message: '请输入联系方式!' }] }
+            'principal',
+            { rules: [{ required: true, message: '请输入负责人!' }] }
             ]"/>
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label='用户详细地址'>
+          <a-form-item label='店铺地址'>
             <a-input-search
               v-decorator="[
-              'merchant'
+              'address'
               ]"
               enter-button="选择"
               @search="showChildrenDrawer"
@@ -54,27 +54,82 @@
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label='省份' v-bind="formItemLayout">
+          <a-form-item label='联系方式' v-bind="formItemLayout">
             <a-input v-decorator="[
-            'province',
-            { rules: [{ required: true, message: '请输入省份!' }] }
+            'phone',
+            { rules: [{ required: true, message: '请输入联系方式!' }] }
             ]"/>
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label='市区' v-bind="formItemLayout">
-            <a-input v-decorator="[
-            'city',
-            { rules: [{ required: true, message: '请输入市区!' }] }
-            ]"/>
+          <a-form-item label='菜系' v-bind="formItemLayout">
+            <a-select v-decorator="[
+            'phone',
+            { rules: [{ required: true, message: '请输入菜系!' }] }
+            ]">
+              <a-select-option value="川菜">川菜</a-select-option>
+              <a-select-option value="湘菜">湘菜</a-select-option>
+              <a-select-option value="粤菜">粤菜</a-select-option>
+              <a-select-option value="快餐">快餐</a-select-option>
+              <a-select-option value="西餐">西餐</a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :span="24">
+          <a-form-item label='营业星期' v-bind="formItemLayout">
+            <div :style="{ borderBottom: '1px solid #E9E9E9' }">
+              <a-checkbox :indeterminate="indeterminate" :checked="checkAll" @change="onCheckAllChange">
+                Check all
+              </a-checkbox>
+            </div>
+            <br />
+            <a-checkbox-group v-model="checkedList" :options="plainOptions" @change="onChange" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label='区' v-bind="formItemLayout">
-            <a-input v-decorator="[
-            'area',
-            { rules: [{ required: true, message: '请输入区!' }] }
+          <a-form-item label='开始营业时间' v-bind="formItemLayout">
+            <a-time-picker :default-open-value="moment('00:00:00', 'HH:mm:ss')" style="width: 100%" v-decorator="[
+            'operateStartTime',
+            { rules: [{ required: true, message: '请输入开始营业时间!' }] }
+            ]" />
+          </a-form-item>
+        </a-col>
+        <a-col :span="12">
+          <a-form-item label='营业结束时间' v-bind="formItemLayout">
+            <a-time-picker style="width: 100%" v-decorator="[
+            'operateEndTime',
+            { rules: [{ required: true, message: '请输入营业结束时间!' }] }
+            ]" />
+          </a-form-item>
+        </a-col>
+        <a-col :span="24">
+          <a-form-item label='店铺介绍' v-bind="formItemLayout">
+            <a-textarea :rows="6" v-decorator="[
+            'content',
+             { rules: [{ required: true, message: '请输入店铺介绍!' }] }
             ]"/>
+          </a-form-item>
+        </a-col>
+        <a-col :span="24">
+          <a-form-item label='图册' v-bind="formItemLayout">
+            <a-upload
+              name="avatar"
+              action="http://127.0.0.1:9527/file/fileUpload/"
+              list-type="picture-card"
+              :file-list="fileList"
+              @preview="handlePreview"
+              @change="picHandleChange"
+            >
+              <div v-if="fileList.length < 8">
+                <a-icon type="plus" />
+                <div class="ant-upload-text">
+                  Upload
+                </div>
+              </div>
+            </a-upload>
+            <a-modal :visible="previewVisible" :footer="null" @cancel="handleCancel">
+              <img alt="example" style="width: 100%" :src="previewImage" />
+            </a-modal>
           </a-form-item>
         </a-col>
       </a-row>
@@ -95,6 +150,8 @@
 import baiduMap from '@/utils/map/baiduMap'
 import drawerMap from '@/utils/map/searchmap/drawerMap'
 import {mapState} from 'vuex'
+import moment from 'moment'
+moment.locale('zh-cn')
 function getBase64 (file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -107,6 +164,8 @@ const formItemLayout = {
   labelCol: { span: 24 },
   wrapperCol: { span: 24 }
 }
+const plainOptions = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+const defaultCheckedList = ['周一', '周二', '周三', '周四', '周五']
 export default {
   name: 'merchantAdd',
   props: {
@@ -131,6 +190,10 @@ export default {
   },
   data () {
     return {
+      checkedList: defaultCheckedList,
+      indeterminate: true,
+      checkAll: false,
+      plainOptions,
       formItemLayout,
       form: this.$form.createForm(this),
       loading: false,
@@ -143,6 +206,19 @@ export default {
     }
   },
   methods: {
+    moment,
+    onChange (checkedList) {
+      this.indeterminate = !!checkedList.length && checkedList.length < plainOptions.length
+      this.checkAll = checkedList.length === plainOptions.length
+      console.log(this.checkedList)
+    },
+    onCheckAllChange (e) {
+      Object.assign(this, {
+        checkedList: e.target.checked ? plainOptions : [],
+        indeterminate: false,
+        checkAll: e.target.checked
+      })
+    },
     handlerClosed (localPoint) {
       this.childrenDrawer = false
       if (localPoint !== null && localPoint !== undefined) {
@@ -198,8 +274,19 @@ export default {
       this.$emit('close')
     },
     handleSubmit () {
+      if (this.checkedList.length === 0) {
+        this.$message.warn('至少选择一天')
+        return false
+      }
+      // 获取图片List
+      let images = []
+      this.fileList.forEach(image => {
+        images.push(image.response)
+      })
       this.form.validateFields((err, values) => {
         values.userId = this.currentUser.userId
+        values.images = images.length > 0 ? images.join(',') : null
+        values.operateDay = this.checkedList.join(',')
         if (!err) {
           this.loading = true
           this.$post('/cos/merchant-info', {

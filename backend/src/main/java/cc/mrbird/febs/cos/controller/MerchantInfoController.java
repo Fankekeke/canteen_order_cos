@@ -64,6 +64,7 @@ public class MerchantInfoController {
      */
     @PostMapping
     public R save(MerchantInfo merchantInfo) {
+        merchantInfo.setCode("MER-" + System.currentTimeMillis());
         merchantInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
         return R.ok(merchantInfoService.save(merchantInfo));
     }
