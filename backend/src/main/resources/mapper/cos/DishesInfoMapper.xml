@@ -38,6 +38,9 @@
         <if test="dishesInfo.merchantName != null and dishesInfo.merchantName != ''">
             AND mi.name LIKE CONCAT('%',#{dishesInfo.merchantName},'%')
         </if>
+        <if test="dishesInfo.merchantId != null and dishesInfo.merchantId != ''">
+            AND mi.user_id = #{dishesInfo.merchantId}
+        </if>
         order by
             di.create_date desc
 

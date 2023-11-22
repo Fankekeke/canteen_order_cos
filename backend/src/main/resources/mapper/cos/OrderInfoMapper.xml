@@ -42,6 +42,12 @@
         <if test="orderInfo.merchantName != null and orderInfo.merchantName != ''">
             AND mi.name LIKE CONCAT('%',#{orderInfo.merchantName},'%')
         </if>
+        <if test="orderInfo.userId != null and orderInfo.userId != ''">
+            AND ui.user_id = #{orderInfo.userId}
+        </if>
+        <if test="orderInfo.merchantId != null and orderInfo.merchantId != ''">
+            AND mi.user_id = #{orderInfo.merchantId}
+        </if>
         order by
             oi.create_date desc
 

@@ -7,7 +7,7 @@
           <div :class="advanced ? null: 'fold'">
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="记录编号"
+                label="商家编号"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
                 <a-input v-model="queryParams.code"/>
@@ -15,18 +15,10 @@
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="用户名称"
+                label="商家名称"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.userName"/>
-              </a-form-item>
-            </a-col>
-            <a-col :md="6" :sm="24">
-              <a-form-item
-                label="物品名称"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.materialName"/>
+                <a-input v-model="queryParams.name"/>
               </a-form-item>
             </a-col>
           </div>
@@ -73,15 +65,15 @@ import moment from 'moment'
 moment.locale('zh-cn')
 
 export default {
-  name: 'exchange',
+  name: 'member',
   components: {RangeDate},
   data () {
     return {
       advanced: false,
-      exchangeAdd: {
+      memberAdd: {
         visiable: false
       },
-      exchangeEdit: {
+      memberEdit: {
         visiable: false
       },
       queryParams: {},
@@ -108,11 +100,11 @@ export default {
     }),
     columns () {
       return [{
-        title: '记录编号',
+        title: '商家编号',
         dataIndex: 'code'
       }, {
-        title: '兑换记录用户',
-        dataIndex: 'userName',
+        title: '商家名称',
+        dataIndex: 'name',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -121,20 +113,20 @@ export default {
           }
         }
       }, {
-        title: '用户头像',
-        dataIndex: 'userImages',
+        title: '商家图片',
+        dataIndex: 'images',
         customRender: (text, record, index) => {
-          if (!record.userImages) return <a-avatar shape="square" icon="user" />
+          if (!record.images) return <a-avatar shape="square" icon="user" />
           return <a-popover>
             <template slot="content">
-              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.userImages.split(',')[0] } />
+              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
             </template>
-            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.userImages.split(',')[0] } />
+            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
           </a-popover>
         }
       }, {
-        title: '邮箱地址',
-        dataIndex: 'mail',
+        title: '联系方式',
+        dataIndex: 'phone',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -143,7 +135,7 @@ export default {
           }
         }
       }, {
-        title: '收货地址',
+        title: '详细地址',
         dataIndex: 'address',
         customRender: (text, row, index) => {
           if (text !== null) {
@@ -153,7 +145,7 @@ export default {
           }
         }
       }, {
-        title: '消耗积分',
+        title: '会员所需积分',
         dataIndex: 'integral',
         customRender: (text, row, index) => {
           if (text !== null) {
@@ -163,8 +155,8 @@ export default {
           }
         }
       }, {
-        title: '兑换物品',
-        dataIndex: 'materialName',
+        title: '负责人',
+        dataIndex: 'principal',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -173,19 +165,7 @@ export default {
           }
         }
       }, {
-        title: '物品图片',
-        dataIndex: 'materialImages',
-        customRender: (text, record, index) => {
-          if (!record.materialImages) return <a-avatar shape="square" icon="user" />
-          return <a-popover>
-            <template slot="content">
-              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.materialImages.split(',')[0] } />
-            </template>
-            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.materialImages.split(',')[0] } />
-          </a-popover>
-        }
-      }, {
-        title: '兑换记录时间',
+        title: '创建时间',
         dataIndex: 'createDate',
         customRender: (text, row, index) => {
           if (text !== null) {
@@ -208,26 +188,26 @@ export default {
       this.advanced = !this.advanced
     },
     add () {
-      this.exchangeAdd.visiable = true
+      this.memberAdd.visiable = true
     },
-    handleexchangeAddClose () {
-      this.exchangeAdd.visiable = false
+    handlememberAddClose () {
+      this.memberAdd.visiable = false
     },
-    handleexchangeAddSuccess () {
-      this.exchangeAdd.visiable = false
-      this.$message.success('新增兑换记录成功')
+    handlememberAddSuccess () {
+      this.memberAdd.visiable = false
+      this.$message.success('新增会员积分记录成功')
       this.search()
     },
     edit (record) {
-      this.$refs.exchangeEdit.setFormValues(record)
-      this.exchangeEdit.visiable = true
+      this.$refs.memberEdit.setFormValues(record)
+      this.memberEdit.visiable = true
     },
-    handleexchangeEditClose () {
-      this.exchangeEdit.visiable = false
+    handlememberEditClose () {
+      this.memberEdit.visiable = false
     },
-    handleexchangeEditSuccess () {
-      this.exchangeEdit.visiable = false
-      this.$message.success('修改兑换记录成功')
+    handlememberEditSuccess () {
+      this.memberEdit.visiable = false
+      this.$message.success('修改会员积分记录成功')
       this.search()
     },
     handleDeptChange (value) {
@@ -245,7 +225,7 @@ export default {
         centered: true,
         onOk () {
           let ids = that.selectedRowKeys.join(',')
-          that.$delete('/cos/exchange-info/' + ids).then(() => {
+          that.$delete('/cos/member-info/' + ids).then(() => {
             that.$message.success('删除成功')
             that.selectedRowKeys = []
             that.search()
@@ -318,7 +298,7 @@ export default {
       if (params.type === undefined) {
         delete params.type
       }
-      this.$get('/cos/exchange-info/page', {
+      this.$get('/cos/member-info/page', {
         ...params
       }).then((r) => {
         let data = r.data.data

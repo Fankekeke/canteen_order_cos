@@ -32,6 +32,9 @@
         <if test="addressInfo.userCode != null and addressInfo.userCode != ''">
             AND ui.code LIKE CONCAT('%',#{addressInfo.userCode},'%')
         </if>
+        <if test="addressInfo.userId != null and addressInfo.userId != ''">
+            AND ui.user_id = #{addressInfo.userId}
+        </if>
         order by
             ai.create_date desc
     </select>

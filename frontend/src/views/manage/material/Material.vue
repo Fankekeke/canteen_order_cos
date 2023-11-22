@@ -7,7 +7,7 @@
           <div :class="advanced ? null: 'fold'">
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="记录编号"
+                label="物品编号"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
                 <a-input v-model="queryParams.code"/>
@@ -15,18 +15,10 @@
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="用户名称"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.userName"/>
-              </a-form-item>
-            </a-col>
-            <a-col :md="6" :sm="24">
-              <a-form-item
                 label="物品名称"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.materialName"/>
+                <a-input v-model="queryParams.name"/>
               </a-form-item>
             </a-col>
           </div>
@@ -39,6 +31,7 @@
     </div>
     <div>
       <div class="operator">
+        <a-button type="primary" ghost @click="add">新增</a-button>
         <a-button @click="batchDelete">删除</a-button>
       </div>
       <!-- 表格区域 -->
@@ -51,37 +44,44 @@
                :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
                :scroll="{ x: 900 }"
                @change="handleTableChange">
-        <template slot="contentShow" slot-scope="text, record">
-          <template>
-            <a-tooltip>
-              <template slot="title">
-                {{ record.remark }}
-              </template>
-              {{ record.remark.slice(0, 10) }} ...
-            </a-tooltip>
-          </template>
+        <template slot="operation" slot-scope="text, record">
+          <a-icon type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="edit(record)" title="修 改"></a-icon>
         </template>
       </a-table>
     </div>
+    <material-add
+      v-if="materialAdd.visiable"
+      @close="handlematerialAddClose"
+      @success="handlematerialAddSuccess"
+      :materialAddVisiable="materialAdd.visiable">
+    </material-add>
+    <material-edit
+      ref="materialEdit"
+      @close="handlematerialEditClose"
+      @success="handlematerialEditSuccess"
+      :materialEditVisiable="materialEdit.visiable">
+    </material-edit>
   </a-card>
 </template>
 
 <script>
 import RangeDate from '@/components/datetime/RangeDate'
+import materialAdd from './MaterialAdd'
+import materialEdit from './MaterialEdit'
 import {mapState} from 'vuex'
 import moment from 'moment'
 moment.locale('zh-cn')
 
 export default {
-  name: 'exchange',
-  components: {RangeDate},
+  name: 'material',
+  components: {materialAdd, materialEdit, RangeDate},
   data () {
     return {
       advanced: false,
-      exchangeAdd: {
+      materialAdd: {
         visiable: false
       },
-      exchangeEdit: {
+      materialEdit: {
         visiable: false
       },
       queryParams: {},
@@ -108,33 +108,26 @@ export default {
     }),
     columns () {
       return [{
-        title: '记录编号',
+        title: '物品编号',
         dataIndex: 'code'
       }, {
-        title: '兑换记录用户',
-        dataIndex: 'userName',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
+        title: '物品名称',
+        dataIndex: 'name'
       }, {
-        title: '用户头像',
-        dataIndex: 'userImages',
+        title: '物品图片',
+        dataIndex: 'images',
         customRender: (text, record, index) => {
-          if (!record.userImages) return <a-avatar shape="square" icon="user" />
+          if (!record.images) return <a-avatar shape="square" icon="user" />
           return <a-popover>
             <template slot="content">
-              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.userImages.split(',')[0] } />
+              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
             </template>
-            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.userImages.split(',')[0] } />
+            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
           </a-popover>
         }
       }, {
-        title: '邮箱地址',
-        dataIndex: 'mail',
+        title: '物品描述',
+        dataIndex: 'content',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -143,17 +136,7 @@ export default {
           }
         }
       }, {
-        title: '收货地址',
-        dataIndex: 'address',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '消耗积分',
+        title: '所需积分',
         dataIndex: 'integral',
         customRender: (text, row, index) => {
           if (text !== null) {
@@ -163,8 +146,8 @@ export default {
           }
         }
       }, {
-        title: '兑换物品',
-        dataIndex: 'materialName',
+        title: '销量',
+        dataIndex: 'saleNum',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -173,19 +156,7 @@ export default {
           }
         }
       }, {
-        title: '物品图片',
-        dataIndex: 'materialImages',
-        customRender: (text, record, index) => {
-          if (!record.materialImages) return <a-avatar shape="square" icon="user" />
-          return <a-popover>
-            <template slot="content">
-              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.materialImages.split(',')[0] } />
-            </template>
-            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.materialImages.split(',')[0] } />
-          </a-popover>
-        }
-      }, {
-        title: '兑换记录时间',
+        title: '创建时间',
         dataIndex: 'createDate',
         customRender: (text, row, index) => {
           if (text !== null) {
@@ -194,6 +165,10 @@ export default {
             return '- -'
           }
         }
+      }, {
+        title: '操作',
+        dataIndex: 'operation',
+        scopedSlots: {customRender: 'operation'}
       }]
     }
   },
@@ -208,26 +183,26 @@ export default {
       this.advanced = !this.advanced
     },
     add () {
-      this.exchangeAdd.visiable = true
+      this.materialAdd.visiable = true
     },
-    handleexchangeAddClose () {
-      this.exchangeAdd.visiable = false
+    handlematerialAddClose () {
+      this.materialAdd.visiable = false
     },
-    handleexchangeAddSuccess () {
-      this.exchangeAdd.visiable = false
-      this.$message.success('新增兑换记录成功')
+    handlematerialAddSuccess () {
+      this.materialAdd.visiable = false
+      this.$message.success('新增物品成功')
       this.search()
     },
     edit (record) {
-      this.$refs.exchangeEdit.setFormValues(record)
-      this.exchangeEdit.visiable = true
+      this.$refs.materialEdit.setFormValues(record)
+      this.materialEdit.visiable = true
     },
-    handleexchangeEditClose () {
-      this.exchangeEdit.visiable = false
+    handlematerialEditClose () {
+      this.materialEdit.visiable = false
     },
-    handleexchangeEditSuccess () {
-      this.exchangeEdit.visiable = false
-      this.$message.success('修改兑换记录成功')
+    handlematerialEditSuccess () {
+      this.materialEdit.visiable = false
+      this.$message.success('修改物品成功')
       this.search()
     },
     handleDeptChange (value) {
@@ -245,7 +220,7 @@ export default {
         centered: true,
         onOk () {
           let ids = that.selectedRowKeys.join(',')
-          that.$delete('/cos/exchange-info/' + ids).then(() => {
+          that.$delete('/cos/material-info/' + ids).then(() => {
             that.$message.success('删除成功')
             that.selectedRowKeys = []
             that.search()
@@ -315,10 +290,7 @@ export default {
         params.size = this.pagination.defaultPageSize
         params.current = this.pagination.defaultCurrent
       }
-      if (params.type === undefined) {
-        delete params.type
-      }
-      this.$get('/cos/exchange-info/page', {
+      this.$get('/cos/material-info/page', {
         ...params
       }).then((r) => {
         let data = r.data.data

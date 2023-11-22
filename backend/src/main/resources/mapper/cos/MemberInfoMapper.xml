@@ -24,5 +24,8 @@
         <if test="memberInfo.code != null and memberInfo.code != ''">
             AND mei.code LIKE CONCAT('%',#{memberInfo.code},'%')
         </if>
+        <if test="memberInfo.merchantId != null and memberInfo.merchantId != ''">
+            AND mei.user_id = #{memberInfo.merchantId}
+        </if>
     </select>
 </mapper>

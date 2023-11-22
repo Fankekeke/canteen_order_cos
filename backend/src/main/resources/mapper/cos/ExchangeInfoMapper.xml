@@ -31,8 +31,11 @@
         <if test="exchangeInfo.userName != null and exchangeInfo.userName != ''">
             AND ui.name LIKE CONCAT('%',#{exchangeInfo.userName},'%')
         </if>
-            <if test="exchangeInfo.materialName != null and exchangeInfo.materialName != ''">
+        <if test="exchangeInfo.materialName != null and exchangeInfo.materialName != ''">
             AND mi.name LIKE CONCAT('%',#{exchangeInfo.materialName},'%')
+        </if>
+        <if test="exchangeInfo.userId != null and exchangeInfo.userId != ''">
+            AND ui.user_id = #{exchangeInfo.userId}
         </if>
         order by
             ei.create_date desc

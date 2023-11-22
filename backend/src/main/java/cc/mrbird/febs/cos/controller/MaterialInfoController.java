@@ -64,6 +64,7 @@ public class MaterialInfoController {
      */
     @PostMapping
     public R save(MaterialInfo materialInfo) {
+        materialInfo.setCode("MAT-" + System.currentTimeMillis());
         materialInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
         return R.ok(materialInfoService.save(materialInfo));
     }
