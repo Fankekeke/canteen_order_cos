@@ -54,6 +54,7 @@
                @change="handleTableChange">
         <template slot="operation" slot-scope="text, record">
           <a-icon type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="edit(record)" title="修 改"></a-icon>
+          <a-icon type="file-search" @click="dishesViewOpen(record)" title="详 情" style="margin-left: 15px"></a-icon>
         </template>
       </a-table>
     </div>
@@ -69,6 +70,11 @@
       @success="handledishesEditSuccess"
       :dishesEditVisiable="dishesEdit.visiable">
     </dishes-edit>
+    <dishes-view
+      @close="handledishesViewClose"
+      :dishesShow="dishesView.visiable"
+      :dishesData="dishesView.data">
+    </dishes-view>
   </a-card>
 </template>
 
@@ -76,13 +82,14 @@
 import RangeDate from '@/components/datetime/RangeDate'
 import dishesAdd from './DishesAdd'
 import dishesEdit from './DishesEdit'
+import dishesView from './DishesView.vue'
 import {mapState} from 'vuex'
 import moment from 'moment'
 moment.locale('zh-cn')
 
 export default {
   name: 'dishes',
-  components: {dishesAdd, dishesEdit, RangeDate},
+  components: {dishesAdd, dishesEdit, dishesView, RangeDate},
   data () {
     return {
       advanced: false,
@@ -91,6 +98,10 @@ export default {
       },
       dishesEdit: {
         visiable: false
+      },
+      dishesView: {
+        visiable: false,
+        data: null
       },
       queryParams: {},
       filteredInfo: null,
@@ -229,6 +240,13 @@ export default {
     this.fetch()
   },
   methods: {
+    dishesViewOpen (row) {
+      this.dishesView.data = row
+      this.dishesView.visiable = true
+    },
+    handledishesViewClose () {
+      this.dishesView.visiable = false
+    },
     onSelectChange (selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },

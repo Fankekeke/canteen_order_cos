@@ -173,8 +173,8 @@ export default {
           }
         }
       }, {
-        title: '车店编号',
-        dataIndex: 'shopCode',
+        title: '商家编号',
+        dataIndex: 'merchantCode',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -183,8 +183,8 @@ export default {
           }
         }
       }, {
-        title: '所属车店',
-        dataIndex: 'shopName',
+        title: '所属商家',
+        dataIndex: 'merchantName',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text

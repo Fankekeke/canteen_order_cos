@@ -22,6 +22,8 @@
             di.protein,
             di.fat,
             mi.name as merchantName,
+            mi.principal,
+            mi.phone,
             mi.images as merchantImages
         from
             dishes_info di

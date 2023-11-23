@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.io.Serializable;
+import java.util.List;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -104,6 +105,11 @@ public class OrderInfo implements Serializable {
      * 员工ID
      */
     private Integer staffId;
+
+    /**
+     * 订单菜品
+     */
+    List<OrderItemInfo> orderItemList;
 
     @TableField(exist = false)
     private String merchantName;
