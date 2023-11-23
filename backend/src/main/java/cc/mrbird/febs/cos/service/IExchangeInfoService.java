@@ -1,5 +1,6 @@
 package cc.mrbird.febs.cos.service;
 
+import cc.mrbird.febs.common.exception.FebsException;
 import cc.mrbird.febs.cos.entity.ExchangeInfo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -21,4 +22,12 @@ public interface IExchangeInfoService extends IService<ExchangeInfo> {
      * @return 结果
      */
     IPage<LinkedHashMap<String, Object>> selectExChangePage(Page<ExchangeInfo> page, ExchangeInfo exchangeInfo);
+
+    /**
+     * 新增积分兑换信息
+     *
+     * @param exchangeInfo 积分兑换信息
+     * @return 结果
+     */
+    boolean addExchange(ExchangeInfo exchangeInfo) throws FebsException;
 }

@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -39,6 +40,22 @@ public class DishesInfoController {
     @GetMapping("/page")
     public R page(Page<DishesInfo> page, DishesInfo dishesInfo) {
         return R.ok(dishesInfoService.selectDishesPage(page, dishesInfo));
+    }
+
+    /**
+     * 根据商家获取菜品信息
+     *
+     * @param merchantUserId 商家ID
+     * @return 结果
+     */
+    @GetMapping("/selectDishesByMerchant/{merchantUserId}")
+    public R selectDishesByMerchant(@PathVariable("merchantUserId") Integer merchantUserId) {
+        // 获取所属商家
+        MerchantInfo merchantInfo = merchantInfoService.getOne(Wrappers.<MerchantInfo>lambdaQuery().eq(MerchantInfo::getUserId, merchantUserId));
+        if (merchantInfo == null) {
+            return R.ok(Collections.emptyList());
+        }
+        return R.ok(dishesInfoService.list(Wrappers.<DishesInfo>lambdaQuery().eq(DishesInfo::getMerchantId, merchantInfo.getId()).eq(DishesInfo::getStatus, "1")));
     }
 
     /**

@@ -1,6 +1,7 @@
 package cc.mrbird.febs.cos.controller;
 
 
+import cc.mrbird.febs.common.exception.FebsException;
 import cc.mrbird.febs.common.utils.R;
 import cc.mrbird.febs.cos.entity.ExchangeInfo;
 import cc.mrbird.febs.cos.entity.UserInfo;
@@ -25,8 +26,6 @@ import java.util.List;
 public class ExchangeInfoController {
 
     private final IExchangeInfoService exchangeInfoService;
-
-    private final IUserInfoService userInfoService;
 
     /**
      * 分页获取积分兑换信息
@@ -68,14 +67,8 @@ public class ExchangeInfoController {
      * @return 结果
      */
     @PostMapping
-    public R save(ExchangeInfo exchangeInfo) {
-        // 获取所属用户
-        UserInfo userInfo = userInfoService.getOne(Wrappers.<UserInfo>lambdaQuery().eq(UserInfo::getUserId, exchangeInfo.getUserId()));
-        if (userInfo != null) {
-            exchangeInfo.setUserId(userInfo.getId());
-        }
-        exchangeInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
-        return R.ok(exchangeInfoService.save(exchangeInfo));
+    public R save(ExchangeInfo exchangeInfo) throws FebsException {
+        return R.ok(exchangeInfoService.addExchange(exchangeInfo));
     }
 
     /**

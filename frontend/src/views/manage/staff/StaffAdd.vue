@@ -19,16 +19,6 @@
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label='所属车店' v-bind="formItemLayout">
-            <a-select v-decorator="[
-              'deptId',
-              { rules: [{ required: true, message: '请输入所属车店!' }] }
-              ]">
-              <a-select-option :value="item.id" v-for="(item, index) in shopList" :key="index">{{ item.name }}</a-select-option>
-            </a-select>
-          </a-form-item>
-        </a-col>
-        <a-col :span="12">
           <a-form-item label='员工性别' v-bind="formItemLayout">
             <a-select v-decorator="[
               'sex',
@@ -126,15 +116,7 @@ export default {
       shopList: []
     }
   },
-  mounted () {
-    this.selectShopList()
-  },
   methods: {
-    selectShopList () {
-      this.$get(`/cos/shop-info/datalist`).then((r) => {
-        this.shopList = r.data.data
-      })
-    },
     handleCancel () {
       this.previewVisible = false
     },
@@ -165,6 +147,7 @@ export default {
         })
         if (!err) {
           values.images = images.length > 0 ? images.join(',') : null
+          values.pharmacyId = this.currentUser.userId
           this.loading = true
           this.$post('/cos/staff-info', {
             ...values

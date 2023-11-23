@@ -32,7 +32,7 @@ public class MemberInfoController {
      */
     @GetMapping("/page")
     public R page(Page<MemberInfo> page, MemberInfo memberInfo) {
-        return R.ok();
+        return R.ok(memberInfoService.selectMemberPage(page, memberInfo));
     }
 
     /**

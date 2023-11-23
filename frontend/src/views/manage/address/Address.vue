@@ -68,6 +68,7 @@
         </template>
         <template slot="operation" slot-scope="text, record">
           <a-icon type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="edit(record)" title="修 改"></a-icon>
+          <a-icon type="file-search" @click="addressViewOpen(record)" title="详 情" style="margin-left: 15px"></a-icon>
         </template>
       </a-table>
     </div>
@@ -83,6 +84,11 @@
       @success="handleaddressEditSuccess"
       :addressEditVisiable="addressEdit.visiable">
     </address-edit>
+    <address-view
+      @close="handleaddressViewClose"
+      :addressShow="addressView.visiable"
+      :addressData="addressView.data">
+    </address-view>
   </a-card>
 </template>
 
@@ -90,13 +96,14 @@
 import RangeDate from '@/components/datetime/RangeDate'
 import addressAdd from './AddressAdd'
 import addressEdit from './AddressEdit'
+import addressView from './AddressView.vue'
 import {mapState} from 'vuex'
 import moment from 'moment'
 moment.locale('zh-cn')
 
 export default {
   name: 'address',
-  components: {addressAdd, addressEdit, RangeDate},
+  components: {addressAdd, addressEdit, addressView, RangeDate},
   data () {
     return {
       advanced: false,
@@ -105,6 +112,10 @@ export default {
       },
       addressEdit: {
         visiable: false
+      },
+      addressView: {
+        visiable: false,
+        data: null
       },
       queryParams: {},
       filteredInfo: null,
@@ -214,6 +225,13 @@ export default {
     this.fetch()
   },
   methods: {
+    addressViewOpen (row) {
+      this.addressView.data = row
+      this.addressView.visiable = true
+    },
+    handleaddressViewClose () {
+      this.addressView.visiable = false
+    },
     onSelectChange (selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },

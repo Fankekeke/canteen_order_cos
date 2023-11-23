@@ -15,13 +15,13 @@
         sti.create_date,
         sti.user_id,
         sti.pharmacy_id,
-        si.name as shopName,
-        si.code as shopCode,
-        si.images as shopImage
+        mi.name as merchantName,
+        mi.code as merchantCode,
+        mi.images as merchantImage
         from
         staff_info sti
-        left join shop_info si on
-        (si.id = sti.dept_id)
+        left join merchant_info mi on
+        (mi.id = sti.pharmacy_id)
         where
         1 = 1
         <if test="staffInfo.name != null and staffInfo.name != ''">
@@ -32,6 +32,9 @@
         </if>
         <if test="staffInfo.status != null and staffInfo.status != ''">
             AND sti.status = #{staffInfo.status}
+        </if>
+        <if test="staffInfo.pharmacyId != null and staffInfo.pharmacyId != ''">
+            AND mi.user_id = #{staffInfo.pharmacyId}
         </if>
         order by
         sti.create_date desc
