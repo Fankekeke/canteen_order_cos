@@ -71,9 +71,9 @@ public class StaffInfoController {
     @PostMapping
     public R save(StaffInfo staffInfo) {
         // 获取所属商家
-        MerchantInfo merchantInfo = merchantInfoService.getOne(Wrappers.<MerchantInfo>lambdaQuery().eq(MerchantInfo::getUserId, staffInfo.getPharmacyId()));
+        MerchantInfo merchantInfo = merchantInfoService.getOne(Wrappers.<MerchantInfo>lambdaQuery().eq(MerchantInfo::getUserId, staffInfo.getCanteenId()));
         if (merchantInfo != null) {
-            staffInfo.setPharmacyId(merchantInfo.getId());
+            staffInfo.setCanteenId(merchantInfo.getId());
         }
         staffInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
         staffInfo.setCode("STF-" + System.currentTimeMillis());
@@ -93,7 +93,7 @@ public class StaffInfoController {
         if (merchantInfo == null) {
             return R.ok(Collections.emptyList());
         }
-        return R.ok(staffInfoService.list(Wrappers.<StaffInfo>lambdaQuery().eq(StaffInfo::getPharmacyId, merchantInfo.getId())));
+        return R.ok(staffInfoService.list(Wrappers.<StaffInfo>lambdaQuery().eq(StaffInfo::getCanteenId, merchantInfo.getId())));
     }
 
     /**

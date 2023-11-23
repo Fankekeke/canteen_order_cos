@@ -67,7 +67,7 @@ public class StaffInfo implements Serializable {
      */
     private Long userId;
 
-    private Integer pharmacyId;
+    private Integer canteenId;
 
 
 }
