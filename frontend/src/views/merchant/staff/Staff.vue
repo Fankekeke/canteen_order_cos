@@ -336,6 +336,7 @@ export default {
       if (params.status === undefined) {
         delete params.status
       }
+      params.merchantId = this.currentUser.userId
       this.$get('/cos/staff-info/page', {
         ...params
       }).then((r) => {
