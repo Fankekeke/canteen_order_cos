@@ -1,5 +1,6 @@
 package cc.mrbird.febs.cos.service;
 
+import cc.mrbird.febs.common.exception.FebsException;
 import cc.mrbird.febs.cos.entity.OrderInfo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -28,5 +29,5 @@ public interface IOrderInfoService extends IService<OrderInfo> {
      * @param orderInfo 订单信息
      * @return 结果
      */
-    boolean addOrder(OrderInfo orderInfo);
+    boolean addOrder(OrderInfo orderInfo) throws FebsException;
 }

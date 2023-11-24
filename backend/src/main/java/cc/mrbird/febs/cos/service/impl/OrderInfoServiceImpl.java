@@ -1,9 +1,11 @@
 package cc.mrbird.febs.cos.service.impl;
 
+import cc.mrbird.febs.common.exception.FebsException;
 import cc.mrbird.febs.common.utils.LocationUtils;
 import cc.mrbird.febs.cos.entity.*;
 import cc.mrbird.febs.cos.dao.OrderInfoMapper;
 import cc.mrbird.febs.cos.service.*;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * @author FanK
@@ -32,6 +35,8 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     private final IAddressInfoService addressInfoService;
 
     private final IMerchantMemberInfoService merchantMemberInfoService;
+
+    private final IOrderItemInfoService orderItemInfoService;
 
     /**
      * 分页获取订单信息
@@ -52,7 +57,13 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
      * @return 结果
      */
     @Override
-    public boolean addOrder(OrderInfo orderInfo) {
+    public boolean addOrder(OrderInfo orderInfo) throws FebsException {
+
+        List<OrderItemInfo> orderItemList = orderInfo.getOrderItemList();
+        if (CollectionUtil.isEmpty(orderItemList)) {
+            throw new FebsException("订单详情不能为空");
+        }
+
         orderInfo.setCode("ORD-" + System.currentTimeMillis());
         orderInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
         // 用户信息
@@ -70,6 +81,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
             double distance = LocationUtils.getDistance(merchantInfo.getLongitude().doubleValue(), merchantInfo.getLatitude().doubleValue(), addressInfo.getLongitude().doubleValue(), addressInfo.getLatitude().doubleValue());
             orderInfo.setDiscount(NumberUtil.div(new BigDecimal(distance), 1000));
 
+
             // 每公里两米
             orderInfo.setDistributionPrice(NumberUtil.mul(orderInfo.getDistributionPrice(), 2));
             orderInfo.setOrderPrice(NumberUtil.add(orderInfo.getOrderPrice(), orderInfo.getDistributionPrice()));
@@ -83,9 +95,19 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
             orderInfo.setDiscount(discount);
             orderInfo.setAfterOrderPrice(NumberUtil.mul(orderInfo.getOrderPrice(), 0.8));
         }
-        // 添加订单详情
 
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        for (OrderItemInfo orderItem : orderItemList) {
+            orderItem.setTotalPrice(NumberUtil.mul(orderItem.getTotalPrice(), orderItem.getAmount()));
+            totalPrice = NumberUtil.add(totalPrice, orderItem.getTotalPrice());
+        }
         // 添加订单
-        return this.save(orderInfo);
+        this.save(orderInfo);
+
+        // 添加订单详情
+        for (OrderItemInfo orderItem : orderItemList) {
+            orderItem.setOrderId(orderInfo.getId());
+        }
+        return orderItemInfoService.saveBatch(orderItemList);
     }
 }
