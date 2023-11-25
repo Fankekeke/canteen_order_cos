@@ -72,7 +72,7 @@ public class IMailServiceImpl implements IMailService {
         try {
             messageHelper = new MimeMessageHelper(message, true);
             //邮件发送人
-            messageHelper.setFrom("EVA-2<" + from + ">");
+            messageHelper.setFrom("FanK<" + from + ">");
             //邮件接收人
             messageHelper.setTo(to);
             //邮件主题

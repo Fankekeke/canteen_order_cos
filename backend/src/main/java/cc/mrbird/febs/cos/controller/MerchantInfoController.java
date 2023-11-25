@@ -3,13 +3,17 @@ package cc.mrbird.febs.cos.controller;
 
 import cc.mrbird.febs.common.utils.R;
 import cc.mrbird.febs.cos.entity.MerchantInfo;
+import cc.mrbird.febs.cos.entity.UserInfo;
 import cc.mrbird.febs.cos.service.IMerchantInfoService;
+import cc.mrbird.febs.cos.service.IUserInfoService;
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -23,16 +27,55 @@ public class MerchantInfoController {
 
     private final IMerchantInfoService merchantInfoService;
 
+    private final IUserInfoService userInfoService;
+
     /**
      * 分页获取商家信息
      *
-     * @param page        分页对象
+     * @param page         分页对象
      * @param merchantInfo 商家信息
      * @return 结果
      */
     @GetMapping("/page")
     public R page(Page<MerchantInfo> page, MerchantInfo merchantInfo) {
         return R.ok(merchantInfoService.selectMerchantPage(page, merchantInfo));
+    }
+
+    /**
+     * 根据用户ID获取商家信息
+     *
+     * @param userId 用户ID
+     * @return 结果
+     */
+    @GetMapping("/getMerchantByUser")
+    public R getMerchantByUser(@RequestParam("userId") Integer userId) {
+        MerchantInfo merchantInfo = merchantInfoService.getOne(Wrappers.<MerchantInfo>lambdaQuery().eq(MerchantInfo::getUserId, userId));
+        if (merchantInfo == null) {
+            return R.ok();
+        }
+        return R.ok(merchantInfo);
+    }
+
+    /**
+     * 根据商家获取订单评价信息
+     *
+     * @param merchantId 商家ID
+     * @return 结果
+     */
+    @GetMapping("/selectEvaluateByMerchant")
+    public R selectEvaluateByMerchant(@RequestParam("merchantId") Integer merchantId, @RequestParam(value = "dishesId", required = false) Integer dishesId) {
+        return R.ok(merchantInfoService.selectEvaluateByMerchant(merchantId, dishesId));
+    }
+
+    /**
+     * 商家获取统计信息
+     *
+     * @param userId 商家用户ID
+     * @return 结果
+     */
+    @GetMapping("/homeData")
+    public R selectHomeDataByMerchant(@RequestParam("userId") Integer userId) {
+        return R.ok(merchantInfoService.selectHomeDataByMerchant(userId));
     }
 
     /**

@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * @author FanK
@@ -21,4 +22,13 @@ public interface MerchantInfoMapper extends BaseMapper<MerchantInfo> {
      * @return 结果
      */
     IPage<LinkedHashMap<String, Object>> selectMerchantPage(Page<MerchantInfo> page, @Param("merchantInfo") MerchantInfo merchantInfo);
+
+    /**
+     * 根据商家获取订单评价信息
+     *
+     * @param merchantId 商家ID
+     * @param dishesId   菜品ID
+     * @return 结果
+     */
+    List<LinkedHashMap<String, Object>> selectEvaluateByMerchant(@Param("merchantId") Integer merchantId, @Param("dishesId") Integer dishesId);
 }

@@ -1,6 +1,7 @@
 package cc.mrbird.febs.cos.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -35,7 +36,7 @@ public class MemberInfo implements Serializable {
     /**
      * 会员所达积分
      */
-    private Integer integral;
+    private BigDecimal integral;
 
     @TableField(exist = false)
     private String name;
