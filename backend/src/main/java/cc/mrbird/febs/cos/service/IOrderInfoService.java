@@ -30,4 +30,29 @@ public interface IOrderInfoService extends IService<OrderInfo> {
      * @return 结果
      */
     boolean addOrder(OrderInfo orderInfo) throws FebsException;
+
+    /**
+     * 获取ID获取订单详情
+     *
+     * @param id 主键
+     * @return 结果
+     */
+    LinkedHashMap<String, Object> orderDetail(Integer id);
+
+    /**
+     * 订单支付
+     *
+     * @param orderCode 订单编号
+     * @return 结果
+     */
+    boolean orderPay(String orderCode);
+
+    /**
+     * 外送订单选择配送员
+     *
+     * @param orderCode 订单编号
+     * @param staffId   员工ID
+     * @return 结果
+     */
+    boolean checkDealer(String orderCode, Integer staffId);
 }

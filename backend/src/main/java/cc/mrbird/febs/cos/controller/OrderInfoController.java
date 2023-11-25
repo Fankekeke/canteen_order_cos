@@ -1,6 +1,7 @@
 package cc.mrbird.febs.cos.controller;
 
 
+import cc.mrbird.febs.common.exception.FebsException;
 import cc.mrbird.febs.common.utils.R;
 import cc.mrbird.febs.cos.entity.OrderInfo;
 import cc.mrbird.febs.cos.service.IOrderInfoService;
@@ -26,7 +27,7 @@ public class OrderInfoController {
     /**
      * 分页获取订单信息
      *
-     * @param page        分页对象
+     * @param page      分页对象
      * @param orderInfo 订单信息
      * @return 结果
      */
@@ -43,7 +44,7 @@ public class OrderInfoController {
      */
     @GetMapping("/{id}")
     public R detail(@PathVariable("id") Integer id) {
-        return R.ok(orderInfoService.getById(id));
+        return R.ok(orderInfoService.orderDetail(id));
     }
 
     /**
@@ -63,9 +64,31 @@ public class OrderInfoController {
      * @return 结果
      */
     @PostMapping
-    public R save(OrderInfo orderInfo) {
-        orderInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
-        return R.ok(orderInfoService.save(orderInfo));
+    public R save(OrderInfo orderInfo) throws FebsException {
+        return R.ok(orderInfoService.addOrder(orderInfo));
+    }
+
+    /**
+     * 订单支付
+     *
+     * @param orderCode 订单编号
+     * @return 结果
+     */
+    @PostMapping("/orderPay")
+    public R orderPay(@RequestParam("orderCode") String orderCode) {
+        return R.ok(orderInfoService.orderPay(orderCode));
+    }
+
+    /**
+     * 外送订单选择配送员
+     *
+     * @param orderCode 订单编号
+     * @param staffId   员工ID
+     * @return 结果
+     */
+    @GetMapping("/checkDealer")
+    public R checkDealer(@RequestParam("orderCode") String orderCode, @RequestParam("staffId") Integer staffId) {
+        return R.ok();
     }
 
     /**

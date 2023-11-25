@@ -237,7 +237,7 @@ export default {
               }
             }
             let obj = {}
-            obj['merchantmerchant'] = this.staymerchant
+            obj['address'] = this.staymerchant
             obj['longitude'] = localPoint.lng
             obj['latitude'] = localPoint.lat
             this.form.setFieldsValue(obj)
@@ -276,7 +276,7 @@ export default {
     },
     setFormValues ({...merchant}) {
       this.rowId = merchant.id
-      let fields = ['merchant', 'province', 'city', 'area', 'contactPerson', 'contactMethod', 'longitude', 'latitude']
+      let fields = ['merchant', 'province', 'city', 'area', 'contactPerson', 'contactMethod', 'longitude', 'latitude', 'address']
       let obj = {}
       Object.keys(merchant).forEach((key) => {
         if (key === 'images') {

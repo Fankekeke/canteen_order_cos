@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.io.Serializable;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -52,5 +53,15 @@ public class OrderItemInfo implements Serializable {
      */
     private Integer orderId;
 
+    /**
+     * 菜品名称
+     */
+    @TableField(exist = false)
+    private String dishesName;
 
+    /**
+     * 菜品图片
+     */
+    @TableField(exist = false)
+    private String images;
 }
