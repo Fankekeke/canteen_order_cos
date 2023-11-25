@@ -1,32 +1,32 @@
 <template>
   <div style="padding: 12px;width: 100%">
     <a-row :gutter="15">
-      <a-col :span="12">
-        <a-card hoverable :bordered="false">
+      <a-col :span="8">
+        <a-card :bordered="false">
           <a-form :form="form" layout="vertical">
             <a-row :gutter="20">
               <a-col :span="12">
                 <a-form-item label='商家名称' v-bind="formItemLayout">
                   <a-input v-decorator="[
-            'name',
-            { rules: [{ required: true, message: '请输入商家名称!' }] }
-            ]"/>
+                  'name',
+                  { rules: [{ required: true, message: '请输入商家名称!' }] }
+                  ]"/>
                 </a-form-item>
               </a-col>
               <a-col :span="12">
                 <a-form-item label='负责人' v-bind="formItemLayout">
                   <a-input v-decorator="[
-            'principal',
-            { rules: [{ required: true, message: '请输入负责人!' }] }
-            ]"/>
+                  'principal',
+                  { rules: [{ required: true, message: '请输入负责人!' }] }
+                  ]"/>
                 </a-form-item>
               </a-col>
               <a-col :span="12">
                 <a-form-item label='店铺地址'>
                   <a-input-search
                     v-decorator="[
-              'address'
-              ]"
+                    'address'
+                    ]"
                     enter-button="选择"
                     @search="showChildrenDrawer"
                   />
@@ -35,38 +35,39 @@
               <a-col :span="12">
                 <a-form-item label='经度' v-bind="formItemLayout">
                   <a-input v-decorator="[
-            'longitude',
-            { rules: [{ required: true, message: '请输入经度!' }] }
-            ]"/>
+                  'longitude',
+                  { rules: [{ required: true, message: '请输入经度!' }] }
+                  ]"/>
                 </a-form-item>
               </a-col>
               <a-col :span="12">
                 <a-form-item label='纬度' v-bind="formItemLayout">
                   <a-input v-decorator="[
-            'latitude',
-            { rules: [{ required: true, message: '请输入纬度!' }] }
-            ]"/>
+                  'latitude',
+                  { rules: [{ required: true, message: '请输入纬度!' }] }
+                  ]"/>
                 </a-form-item>
               </a-col>
               <a-col :span="12">
                 <a-form-item label='联系方式' v-bind="formItemLayout">
                   <a-input v-decorator="[
-            'phone',
-            { rules: [{ required: true, message: '请输入联系方式!' }] }
-            ]"/>
+                  'phone',
+                  { rules: [{ required: true, message: '请输入联系方式!' }] }
+                  ]"/>
                 </a-form-item>
               </a-col>
               <a-col :span="12">
                 <a-form-item label='菜系' v-bind="formItemLayout">
                   <a-select v-decorator="[
-            'phone',
-            { rules: [{ required: true, message: '请输入菜系!' }] }
-            ]">
+                  'phone',
+                  { rules: [{ required: true, message: '请输入菜系!' }] }
+                  ]">
                     <a-select-option value="川菜">川菜</a-select-option>
                     <a-select-option value="湘菜">湘菜</a-select-option>
                     <a-select-option value="粤菜">粤菜</a-select-option>
                     <a-select-option value="快餐">快餐</a-select-option>
                     <a-select-option value="西餐">西餐</a-select-option>
+                    <a-select-option value="中餐">中餐</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -84,25 +85,25 @@
               <a-col :span="12">
                 <a-form-item label='开始营业时间' v-bind="formItemLayout">
                   <a-time-picker :default-open-value="moment('00:00:00', 'HH:mm:ss')" style="width: 100%" v-decorator="[
-            'operateStartTime',
-            { rules: [{ required: true, message: '请输入开始营业时间!' }] }
-            ]" />
+                  'operateStartTime',
+                  { rules: [{ required: true, message: '请输入开始营业时间!' }] }
+                  ]" />
                 </a-form-item>
               </a-col>
               <a-col :span="12">
                 <a-form-item label='营业结束时间' v-bind="formItemLayout">
                   <a-time-picker style="width: 100%" v-decorator="[
-            'operateEndTime',
-            { rules: [{ required: true, message: '请输入营业结束时间!' }] }
-            ]" />
+                  'operateEndTime',
+                  { rules: [{ required: true, message: '请输入营业结束时间!' }] }
+                  ]" />
                 </a-form-item>
               </a-col>
               <a-col :span="24">
                 <a-form-item label='店铺介绍' v-bind="formItemLayout">
                   <a-textarea :rows="6" v-decorator="[
-            'content',
-             { rules: [{ required: true, message: '请输入店铺介绍!' }] }
-            ]"/>
+                  'content',
+                   { rules: [{ required: true, message: '请输入店铺介绍!' }] }
+                  ]"/>
                 </a-form-item>
               </a-col>
               <a-col :span="24">
@@ -133,7 +134,7 @@
           <drawerMap :childrenDrawerShow="childrenDrawer" @handlerClosed="handlerClosed"></drawerMap>
         </a-card>
       </a-col>
-      <a-col :span="12">
+      <a-col :span="16">
         <div id="areas" style="width: 100%;height: 700px;box-shadow: 0 0 0 10px white;"></div>
       </a-col>
     </a-row>
@@ -144,6 +145,8 @@
 import {mapState} from 'vuex'
 import baiduMap from '@/utils/map/baiduMap'
 import drawerMap from '@/utils/map/searchmap/drawerMap'
+import moment from 'moment'
+moment.locale('zh-cn')
 
 const plainOptions = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
 const formItemLayout = {
@@ -317,11 +320,17 @@ export default {
     },
     setFormValues ({...user}) {
       this.userId = user.id
-      let fields = ['merchant', 'province', 'city', 'area', 'contactPerson', 'contactMethod', 'longitude', 'latitude', 'address']
+      let fields = ['name', 'dishes', 'code', 'operateEndTime', 'operateStartTime', 'principal', 'longitude', 'latitude', 'address', 'phone', 'content']
       Object.keys(user).forEach((key) => {
         if (key === 'images') {
           this.fileList = []
           this.imagesInit(user['images'])
+        }
+        if (key === 'operateStartTime' && user[key] != null) {
+          user[key] = moment(user[key], 'HH:mm:ss')
+        }
+        if (key === 'operateEndTime' && user[key] != null) {
+          user[key] = moment(user[key], 'HH:mm:ss')
         }
         if (fields.indexOf(key) !== -1) {
           this.form.getFieldDecorator(key)

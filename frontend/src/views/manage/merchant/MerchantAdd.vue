@@ -72,6 +72,7 @@
               <a-select-option value="粤菜">粤菜</a-select-option>
               <a-select-option value="快餐">快餐</a-select-option>
               <a-select-option value="西餐">西餐</a-select-option>
+              <a-select-option value="中餐">中餐</a-select-option>
             </a-select>
           </a-form-item>
         </a-col>

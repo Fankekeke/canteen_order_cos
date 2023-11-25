@@ -28,7 +28,7 @@ public class MerchantInfoServiceImpl extends ServiceImpl<MerchantInfoMapper, Mer
 
     private final IBulletinInfoService bulletinInfoService;
 
-    private final IMerchantInfoService merchantInfoService;
+    private final MerchantInfoMapper merchantInfoMapper;
 
     /**
      * 分页获取商家信息
@@ -73,7 +73,7 @@ public class MerchantInfoServiceImpl extends ServiceImpl<MerchantInfoMapper, Mer
         };
 
         // 商家信息
-        MerchantInfo merchantInfo = merchantInfoService.getOne(Wrappers.<MerchantInfo>lambdaQuery().eq(MerchantInfo::getUserId, userId));
+        MerchantInfo merchantInfo = merchantInfoMapper.selectOne(Wrappers.<MerchantInfo>lambdaQuery().eq(MerchantInfo::getUserId, userId));
 
         // 近十天销售订单统计
         result.put("orderNumWithinDays", orderInfoMapper.selectOrderNumWithinDays(merchantInfo.getId()));

@@ -72,6 +72,7 @@
               <a-select-option value="粤菜">粤菜</a-select-option>
               <a-select-option value="快餐">快餐</a-select-option>
               <a-select-option value="西餐">西餐</a-select-option>
+              <a-select-option value="中餐">中餐</a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
@@ -276,12 +277,18 @@ export default {
     },
     setFormValues ({...merchant}) {
       this.rowId = merchant.id
-      let fields = ['merchant', 'province', 'city', 'area', 'contactPerson', 'contactMethod', 'longitude', 'latitude', 'address']
+      let fields = ['name', 'dishes', 'code', 'operateEndTime', 'operateStartTime', 'principal', 'longitude', 'latitude', 'address', 'phone', 'content']
       let obj = {}
       Object.keys(merchant).forEach((key) => {
         if (key === 'images') {
           this.fileList = []
           this.imagesInit(merchant['images'])
+        }
+        if (key === 'operateStartTime' && merchant[key] != null) {
+          merchant[key] = moment(merchant[key], 'HH:mm:ss')
+        }
+        if (key === 'operateEndTime' && merchant[key] != null) {
+          merchant[key] = moment(merchant[key], 'HH:mm:ss')
         }
         if (fields.indexOf(key) !== -1) {
           this.form.getFieldDecorator(key)

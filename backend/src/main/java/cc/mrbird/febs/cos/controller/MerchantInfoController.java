@@ -7,6 +7,7 @@ import cc.mrbird.febs.cos.entity.UserInfo;
 import cc.mrbird.febs.cos.service.IMerchantInfoService;
 import cc.mrbird.febs.cos.service.IUserInfoService;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -86,7 +87,11 @@ public class MerchantInfoController {
      */
     @GetMapping("/{id}")
     public R detail(@PathVariable("id") Integer id) {
-        return R.ok(merchantInfoService.getById(id));
+        MerchantInfo merchantInfo = merchantInfoService.getById(id);
+        if (StrUtil.isNotEmpty(merchantInfo.getOperateDay())) {
+
+        }
+        return R.ok();
     }
 
     /**

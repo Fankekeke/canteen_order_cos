@@ -211,9 +211,9 @@ export default {
         dataIndex: 'status',
         customRender: (text, row, index) => {
           switch (text) {
-            case 0:
+            case '0':
               return <a-tag color="red">下架</a-tag>
-            case 1:
+            case '1':
               return <a-tag color="green">上架</a-tag>
             default:
               return '- -'
