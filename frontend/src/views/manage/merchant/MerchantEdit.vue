@@ -226,19 +226,19 @@ export default {
         this.localPoint = localPoint
         console.log(this.localPoint)
 
-        let merchant = baiduMap.getmerchant(localPoint)
-        merchant.getLocation(localPoint, (rs) => {
+        let address = baiduMap.getAddress(localPoint)
+        address.getLocation(localPoint, (rs) => {
           if (rs != null) {
-            if (rs.merchant !== undefined && rs.merchant.length !== 0) {
-              this.staymerchant = rs.merchant
+            if (rs.address !== undefined && rs.address.length !== 0) {
+              this.stayAddress = rs.address
             }
             if (rs.surroundingPois !== undefined) {
-              if (rs.surroundingPois.merchant !== undefined && rs.surroundingPois.merchant.length !== 0) {
-                this.staymerchant = rs.surroundingPois.merchant
+              if (rs.surroundingPois.address !== undefined && rs.surroundingPois.address.length !== 0) {
+                this.stayAddress = rs.surroundingPois.address
               }
             }
             let obj = {}
-            obj['address'] = this.staymerchant
+            obj['address'] = this.stayAddress
             obj['longitude'] = localPoint.lng
             obj['latitude'] = localPoint.lat
             this.form.setFieldsValue(obj)
@@ -277,12 +277,42 @@ export default {
     },
     setFormValues ({...merchant}) {
       this.rowId = merchant.id
-      let fields = ['name', 'dishes', 'code', 'operateEndTime', 'operateStartTime', 'principal', 'longitude', 'latitude', 'address', 'phone', 'content']
+      let fields = ['name', 'dishes', 'code', 'operateEndTime', 'operateStartTime', 'principal', 'longitude', 'latitude', 'address', 'phone', 'content', 'operateDay']
       let obj = {}
       Object.keys(merchant).forEach((key) => {
         if (key === 'images') {
           this.fileList = []
           this.imagesInit(merchant['images'])
+        }
+        if (key === 'operateDay' && merchant[key] != null) {
+          let operateDay = merchant[key].split(',')
+          let checkList = []
+          operateDay.forEach(e => {
+            switch (e) {
+              case '1':
+                checkList.push('周一')
+                break
+              case '2':
+                checkList.push('周二')
+                break
+              case '3':
+                checkList.push('周三')
+                break
+              case '4':
+                checkList.push('周四')
+                break
+              case '5':
+                checkList.push('周五')
+                break
+              case '6':
+                checkList.push('周六')
+                break
+              case '7':
+                checkList.push('周日')
+                break
+            }
+          })
+          this.checkedList = checkList
         }
         if (key === 'operateStartTime' && merchant[key] != null) {
           merchant[key] = moment(merchant[key], 'HH:mm:ss')
@@ -323,6 +353,8 @@ export default {
         values.id = this.rowId
         values.images = images.length > 0 ? images.join(',') : null
         values.operateDay = this.checkedList.join(',')
+        values.operateStartTime = moment(values.operateStartTime).format('HH:mm:ss')
+        values.operateEndTime = moment(values.operateEndTime).format('HH:mm:ss')
         if (!err) {
           this.loading = true
           this.$put('/cos/merchant-info', {

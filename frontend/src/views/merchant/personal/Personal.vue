@@ -217,7 +217,7 @@ export default {
       this.$get('/cos/merchant-info/getMerchantByUser', { userId: this.currentUser.userId }).then((r) => {
         this.merchantInfo = r.data.data
         this.rowId = this.merchantInfo.id
-        if (this.merchantInfo.point !== null) {
+        if (this.merchantInfo.longitude !== null && this.merchantInfo.latitude !== null) {
           setTimeout(() => {
             this.localhost(this.merchantInfo)
           }, 500)
@@ -229,7 +229,7 @@ export default {
       baiduMap.clearOverlays()
       baiduMap.rMap().enableScrollWheelZoom(true)
       // eslint-disable-next-line no-undef
-      let point = new BMap.Point(scenic.point.split(',')[0], scenic.point.split(',')[1])
+      let point = new BMap.Point(scenic.longitude, scenic.latitude)
       baiduMap.pointAdd(point)
       baiduMap.findPoint(point, 16)
     },
@@ -320,11 +320,41 @@ export default {
     },
     setFormValues ({...user}) {
       this.userId = user.id
-      let fields = ['name', 'dishes', 'code', 'operateEndTime', 'operateStartTime', 'principal', 'longitude', 'latitude', 'address', 'phone', 'content']
+      let fields = ['name', 'dishes', 'code', 'operateEndTime', 'operateStartTime', 'principal', 'longitude', 'latitude', 'address', 'phone', 'content', 'operateDay']
       Object.keys(user).forEach((key) => {
         if (key === 'images') {
           this.fileList = []
           this.imagesInit(user['images'])
+        }
+        if (key === 'operateDay' && user[key] != null) {
+          let operateDay = user[key].split(',')
+          let checkList = []
+          operateDay.forEach(e => {
+            switch (e) {
+              case '1':
+                checkList.push('周一')
+                break
+              case '2':
+                checkList.push('周二')
+                break
+              case '3':
+                checkList.push('周三')
+                break
+              case '4':
+                checkList.push('周四')
+                break
+              case '5':
+                checkList.push('周五')
+                break
+              case '6':
+                checkList.push('周六')
+                break
+              case '7':
+                checkList.push('周日')
+                break
+            }
+          })
+          this.checkedList = checkList
         }
         if (key === 'operateStartTime' && user[key] != null) {
           user[key] = moment(user[key], 'HH:mm:ss')
@@ -360,9 +390,8 @@ export default {
           let user = this.form.getFieldsValue()
           user.images = images.length > 0 ? images.join(',') : null
           user.operateDay = this.checkedList.join(',')
-          if (this.localPoint.lng !== undefined && this.localPoint.lat !== undefined) {
-            user.point = this.localPoint.lng.toString() + ',' + this.localPoint.lat
-          }
+          values.operateStartTime = moment(values.operateStartTime).format('HH:mm:ss')
+          values.operateEndTime = moment(values.operateEndTime).format('HH:mm:ss')
           user.id = this.rowId
           this.$put('/cos/merchant-info', {
             ...user

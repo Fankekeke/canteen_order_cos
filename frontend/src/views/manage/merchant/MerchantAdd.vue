@@ -226,19 +226,19 @@ export default {
         this.localPoint = localPoint
         console.log(this.localPoint)
 
-        let merchant = baiduMap.getmerchant(localPoint)
-        merchant.getLocation(localPoint, (rs) => {
+        let address = baiduMap.getAddress(localPoint)
+        address.getLocation(localPoint, (rs) => {
           if (rs != null) {
-            if (rs.merchant !== undefined && rs.merchant.length !== 0) {
-              this.staymerchant = rs.merchant
+            if (rs.address !== undefined && rs.address.length !== 0) {
+              this.stayAddress = rs.address
             }
             if (rs.surroundingPois !== undefined) {
-              if (rs.surroundingPois.merchant !== undefined && rs.surroundingPois.merchant.length !== 0) {
-                this.staymerchant = rs.surroundingPois.merchant
+              if (rs.surroundingPois.address !== undefined && rs.surroundingPois.address.length !== 0) {
+                this.stayAddress = rs.surroundingPois.address
               }
             }
             let obj = {}
-            obj['merchantmerchant'] = this.staymerchant
+            obj['address'] = this.stayAddress
             obj['longitude'] = localPoint.lng
             obj['latitude'] = localPoint.lat
             this.form.setFieldsValue(obj)
@@ -288,6 +288,8 @@ export default {
         values.userId = this.currentUser.userId
         values.images = images.length > 0 ? images.join(',') : null
         values.operateDay = this.checkedList.join(',')
+        values.operateStartTime = moment(values.operateStartTime).format('HH:mm:ss')
+        values.operateEndTime = moment(values.operateEndTime).format('HH:mm:ss')
         if (!err) {
           this.loading = true
           this.$post('/cos/merchant-info', {

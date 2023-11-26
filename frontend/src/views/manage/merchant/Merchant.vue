@@ -54,6 +54,7 @@
                @change="handleTableChange">
         <template slot="operation" slot-scope="text, record">
           <a-icon type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="edit(record)" title="修 改"></a-icon>
+          <a-icon type="file-search" @click="merchantViewOpen(record)" title="详 情" style="margin-left: 15px"></a-icon>
         </template>
       </a-table>
     </div>
@@ -69,6 +70,11 @@
       @success="handlemerchantEditSuccess"
       :merchantEditVisiable="merchantEdit.visiable">
     </merchant-edit>
+    <merchant-view
+      @close="handlemerchantViewClose"
+      :merchantShow="merchantView.visiable"
+      :merchantData="merchantView.data">
+    </merchant-view>
   </a-card>
 </template>
 
@@ -76,13 +82,14 @@
 import RangeDate from '@/components/datetime/RangeDate'
 import merchantAdd from './MerchantAdd'
 import merchantEdit from './MerchantEdit'
+import merchantView from './MerchantView.vue'
 import {mapState} from 'vuex'
 import moment from 'moment'
 moment.locale('zh-cn')
 
 export default {
   name: 'merchant',
-  components: {merchantAdd, merchantEdit, RangeDate},
+  components: {merchantAdd, merchantEdit, merchantView, RangeDate},
   data () {
     return {
       advanced: false,
@@ -91,6 +98,10 @@ export default {
       },
       merchantEdit: {
         visiable: false
+      },
+      merchantView: {
+        visiable: false,
+        data: null
       },
       queryParams: {},
       filteredInfo: null,
@@ -194,6 +205,13 @@ export default {
     this.fetch()
   },
   methods: {
+    merchantViewOpen (row) {
+      this.merchantView.data = row
+      this.merchantView.visiable = true
+    },
+    handlemerchantViewClose () {
+      this.merchantView.visiable = false
+    },
     onSelectChange (selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },

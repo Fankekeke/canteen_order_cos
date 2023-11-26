@@ -162,7 +162,7 @@ export default {
               }
             }
             let obj = {}
-            obj['addressAddress'] = this.stayAddress
+            obj['address'] = this.stayAddress
             obj['longitude'] = localPoint.lng
             obj['latitude'] = localPoint.lat
             this.form.setFieldsValue(obj)
