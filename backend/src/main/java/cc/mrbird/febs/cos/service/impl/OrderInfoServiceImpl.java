@@ -6,7 +6,9 @@ import cc.mrbird.febs.cos.entity.*;
 import cc.mrbird.febs.cos.dao.OrderInfoMapper;
 import cc.mrbird.febs.cos.service.*;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -47,6 +49,8 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     private final IDishesInfoService dishesInfoService;
 
     private final IStaffInfoService staffInfoService;
+
+    private final IEvaluateInfoService evaluateInfoService;
 
     private final TemplateEngine templateEngine;
 
@@ -143,10 +147,133 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
                 put("orderItem", Collections.emptyList());
                 put("address", null);
                 put("staff", null);
+                put("evaluate", null);
             }
         };
         // 获取订单信息
         OrderInfo orderInfo = this.getById(id);
+        result.put("order", orderInfo);
+
+        // 评价信息
+        EvaluateInfo evaluateInfo = evaluateInfoService.getOne(Wrappers.<EvaluateInfo>lambdaQuery().eq(EvaluateInfo::getOrderCode, orderInfo.getCode()));
+        result.put("evaluate", evaluateInfo);
+
+        // 订单详情
+        List<OrderItemInfo> orderItemInfoList = orderItemInfoService.list(Wrappers.<OrderItemInfo>lambdaQuery().eq(OrderItemInfo::getOrderId, orderInfo.getId()));
+        // 获取菜品信息
+        List<Integer> dishesIds = orderItemInfoList.stream().map(OrderItemInfo::getDishesId).distinct().collect(Collectors.toList());
+        List<DishesInfo> dishesInfoList = dishesInfoService.list(Wrappers.<DishesInfo>lambdaQuery().in(DishesInfo::getId, dishesIds));
+        Map<Integer, DishesInfo> dishesMap = dishesInfoList.stream().collect(Collectors.toMap(DishesInfo::getId, e -> e));
+
+        for (OrderItemInfo orderItemInfo : orderItemInfoList) {
+            if (CollectionUtil.isNotEmpty(dishesMap) && dishesMap.get(orderItemInfo.getDishesId()) != null) {
+                DishesInfo dishesInfo = dishesMap.get(orderItemInfo.getDishesId());
+                orderItemInfo.setDishesName(dishesInfo.getName());
+                orderItemInfo.setImages(dishesInfo.getImages());
+            }
+        }
+        result.put("orderItem", orderItemInfoList);
+
+        // 用户信息
+        UserInfo userInfo = userInfoService.getById(orderInfo.getUserId());
+        result.put("user", userInfo);
+
+        // 所属商家
+        MerchantInfo merchantInfo = merchantInfoService.getById(orderInfo.getMerchantId());
+        result.put("merchant", merchantInfo);
+
+        if ("1".equals(orderInfo.getType())) {
+            // 用户收货地址
+            if (orderInfo.getAddressId() != null) {
+                AddressInfo addressInfo = addressInfoService.getById(orderInfo.getAddressId());
+                result.put("address", addressInfo);
+            }
+
+            // 配送员工
+            if (orderInfo.getStaffId() != null) {
+                StaffInfo staffInfo = staffInfoService.getById(orderInfo.getStaffId());
+                result.put("staff", staffInfo);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 查询可卖商家
+     *
+     * @return 结果
+     */
+    @Override
+    public List<MerchantInfo> selectMerchantList() {
+        // 获取所有商家
+        List<MerchantInfo> merchantList = merchantInfoService.list();
+        if (CollectionUtil.isEmpty(merchantList)) {
+            return merchantList;
+        }
+
+        List<Integer> merchantIds = merchantList.stream().map(MerchantInfo::getId).collect(Collectors.toList());
+        // 根据商家获取菜品
+        List<DishesInfo> dishesList = dishesInfoService.list(Wrappers.<DishesInfo>lambdaQuery().in(DishesInfo::getMerchantId, merchantIds));
+        Map<Integer, List<DishesInfo>> dishesMap = dishesList.stream().collect(Collectors.groupingBy(DishesInfo::getMerchantId));
+
+        for (MerchantInfo merchantInfo : merchantList) {
+            // 校验营业时间是否填写
+            if (StrUtil.isEmpty(merchantInfo.getOperateDay()) || StrUtil.isEmpty(merchantInfo.getOperateStartTime()) || StrUtil.isEmpty(merchantInfo.getOperateEndTime())) {
+                merchantInfo.setCurrentStatus("0");
+                continue;
+            }
+
+            // 根据商家获取菜品
+            List<DishesInfo> dishesInfoList = dishesMap.get(merchantInfo.getId());
+            if (CollectionUtil.isEmpty(dishesInfoList)) {
+                merchantInfo.setCurrentStatus("0");
+                continue;
+            }
+
+            // 判断是否在营业日期内
+            String week = cc.mrbird.febs.common.utils.DateUtil.getWeekOfDate(new Date());
+            if (!merchantInfo.getOperateDay().contains(week)) {
+                merchantInfo.setCurrentStatus("0");
+                continue;
+            }
+
+            DateTime startTime = DateUtil.parseDateTime(DateUtil.formatDate(new Date()) + " " + merchantInfo.getOperateStartTime());
+            DateTime endTime = DateUtil.parseDateTime(DateUtil.formatDate(new Date()) + " " + merchantInfo.getOperateEndTime());
+            if (!DateUtil.isIn(new Date(), startTime, endTime)) {
+                merchantInfo.setCurrentStatus("0");
+                continue;
+            }
+            merchantInfo.setCurrentStatus("1");
+        }
+        return merchantList;
+    }
+
+    /**
+     * 获取订单评价详情
+     *
+     * @param id 主键
+     * @return 结果
+     */
+    @Override
+    public LinkedHashMap<String, Object> evaluateDetail(Integer id) {
+        // 返回数据
+        LinkedHashMap<String, Object> result = new LinkedHashMap<String, Object>() {
+            {
+                put("order", null);
+                put("user", null);
+                put("merchant", null);
+                put("orderItem", Collections.emptyList());
+                put("address", null);
+                put("staff", null);
+                put("evaluate", null);
+            }
+        };
+        // 获取评价信息
+        EvaluateInfo evaluateInfo = evaluateInfoService.getById(id);
+        result.put("evaluate", evaluateInfo);
+
+        // 获取订单信息
+        OrderInfo orderInfo = this.getOne(Wrappers.<OrderInfo>lambdaQuery().eq(OrderInfo::getCode, evaluateInfo.getOrderCode()));
         result.put("order", orderInfo);
 
         // 订单详情
@@ -201,6 +328,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         // 获取订单信息
         OrderInfo orderInfo = this.getOne(Wrappers.<OrderInfo>lambdaQuery().eq(OrderInfo::getCode, orderCode));
         orderInfo.setStatus("1");
+        orderInfo.setPayDate(DateUtil.formatDateTime(new Date()));
 
         // 用户添加积分
         UserInfo userInfo = userInfoService.getById(orderInfo.getUserId());

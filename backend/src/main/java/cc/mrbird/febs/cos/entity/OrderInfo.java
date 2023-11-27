@@ -92,6 +92,11 @@ public class OrderInfo implements Serializable {
     private String createDate;
 
     /**
+     * 支付时间
+     */
+    private String payDate;
+
+    /**
      * 送达时间
      */
     private String serviceDate;

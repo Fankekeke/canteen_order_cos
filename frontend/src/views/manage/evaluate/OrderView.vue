@@ -227,7 +227,7 @@ export default {
   },
   methods: {
     dataInit (orderId) {
-      this.$get(`/cos/order-info/${orderId}`).then((r) => {
+      this.$get(`/cos/order-info/evaluate/${orderId}`).then((r) => {
         this.userInfo = r.data.user
         this.orderInfo = r.data.order
         this.merchantInfo = r.data.merchant

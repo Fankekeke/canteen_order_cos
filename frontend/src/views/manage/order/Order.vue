@@ -15,7 +15,7 @@
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="客户名称"
+                label="用户名称"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
                 <a-input v-model="queryParams.userName"/>
@@ -23,10 +23,10 @@
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="订单状态"
+                label="商家名称"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.pharmacyName"/>
+                <a-input v-model="queryParams.merchantName"/>
               </a-form-item>
             </a-col>
           </div>
@@ -166,16 +166,6 @@ export default {
         title: '订单编号',
         dataIndex: 'code'
       }, {
-        title: '订单名称',
-        dataIndex: 'orderName',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
         title: '下单用户',
         dataIndex: 'userName',
         customRender: (text, row, index) => {
@@ -186,60 +176,20 @@ export default {
           }
         }
       }, {
-        title: '车辆编号',
-        dataIndex: 'vehicleNo',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '车牌号码',
-        dataIndex: 'vehicleNumber',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '车辆图片',
-        dataIndex: 'images',
+        title: '用户头像',
+        dataIndex: 'userImages',
         customRender: (text, record, index) => {
-          if (!record.images) return <a-avatar shape="square" icon="user" />
+          if (!record.userImages) return <a-avatar shape="square" icon="user" />
           return <a-popover>
             <template slot="content">
-              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
+              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.userImages.split(',')[0] } />
             </template>
-            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
+            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.userImages.split(',')[0] } />
           </a-popover>
         }
       }, {
-        title: '价格/日',
-        dataIndex: 'dayPrice',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text + '元'
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '订单总额',
-        dataIndex: 'total',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text + '元'
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '取车时间',
-        dataIndex: 'startDate',
+        title: '所属商家',
+        dataIndex: 'merchantName',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -248,11 +198,53 @@ export default {
           }
         }
       }, {
-        title: '还车时间',
-        dataIndex: 'endDate',
+        title: '商家图片',
+        dataIndex: 'merchantImages',
+        customRender: (text, record, index) => {
+          if (!record.merchantImages) return <a-avatar shape="square" icon="user" />
+          return <a-popover>
+            <template slot="content">
+              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.merchantImages.split(',')[0] } />
+            </template>
+            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.merchantImages.split(',')[0] } />
+          </a-popover>
+        }
+      }, {
+        title: '订单价格（元）',
+        dataIndex: 'orderPrice',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text + '元'
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '折后价格（元）',
+        dataIndex: 'afterOrderPrice',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text + '元'
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '获取积分',
+        dataIndex: 'integral',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '会员折扣（元）',
+        dataIndex: 'discount',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text + '元'
           } else {
             return '- -'
           }
@@ -262,12 +254,27 @@ export default {
         dataIndex: 'status',
         customRender: (text, row, index) => {
           switch (text) {
-            case '-1':
-              return <a-tag>未支付</a-tag>
             case '0':
-              return <a-tag>未完成</a-tag>
+              return <a-tag color="red">未支付</a-tag>
             case '1':
-              return <a-tag>已完成</a-tag>
+              return <a-tag>已支付</a-tag>
+            case '2':
+              return <a-tag>配送中</a-tag>
+            case '3':
+              return <a-tag>已收货</a-tag>
+            default:
+              return '- -'
+          }
+        }
+      }, {
+        title: '订单类型',
+        dataIndex: 'type',
+        customRender: (text, row, index) => {
+          switch (text) {
+            case '0':
+              return <a-tag>堂食</a-tag>
+            case '1':
+              return <a-tag>外送</a-tag>
             default:
               return '- -'
           }
@@ -275,6 +282,16 @@ export default {
       }, {
         title: '下单时间',
         dataIndex: 'createDate',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '支付时间',
+        dataIndex: 'payDate',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -366,7 +383,7 @@ export default {
     },
     handleorderEditSuccess () {
       this.orderEdit.visiable = false
-      this.$message.success('修改产品成功')
+      this.$message.success('修改成功')
       this.search()
     },
     handleDeptChange (value) {

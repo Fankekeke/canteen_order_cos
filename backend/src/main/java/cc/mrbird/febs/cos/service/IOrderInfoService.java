@@ -1,6 +1,7 @@
 package cc.mrbird.febs.cos.service;
 
 import cc.mrbird.febs.common.exception.FebsException;
+import cc.mrbird.febs.cos.entity.MerchantInfo;
 import cc.mrbird.febs.cos.entity.OrderInfo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -8,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * @author FanK
@@ -38,6 +40,21 @@ public interface IOrderInfoService extends IService<OrderInfo> {
      * @return 结果
      */
     LinkedHashMap<String, Object> orderDetail(Integer id);
+
+    /**
+     * 查询可卖商家
+     *
+     * @return 结果
+     */
+    List<MerchantInfo> selectMerchantList();
+
+    /**
+     * 获取订单评价详情
+     *
+     * @param id 主键
+     * @return 结果
+     */
+    LinkedHashMap<String, Object> evaluateDetail(Integer id);
 
     /**
      * 订单支付

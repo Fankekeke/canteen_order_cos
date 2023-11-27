@@ -37,7 +37,7 @@ public class OrderInfoController {
     }
 
     /**
-     * 获取ID获取订单详情
+     * 根据ID获取订单详情
      *
      * @param id 主键
      * @return 结果
@@ -45,6 +45,27 @@ public class OrderInfoController {
     @GetMapping("/{id}")
     public R detail(@PathVariable("id") Integer id) {
         return R.ok(orderInfoService.orderDetail(id));
+    }
+
+    /**
+     * 查询可卖商家
+     *
+     * @return 结果
+     */
+    @GetMapping("/selectMerchantList")
+    public R selectMerchantList() {
+        return R.ok();
+    }
+
+    /**
+     * 获取订单评价详情
+     *
+     * @param id 主键
+     * @return 结果
+     */
+    @GetMapping("/evaluate/{id}")
+    public R evaluateDetail(@PathVariable("id") Integer id) {
+        return R.ok(orderInfoService.evaluateDetail(id));
     }
 
     /**

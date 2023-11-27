@@ -112,4 +112,10 @@ public class MerchantInfo implements Serializable {
     @TableField(exist = false)
     private List<String> operateDayList;
 
+    /**
+     * 当时状态（0.未营业 1.营业中）
+     */
+    @TableField(exist = false)
+    private String currentStatus;
+
 }

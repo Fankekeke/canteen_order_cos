@@ -51,17 +51,15 @@
                :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
                :scroll="{ x: 900 }"
                @change="handleTableChange">
-        <template slot="contentShow" slot-scope="text, record">
-          <template>
-            <a-tooltip>
-              <template slot="title">
-                {{ record.content }}
-              </template>
-              {{ record.content.slice(0, 10) }} ...
-            </a-tooltip>
-          </template>
+        <template slot="operation" slot-scope="text, record">
+          <a-icon type="file-search" @click="orderViewOpen(record)" title="详 情"></a-icon>
         </template>
       </a-table>
+      <order-view
+        @close="handleorderViewClose"
+        :orderShow="orderView.visiable"
+        :orderData="orderView.data">
+      </order-view>
     </div>
   </a-card>
 </template>
@@ -70,11 +68,12 @@
 import RangeDate from '@/components/datetime/RangeDate'
 import {mapState} from 'vuex'
 import moment from 'moment'
+import OrderView from './OrderView'
 moment.locale('zh-cn')
 
 export default {
   name: 'evaluate',
-  components: {RangeDate},
+  components: {RangeDate, OrderView},
   data () {
     return {
       advanced: false,
@@ -83,6 +82,10 @@ export default {
       },
       evaluateEdit: {
         visiable: false
+      },
+      orderView: {
+        visiable: false,
+        data: null
       },
       queryParams: {},
       filteredInfo: null,
@@ -231,6 +234,10 @@ export default {
             return '- -'
           }
         }
+      }, {
+        title: '操作',
+        dataIndex: 'operation',
+        scopedSlots: {customRender: 'operation'}
       }]
     }
   },
@@ -238,6 +245,13 @@ export default {
     this.fetch()
   },
   methods: {
+    orderViewOpen (row) {
+      this.orderView.data = row
+      this.orderView.visiable = true
+    },
+    handleorderViewClose () {
+      this.orderView.visiable = false
+    },
     onSelectChange (selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },

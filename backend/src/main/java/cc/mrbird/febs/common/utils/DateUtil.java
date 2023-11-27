@@ -43,7 +43,7 @@ public class DateUtil {
      * @param date
      * @return 当前日期是星期几
      */
-    public String getWeekOfDate(Date date) {
+    public static String getWeekOfDate(Date date) {
         String[] weekDays = {"周日", "周一", "周二", "周三", "周四", "周五", "周六"};
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);

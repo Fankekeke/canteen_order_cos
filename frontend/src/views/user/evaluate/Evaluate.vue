@@ -7,15 +7,7 @@
           <div :class="advanced ? null: 'fold'">
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="订单名称"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.orderName"/>
-              </a-form-item>
-            </a-col>
-            <a-col :md="6" :sm="24">
-              <a-form-item
-                label="客户名称"
+                label="用户名称"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
                 <a-input v-model="queryParams.userName"/>
@@ -23,18 +15,18 @@
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="车牌号码"
+                label="订单编号"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.vehicleNumber"/>
+                <a-input v-model="queryParams.orderCode"/>
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="车辆名称"
+                label="商家名称"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.vehicleName"/>
+                <a-input v-model="queryParams.merchantName"/>
               </a-form-item>
             </a-col>
           </div>
@@ -59,17 +51,15 @@
                :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
                :scroll="{ x: 900 }"
                @change="handleTableChange">
-        <template slot="contentShow" slot-scope="text, record">
-          <template>
-            <a-tooltip>
-              <template slot="title">
-                {{ record.remark }}
-              </template>
-              {{ record.remark.slice(0, 10) }} ...
-            </a-tooltip>
-          </template>
+        <template slot="operation" slot-scope="text, record">
+          <a-icon type="file-search" @click="orderViewOpen(record)" title="详 情"></a-icon>
         </template>
       </a-table>
+      <order-view
+        @close="handleorderViewClose"
+        :orderShow="orderView.visiable"
+        :orderData="orderView.data">
+      </order-view>
     </div>
   </a-card>
 </template>
@@ -78,11 +68,12 @@
 import RangeDate from '@/components/datetime/RangeDate'
 import {mapState} from 'vuex'
 import moment from 'moment'
+import OrderView from './OrderView'
 moment.locale('zh-cn')
 
 export default {
   name: 'evaluate',
-  components: {RangeDate},
+  components: {RangeDate, OrderView},
   data () {
     return {
       advanced: false,
@@ -91,6 +82,10 @@ export default {
       },
       evaluateEdit: {
         visiable: false
+      },
+      orderView: {
+        visiable: false,
+        data: null
       },
       queryParams: {},
       filteredInfo: null,
@@ -116,11 +111,43 @@ export default {
     }),
     columns () {
       return [{
-        title: '订单编号',
+        title: '用户编号',
         dataIndex: 'orderCode'
       }, {
+        title: '评价用户',
+        dataIndex: 'userName',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '用户头像',
+        dataIndex: 'userImages',
+        customRender: (text, record, index) => {
+          if (!record.userImages) return <a-avatar shape="square" icon="user" />
+          return <a-popover>
+            <template slot="content">
+              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.userImages.split(',')[0] } />
+            </template>
+            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.userImages.split(',')[0] } />
+          </a-popover>
+        }
+      }, {
+        title: '订单编号',
+        dataIndex: 'orderCode',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
+      }, {
         title: '订单价格',
-        dataIndex: 'total',
+        dataIndex: 'orderPrice',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text + '元'
@@ -129,8 +156,15 @@ export default {
           }
         }
       }, {
-        title: '评价客户',
-        dataIndex: 'userName'
+        title: '折后价格',
+        dataIndex: 'afterOrderPrice',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text + '元'
+          } else {
+            return '- -'
+          }
+        }
       }, {
         title: '评价得分',
         dataIndex: 'score',
@@ -142,42 +176,12 @@ export default {
           }
         }
       }, {
-        title: '订单名称',
-        dataIndex: 'orderName',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '车牌号码',
-        dataIndex: 'vehicleNumber',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '车辆名称',
-        dataIndex: 'vehicleName',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
         title: '评价内容',
         dataIndex: 'remark',
         scopedSlots: { customRender: 'contentShow' }
       }, {
         title: '评价图片',
-        dataIndex: 'images',
+        dataIndex: 'userImages',
         customRender: (text, record, index) => {
           if (!record.images) return <a-avatar shape="square" icon="user" />
           return <a-popover>
@@ -186,6 +190,39 @@ export default {
             </template>
             <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
           </a-popover>
+        }
+      }, {
+        title: '所属商家',
+        dataIndex: 'merchantName',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '订单类型',
+        dataIndex: 'type',
+        customRender: (text, row, index) => {
+          switch (text) {
+            case 0:
+              return <a-tag>堂食</a-tag>
+            case 1:
+              return <a-tag>外送</a-tag>
+            default:
+              return '- -'
+          }
+        }
+      }, {
+        title: '获得积分',
+        dataIndex: 'integral',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
         }
       }, {
         title: '评价时间',
@@ -197,6 +234,10 @@ export default {
             return '- -'
           }
         }
+      }, {
+        title: '操作',
+        dataIndex: 'operation',
+        scopedSlots: {customRender: 'operation'}
       }]
     }
   },
@@ -204,6 +245,13 @@ export default {
     this.fetch()
   },
   methods: {
+    orderViewOpen (row) {
+      this.orderView.data = row
+      this.orderView.visiable = true
+    },
+    handleorderViewClose () {
+      this.orderView.visiable = false
+    },
     onSelectChange (selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },
@@ -322,7 +370,7 @@ export default {
         delete params.type
       }
       params.userId = this.currentUser.userId
-      this.$get('/cos/order-evaluate/page', {
+      this.$get('/cos/evaluate-info/page', {
         ...params
       }).then((r) => {
         let data = r.data.data

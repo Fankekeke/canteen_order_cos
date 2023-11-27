@@ -18,6 +18,7 @@
             oi.kilometre,
             oi.distribution_price,
             oi.create_date,
+            oi.pay_date,
             oi.service_date,
             oi.address_id,
             oi.staff_id,
