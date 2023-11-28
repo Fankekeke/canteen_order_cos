@@ -94,6 +94,7 @@
         DATE_FORMAT( oi.create_date, '%Y-%m-%d' ) = DATE_FORMAT( spo.days, '%Y-%m-%d' )
         <if test="merchantId != null">
             AND oi.merchant_id = #{merchantId}
+            AND oi.status != '0'
         </if>
         )
         GROUP BY
@@ -133,6 +134,7 @@
         DATE_FORMAT( oi.create_date, '%Y-%m-%d' ) = DATE_FORMAT( spo.days, '%Y-%m-%d' )
         <if test="merchantId != null">
             AND oi.merchant_id = #{merchantId}
+            AND oi.status != '0'
         </if>
         )
         GROUP BY

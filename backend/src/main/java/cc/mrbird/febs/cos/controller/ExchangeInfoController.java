@@ -47,7 +47,7 @@ public class ExchangeInfoController {
      */
     @GetMapping("/{id}")
     public R detail(@PathVariable("id") Integer id) {
-        return R.ok(exchangeInfoService.getById(id));
+        return R.ok(exchangeInfoService.exchangeDetail(id));
     }
 
     /**

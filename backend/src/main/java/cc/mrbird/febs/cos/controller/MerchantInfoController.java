@@ -78,6 +78,16 @@ public class MerchantInfoController {
     }
 
     /**
+     * 管理员获取统计信息
+     *
+     * @return 结果
+     */
+    @GetMapping("/admin/homeData")
+    public R selectHomeDataByAdmin() {
+        return R.ok(merchantInfoService.selectHomeDataByAdmin());
+    }
+
+    /**
      * 获取ID获取商家详情
      *
      * @param id 主键

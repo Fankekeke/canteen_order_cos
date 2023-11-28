@@ -15,6 +15,7 @@
             mi.principal,
             mi.phone,
             mi.images,
+            ui.code as userCode,
             ui.name as userName,
             ui.images as userImages
         from
@@ -34,7 +35,7 @@
         <if test="merchantMemberInfo.merchantId != null and merchantMemberInfo.merchantId != ''">
             AND mi.user_id = #{merchantMemberInfo.merchantId}
         </if>
-        order last_date desc
+        order by last_date desc
 
     </select>
 </mapper>

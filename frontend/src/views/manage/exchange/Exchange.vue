@@ -51,30 +51,29 @@
                :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
                :scroll="{ x: 900 }"
                @change="handleTableChange">
-        <template slot="contentShow" slot-scope="text, record">
-          <template>
-            <a-tooltip>
-              <template slot="title">
-                {{ record.remark }}
-              </template>
-              {{ record.remark.slice(0, 10) }} ...
-            </a-tooltip>
-          </template>
+        <template slot="operation" slot-scope="text, record">
+          <a-icon type="file-search" @click="exchangeViewOpen(record)" title="详 情" style="margin-left: 15px"></a-icon>
         </template>
       </a-table>
+      <exchange-view
+        @close="handleexchangeViewClose"
+        :exchangeShow="exchangeView.visiable"
+        :exchangeData="exchangeView.data">
+      </exchange-view>
     </div>
   </a-card>
 </template>
 
 <script>
 import RangeDate from '@/components/datetime/RangeDate'
+import exchangeView from './ExchangeView.vue'
 import {mapState} from 'vuex'
 import moment from 'moment'
 moment.locale('zh-cn')
 
 export default {
   name: 'exchange',
-  components: {RangeDate},
+  components: {RangeDate, exchangeView},
   data () {
     return {
       advanced: false,
@@ -83,6 +82,10 @@ export default {
       },
       exchangeEdit: {
         visiable: false
+      },
+      exchangeView: {
+        visiable: false,
+        data: null
       },
       queryParams: {},
       filteredInfo: null,
@@ -194,6 +197,10 @@ export default {
             return '- -'
           }
         }
+      }, {
+        title: '操作',
+        dataIndex: 'operation',
+        scopedSlots: {customRender: 'operation'}
       }]
     }
   },
@@ -201,6 +208,13 @@ export default {
     this.fetch()
   },
   methods: {
+    exchangeViewOpen (row) {
+      this.exchangeView.data = row
+      this.exchangeView.visiable = true
+    },
+    handleexchangeViewClose () {
+      this.exchangeView.visiable = false
+    },
     onSelectChange (selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },

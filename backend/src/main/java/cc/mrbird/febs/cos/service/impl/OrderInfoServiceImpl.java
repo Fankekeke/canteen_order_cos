@@ -317,7 +317,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     }
 
     /**
-     * 订单编号
+     * 订单支付
      *
      * @param orderCode 订单编号
      * @return 结果

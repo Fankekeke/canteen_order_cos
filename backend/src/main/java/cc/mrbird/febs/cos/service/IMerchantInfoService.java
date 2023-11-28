@@ -39,4 +39,11 @@ public interface IMerchantInfoService extends IService<MerchantInfo> {
      * @return 结果
      */
     LinkedHashMap<String, Object> selectHomeDataByMerchant(Integer userId);
+
+    /**
+     * 管理员获取统计信息
+     *
+     * @return 结果
+     */
+    LinkedHashMap<String, Object> selectHomeDataByAdmin();
 }

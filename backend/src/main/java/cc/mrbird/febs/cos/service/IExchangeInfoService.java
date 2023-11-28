@@ -30,4 +30,12 @@ public interface IExchangeInfoService extends IService<ExchangeInfo> {
      * @return 结果
      */
     boolean addExchange(ExchangeInfo exchangeInfo) throws FebsException;
+
+    /**
+     * 获取ID获取积分兑换详情
+     *
+     * @param id 主键
+     * @return 结果
+     */
+    LinkedHashMap<String, Object> exchangeDetail(Integer id);
 }

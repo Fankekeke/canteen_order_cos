@@ -64,7 +64,7 @@
         <a-col :span="12">
           <a-form-item label='菜系' v-bind="formItemLayout">
             <a-select v-decorator="[
-            'phone',
+            'dishes',
             { rules: [{ required: true, message: '请输入菜系!' }] }
             ]">
               <a-select-option value="川菜">川菜</a-select-option>

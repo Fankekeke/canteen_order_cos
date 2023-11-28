@@ -26,7 +26,7 @@ public class MerchantMemberInfoController {
     /**
      * 分页获取商家会员信息
      *
-     * @param page        分页对象
+     * @param page               分页对象
      * @param merchantMemberInfo 商家会员信息
      * @return 结果
      */

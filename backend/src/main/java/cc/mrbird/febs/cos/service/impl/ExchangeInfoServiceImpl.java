@@ -77,4 +77,34 @@ public class ExchangeInfoServiceImpl extends ServiceImpl<ExchangeInfoMapper, Exc
         userInfo.setIntegral(NumberUtil.sub(userInfo.getIntegral(), materialInfo.getIntegral()));
         return userInfoService.updateById(userInfo);
     }
+
+    /**
+     * 获取ID获取积分兑换详情
+     *
+     * @param id 主键
+     * @return 结果
+     */
+    @Override
+    public LinkedHashMap<String, Object> exchangeDetail(Integer id) {
+        // 获取兑换信息
+        ExchangeInfo exchangeInfo = this.getById(id);
+        // 返回数据
+        LinkedHashMap<String, Object> result = new LinkedHashMap<String, Object>() {
+            {
+                put("exchange", null);
+                put("user", null);
+                put("material", null);
+            }
+        };
+        result.put("exchange", exchangeInfo);
+
+        // 用户信息
+        UserInfo userInfo = userInfoService.getById(exchangeInfo.getUserId());
+        result.put("user", userInfo);
+
+        // 物品信息
+        MaterialInfo materialInfo = materialInfoService.getById(exchangeInfo.getMaterialId());
+        result.put("material", materialInfo);
+        return result;
+    }
 }

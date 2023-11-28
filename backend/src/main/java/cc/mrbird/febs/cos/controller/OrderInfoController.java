@@ -6,6 +6,7 @@ import cc.mrbird.febs.common.utils.R;
 import cc.mrbird.febs.cos.entity.OrderInfo;
 import cc.mrbird.febs.cos.service.IOrderInfoService;
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +55,18 @@ public class OrderInfoController {
      */
     @GetMapping("/selectMerchantList")
     public R selectMerchantList() {
-        return R.ok();
+        return R.ok(orderInfoService.selectMerchantList());
+    }
+
+    /**
+     * 根据用户ID获取历史订单
+     *
+     * @param userId 用户ID
+     * @return 结果
+     */
+    @GetMapping("/selectMerchantMember/{userId}")
+    public R selectMerchantMember(@PathVariable("userId") Integer userId) {
+        return R.ok(orderInfoService.list(Wrappers.<OrderInfo>lambdaQuery().eq(OrderInfo::getUserId, userId)));
     }
 
     /**

@@ -1,7 +1,7 @@
 <template>
   <div style="padding: 12px;width: 100%">
     <a-row :gutter="15">
-      <a-col :span="8">
+      <a-col :span="10">
         <a-card :bordered="false">
           <a-form :form="form" layout="vertical">
             <a-row :gutter="20">
@@ -59,7 +59,7 @@
               <a-col :span="12">
                 <a-form-item label='菜系' v-bind="formItemLayout">
                   <a-select v-decorator="[
-                  'phone',
+                  'dishes',
                   { rules: [{ required: true, message: '请输入菜系!' }] }
                   ]">
                     <a-select-option value="川菜">川菜</a-select-option>
@@ -134,7 +134,7 @@
           <drawerMap :childrenDrawerShow="childrenDrawer" @handlerClosed="handlerClosed"></drawerMap>
         </a-card>
       </a-col>
-      <a-col :span="16">
+      <a-col :span="14">
         <div id="areas" style="width: 100%;height: 700px;box-shadow: 0 0 0 10px white;"></div>
       </a-col>
     </a-row>
