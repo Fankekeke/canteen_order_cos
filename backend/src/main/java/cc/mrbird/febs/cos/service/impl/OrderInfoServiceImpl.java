@@ -155,7 +155,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         result.put("order", orderInfo);
 
         // 评价信息
-        EvaluateInfo evaluateInfo = evaluateInfoService.getOne(Wrappers.<EvaluateInfo>lambdaQuery().eq(EvaluateInfo::getOrderCode, orderInfo.getCode()));
+        EvaluateInfo evaluateInfo = evaluateInfoService.getOne(Wrappers.<EvaluateInfo>lambdaQuery().eq(EvaluateInfo::getOrderId, orderInfo.getId()));
         result.put("evaluate", evaluateInfo);
 
         // 订单详情

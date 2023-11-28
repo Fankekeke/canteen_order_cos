@@ -233,14 +233,8 @@ export default {
     }
   },
   mounted () {
-    this.selectShopList()
   },
   methods: {
-    selectShopList () {
-      this.$get(`/cos/shop-info/datalist`).then((r) => {
-        this.shopList = r.data.data
-      })
-    },
     moment,
     dataInit (orderId) {
       this.$get(`/cos/vehicle-info/order/detail/${orderId}`).then((r) => {

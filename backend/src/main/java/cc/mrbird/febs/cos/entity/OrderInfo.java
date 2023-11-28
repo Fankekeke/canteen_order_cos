@@ -114,6 +114,7 @@ public class OrderInfo implements Serializable {
     /**
      * 订单菜品
      */
+    @TableField(exist = false)
     List<OrderItemInfo> orderItemList;
 
     @TableField(exist = false)

@@ -230,26 +230,6 @@ export default {
           }
         }
       }, {
-        title: '获取积分',
-        dataIndex: 'integral',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '会员折扣（元）',
-        dataIndex: 'discount',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text + '元'
-          } else {
-            return '- -'
-          }
-        }
-      }, {
         title: '订单状态',
         dataIndex: 'status',
         customRender: (text, row, index) => {
@@ -282,16 +262,6 @@ export default {
       }, {
         title: '下单时间',
         dataIndex: 'createDate',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '支付时间',
-        dataIndex: 'payDate',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
