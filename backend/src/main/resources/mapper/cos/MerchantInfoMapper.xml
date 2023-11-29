@@ -17,6 +17,7 @@
             operate_end_time,
             images,
             create_date,
+            status,
             dishes,
             longitude,
             latitude

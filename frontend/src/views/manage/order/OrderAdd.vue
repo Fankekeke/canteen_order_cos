@@ -10,128 +10,120 @@
     style="height: calc(100% - 55px);overflow: auto;padding-bottom: 53px;">
     <a-form :form="form" layout="vertical" v-if="nextFlag == 1">
       <a-row :gutter="10">
-        <a-divider orientation="left">
-          <span style="font-size: 13px">始发地</span>
-        </a-divider>
-        <a-col :span="12">
-          <a-form-item label='始发地'>
-            <a-input-search
-              v-decorator="[
-              'startAddress'
-              ]"
-              enter-button="选择"
-              @search="showChildrenDrawer(1)"
-            />
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label='始发经度'>
-            <a-input v-decorator="[
-            'startLongitude'
-            ]"/>
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label='始发纬度'>
-            <a-input v-decorator="[
-            'startLatitude'
-            ]"/>
-          </a-form-item>
-        </a-col>
-        <a-divider orientation="left">
-          <span style="font-size: 13px">运输地</span>
-        </a-divider>
-        <a-col :span="12">
-          <a-form-item label='运输地'>
-            <a-input-search
-              v-decorator="[
-              'endAddress'
-              ]"
-              enter-button="选择"
-              @search="showChildrenDrawer(2)"
-            />
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label='运输经度'>
-            <a-input v-decorator="[
-            'endLongitude'
-            ]"/>
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label='运输纬度'>
-            <a-input v-decorator="[
-            'endLatitude'
-            ]"/>
-          </a-form-item>
-        </a-col>
-        <a-divider orientation="left">
-          <span style="font-size: 13px">运输配置</span>
-        </a-divider>
-        <a-col :span="24">
-          <a-form-item label='车辆配置'>
-            <a-radio-group button-style="solid">
-              <a-radio-button value="1">
-                大型车
-              </a-radio-button>
-              <a-radio-button value="2">
-                中型车
-              </a-radio-button>
-              <a-radio-button value="3">
-                小型车
-              </a-radio-button>
-            </a-radio-group>
-          </a-form-item>
-        </a-col>
-        <a-col :span="24">
-          <a-form-item label='是否需要搬运工'>
-            <a-radio-group button-style="solid">
-              <a-radio-button value="0">
-                不需要
-              </a-radio-button>
-              <a-radio-button value="1">
-                一个
-              </a-radio-button>
-              <a-radio-button value="2">
-                两个
-              </a-radio-button>
-              <a-radio-button value="3">
-                三个
-              </a-radio-button>
-            </a-radio-group>
-          </a-form-item>
-        </a-col>
+        <div style="font-size: 13px;font-family: SimHei" v-if="orderInfo !== null">
+          <a-row style="padding-left: 24px;padding-right: 24px;">
+            <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">订单信息</span></a-col>
+            <a-col :span="6"><b>订单编号：</b>
+              {{ orderInfo.code }}
+            </a-col>
+            <a-col :span="6"><b>订单积分：</b>
+              {{ orderInfo.integral }}
+            </a-col>
+            <a-col :span="6"><b>订单状态：</b>
+              <span v-if="orderInfo.status === '0'" style="color: red">未支付</span>
+              <span v-if="orderInfo.status === '1'" style="color: blue">已支付</span>
+              <span v-if="orderInfo.status === '2'" style="color: orange">配送中</span>
+              <span v-if="orderInfo.status === '3'" style="color: green">已收货</span>
+            </a-col>
+            <a-col :span="6"><b>下单时间：</b>
+              {{ orderInfo.createDate }}
+            </a-col>
+          </a-row>
+          <br/>
+          <a-row style="padding-left: 24px;padding-right: 24px;">
+            <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">选择 外送/堂食</span></a-col>
+            <a-col :span="24">
+              <a-radio-group button-style="solid" v-model="orderInfo.type">
+                <a-radio-button value="0">
+                  堂食
+                </a-radio-button>
+                <a-radio-button value="1">
+                  外送
+                </a-radio-button>
+              </a-radio-group>
+            </a-col>
+          </a-row>
+          <br/>
+          <a-row style="padding-left: 24px;padding-right: 24px;" v-if="orderInfo.type === '1'">
+            <a-col :span="6"><b>公里数：</b>
+              {{ orderInfo.kilometre }}公里
+            </a-col>
+            <a-col :span="6"><b>配送价格：</b>
+              {{ orderInfo.distributionPrice ? orderInfo.distributionPrice + '元' : '- -' }}
+            </a-col>
+            <a-col :span="6"><b>订单价格：</b>
+              {{ orderInfo.orderPrice ? orderInfo.orderPrice + '元' : '- -' }}
+            </a-col>
+            <a-col :span="6"><b>折后价格：</b>
+              {{ orderInfo.afterOrderPrice ? orderInfo.afterOrderPrice + '元' : '- -' }}
+            </a-col>
+            <br/>
+            <br/>
+            <a-col :span="6"><b>会员折扣：</b>
+              {{ orderInfo.discount }} 元
+            </a-col>
+          </a-row>
+          <br/>
+        </div>
+        <br/>
+        <div style="font-size: 13px;font-family: SimHei" v-if="userInfo !== null">
+          <a-row style="padding-left: 24px;padding-right: 24px;">
+            <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">用户信息</span></a-col>
+            <a-col :span="6"><b>会员编号：</b>
+              {{ userInfo.code }}
+            </a-col>
+            <a-col :span="6"><b>用户姓名：</b>
+              {{ userInfo.name ? userInfo.name : '- -' }}
+            </a-col>
+            <a-col :span="6"><b>邮箱地址：</b>
+              {{ userInfo.mail ? userInfo.mail : '- -' }}
+            </a-col>
+            <a-col :span="6"><b>联系电话：</b>
+              {{ userInfo.phone }}
+            </a-col>
+          </a-row>
+          <br/>
+        </div>
+        <br/>
+        <div style="font-size: 13px;font-family: SimHei" v-if="merchantInfo !== null">
+          <a-row style="padding-left: 24px;padding-right: 24px;">
+            <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">商家信息</span></a-col>
+            <a-col :span="6"><b>商家编号：</b>
+              {{ merchantInfo.code }}
+            </a-col>
+            <a-col :span="6"><b>商家名称：</b>
+              {{ merchantInfo.name ? merchantInfo.name : '- -' }}
+            </a-col>
+            <a-col :span="6"><b>地 址：</b>
+              {{ merchantInfo.address ? merchantInfo.address : '- -' }}
+            </a-col>
+            <a-col :span="6"><b>负责人：</b>
+              {{ merchantInfo.principal }}
+            </a-col>
+          </a-row>
+          <br/>
+          <a-row style="padding-left: 24px;padding-right: 24px;">
+            <a-col :span="6"><b>联系方式：</b>
+              {{ merchantInfo.phone }}
+            </a-col>
+            <a-col :span="6"><b>菜系：</b>
+              {{ merchantInfo.dishes ? merchantInfo.dishes : '- -' }}
+            </a-col>
+          </a-row>
+        </div>
+        <br/>
+        <div style="font-size: 13px;font-family: SimHei" v-if="orderItemInfo.length !== 0">
+          <a-row style="padding-left: 24px;padding-right: 24px;">
+            <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">购买菜品</span></a-col>
+            <a-table :columns="columns" :data-source="orderItemInfo"></a-table>
+          </a-row>
+          <br/>
+        </div>
         <a-col :span="16">
           <a-form-item label='备注'>
             <a-textarea v-decorator="[
             'remark'
             ]" :rows="4"/>
-          </a-form-item>
-        </a-col>
-        <a-divider orientation="left">
-          <span style="font-size: 13px">图片</span>
-        </a-divider>
-        <a-col :span="24">
-          <a-form-item label='' v-bind="formItemLayout">
-            <a-upload
-              name="avatar"
-              action="http://127.0.0.1:9527/file/fileUpload/"
-              list-type="picture-card"
-              :file-list="fileList"
-              @preview="handlePreview"
-              @change="picHandleChange"
-            >
-              <div v-if="fileList.length < 8">
-                <a-icon type="plus" />
-                <div class="ant-upload-text">
-                  Upload
-                </div>
-              </div>
-            </a-upload>
-            <a-modal :visible="previewVisible" :footer="null" @cancel="handleCancel">
-              <img alt="example" style="width: 100%" :src="previewImage" />
-            </a-modal>
           </a-form-item>
         </a-col>
       </a-row>
@@ -228,17 +220,52 @@ export default {
       },
       set: function () {
       }
+    },
+    columns () {
+      return [{
+        title: '菜品名称',
+        dataIndex: 'dishesName'
+      }, {
+        title: '图片',
+        dataIndex: 'images',
+        customRender: (text, record, index) => {
+          if (!record.images) return <a-avatar shape="square" icon="user" />
+          return <a-popover>
+            <template slot="content">
+              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
+            </template>
+            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
+          </a-popover>
+        }
+      }, {
+        title: '购买数量',
+        dataIndex: 'amount'
+      }, {
+        title: '单价',
+        dataIndex: 'unitPrice'
+      }, {
+        title: '总价格',
+        dataIndex: 'totalPrice',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
+      }]
     }
   },
   watch: {
     'orderAddShow': function (value) {
       if (value) {
-        this.dataList = []
+        this.dataInit(this.orderData.id)
       }
     }
   },
   data () {
     return {
+      payLoading: false,
       formItemLayout,
       form: this.$form.createForm(this),
       loading: false,
@@ -249,12 +276,50 @@ export default {
       stayAddress: '',
       childrenDrawer: false,
       flagType: 0,
-      nextFlag: 1
+      nextFlag: 1,
+      userInfo: null,
+      orderInfo: null,
+      merchantInfo: null,
+      orderItemInfo: [],
+      addressInfo: null,
+      addressList: []
     }
   },
   mounted () {
+    this.selectAddress()
   },
   methods: {
+    selectAddress () {
+      this.$get(`/cos/address-info/listByUserId/${this.currentUser.userId}`).then((r) => {
+        this.addressList = r.data.data
+      })
+    },
+    dataInit (orderId) {
+      this.$get(`/cos/order-info/${orderId}`).then((r) => {
+        this.userInfo = r.data.user
+        this.orderInfo = r.data.order
+        this.merchantInfo = r.data.merchant
+        this.orderItemInfo = r.data.orderItem
+        this.addressInfo = r.data.address
+        this.staffInfo = r.data.staff
+        this.evaluateInfo = r.data.evaluate
+        this.imagesInit(this.merchantInfo.images)
+        this.payLoading = false
+      })
+    },
+    changeAddress (addressId) {
+      if (!addressId) {
+        return false
+      }
+      this.payLoading = true
+      let orderInfo = this.orderInfo
+      orderInfo.orderItemList = this.orderItemInfo
+      orderInfo.type = '1'
+      orderInfo.addressId = addressId
+      this.$put(`/cos/order-info`, ...orderInfo).then((r) => {
+        this.dataInit(this.orderData.id)
+      })
+    },
     next () {
       this.nextFlag = 2
     },

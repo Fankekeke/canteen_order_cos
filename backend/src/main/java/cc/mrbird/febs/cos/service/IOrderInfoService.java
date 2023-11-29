@@ -34,6 +34,14 @@ public interface IOrderInfoService extends IService<OrderInfo> {
     boolean addOrder(OrderInfo orderInfo) throws FebsException;
 
     /**
+     * 修改订单信息
+     *
+     * @param orderInfo 订单信息
+     * @return 结果
+     */
+    boolean editOrder(OrderInfo orderInfo) throws FebsException;
+
+    /**
      * 获取ID获取订单详情
      *
      * @param id 主键

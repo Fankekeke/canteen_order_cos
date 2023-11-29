@@ -102,6 +102,17 @@ public class OrderInfoController {
     }
 
     /**
+     * 修改订单信息
+     *
+     * @param orderInfo 订单信息
+     * @return 结果
+     */
+    @PutMapping
+    public R edit(OrderInfo orderInfo) throws FebsException {
+        return R.ok(orderInfoService.editOrder(orderInfo));
+    }
+
+    /**
      * 订单支付
      *
      * @param orderCode 订单编号
@@ -121,18 +132,7 @@ public class OrderInfoController {
      */
     @GetMapping("/checkDealer")
     public R checkDealer(@RequestParam("orderCode") String orderCode, @RequestParam("staffId") Integer staffId) {
-        return R.ok();
-    }
-
-    /**
-     * 修改订单信息
-     *
-     * @param orderInfo 订单信息
-     * @return 结果
-     */
-    @PutMapping
-    public R edit(OrderInfo orderInfo) {
-        return R.ok(orderInfoService.updateById(orderInfo));
+        return R.ok(orderInfoService.checkDealer(orderCode, staffId));
     }
 
     /**

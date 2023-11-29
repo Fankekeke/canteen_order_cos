@@ -93,6 +93,14 @@ public interface UserService extends IService<User> {
     void registUser(String username, String password, String name) throws Exception;
 
     /**
+     * 注册商家
+     *
+     * @param username 用户名
+     * @param password 密码
+     */
+    void registMerchant(String username, String password, String name) throws Exception;
+
+    /**
      * 重置密码
      *
      * @param usernames 用户集合

@@ -107,6 +107,11 @@ public class MerchantInfo implements Serializable {
     private Integer userId;
 
     /**
+     * 状态（0.下架 1.上架）
+     */
+    private String status;
+
+    /**
      * 营业星期
      */
     @TableField(exist = false)

@@ -56,6 +56,18 @@ public class MerchantInfoController {
     }
 
     /**
+     * 商家状态审核
+     *
+     * @param merchantId 商家ID
+     * @param status     状态
+     * @return 结果
+     */
+    @GetMapping("audit")
+    public R audit(@RequestParam("merchantId") Integer merchantId, @RequestParam("status") Integer status) {
+        return R.ok(merchantInfoService.update(Wrappers.<MerchantInfo>lambdaUpdate().set(MerchantInfo::getStatus, status).eq(MerchantInfo::getId, merchantId)));
+    }
+
+    /**
      * 根据商家获取订单评价信息
      *
      * @param merchantId 商家ID

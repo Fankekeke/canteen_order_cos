@@ -131,6 +131,53 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     }
 
     /**
+     * 修改订单信息
+     *
+     * @param orderInfo 订单信息
+     * @return 结果
+     */
+    @Override
+    public boolean editOrder(OrderInfo orderInfo) throws FebsException {
+        List<OrderItemInfo> orderItemList = orderInfo.getOrderItemList();
+        if (CollectionUtil.isEmpty(orderItemList)) {
+            throw new FebsException("订单详情不能为空");
+        }
+
+        // 如果为外送 计算配送费用
+        if ("1".equals(orderInfo.getType())) {
+            // 获取送货地址
+            AddressInfo addressInfo = addressInfoService.getById(orderInfo.getAddressId());
+            // 获取商家地址
+            MerchantInfo merchantInfo = merchantInfoService.getById(orderInfo.getMerchantId());
+
+            // 计算公里数与配送费用
+            double distance = LocationUtils.getDistance(merchantInfo.getLongitude().doubleValue(), merchantInfo.getLatitude().doubleValue(), addressInfo.getLongitude().doubleValue(), addressInfo.getLatitude().doubleValue());
+            orderInfo.setDiscount(NumberUtil.div(new BigDecimal(distance), 1000));
+
+
+            // 每公里两米
+            orderInfo.setDistributionPrice(NumberUtil.mul(orderInfo.getDistributionPrice(), 2));
+            orderInfo.setOrderPrice(NumberUtil.add(orderInfo.getOrderPrice(), orderInfo.getDistributionPrice()));
+        }
+
+        // 判断用户是否为此店会员
+        int count = merchantMemberInfoService.count(Wrappers.<MerchantMemberInfo>lambdaQuery().eq(MerchantMemberInfo::getMerchantId, orderInfo.getMerchantId()).eq(MerchantMemberInfo::getUserId, orderInfo.getUserId()));
+        if (count > 0) {
+            BigDecimal discount = NumberUtil.sub(orderInfo.getOrderPrice(), NumberUtil.mul(orderInfo.getOrderPrice(), 0.8));
+            orderInfo.setDiscount(discount);
+            orderInfo.setAfterOrderPrice(NumberUtil.mul(orderInfo.getOrderPrice(), 0.8));
+        }
+
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        for (OrderItemInfo orderItem : orderItemList) {
+            orderItem.setTotalPrice(NumberUtil.mul(orderItem.getTotalPrice(), orderItem.getAmount()));
+            totalPrice = NumberUtil.add(totalPrice, orderItem.getTotalPrice());
+        }
+        // 添加订单
+        return this.updateById(orderInfo);
+    }
+
+    /**
      * 获取ID获取订单详情
      *
      * @param id 主键
@@ -206,7 +253,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     @Override
     public List<MerchantInfo> selectMerchantList() {
         // 获取所有商家
-        List<MerchantInfo> merchantList = merchantInfoService.list();
+        List<MerchantInfo> merchantList = merchantInfoService.list(Wrappers.<MerchantInfo>lambdaQuery().eq(MerchantInfo::getStatus, "1"));
         if (CollectionUtil.isEmpty(merchantList)) {
             return merchantList;
         }

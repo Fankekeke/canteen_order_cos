@@ -125,7 +125,7 @@ public class MerchantInfoServiceImpl extends ServiceImpl<MerchantInfoMapper, Mer
         result.put("orderNum", orderInfoList.size());
         result.put("orderPrice", totalPrice);
         result.put("staffNum", staffInfoMapper.selectCount(Wrappers.<StaffInfo>lambdaQuery().eq(StaffInfo::getStatus, "1")));
-        result.put("merchantNum", merchantInfoMapper.selectCount(Wrappers.<MerchantInfo>lambdaQuery()));
+        result.put("merchantNum", merchantInfoMapper.selectCount(Wrappers.<MerchantInfo>lambdaQuery().eq(MerchantInfo::getStatus, "1")));
 
         // 近十天销售订单统计
         result.put("orderNumWithinDays", orderInfoMapper.selectOrderNumWithinDays(null));
