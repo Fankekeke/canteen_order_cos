@@ -1,7 +1,10 @@
 <template>
-  <a-modal v-model="show" title="订单详情" @cancel="onClose" :width="1500">
+  <a-modal v-model="show" title="订单处理" @cancel="onClose" :width="1200">
     <template slot="footer">
-      <a-button key="back" @click="onClose" type="danger">
+      <a-button key="back" @click="checkDealer" type="primary">
+        分配
+      </a-button>
+      <a-button @click="onClose">
         关闭
       </a-button>
     </template>
@@ -106,9 +109,17 @@
     </div>
     <br/>
     <div style="font-size: 13px;font-family: SimHei" v-if="orderItemInfo.length !== 0">
-      <a-row style="padding-left: 24px;padding-right: 24px;">
+      <a-row style="padding-left: 24px;padding-right: 24px;" :gutter="15">
         <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">购买菜品</span></a-col>
-        <a-table :columns="columns" :data-source="orderItemInfo"></a-table>
+        <a-col :span="18">
+          <a-table :columns="columns" :data-source="orderItemInfo"></a-table>
+        </a-col>
+        <a-col :span="6">
+          <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">选择配送员</span></a-col>
+          <a-select v-model="staffId" style="width: 100%;">
+            <a-select-option v-for="(item, index) in staffList" :value="item.id" :key="index">{{ item.name }}</a-select-option>
+          </a-select>
+        </a-col>
       </a-row>
       <br/>
     </div>
@@ -149,28 +160,12 @@
       <br/>
     </div>
     <br/>
-    <div style="font-size: 13px;font-family: SimHei" v-if="evaluateInfo !== null">
-      <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">订单评价</span></a-col>
-        <a-col :span="6"><b>评价分数：</b>
-          <a-rate :default-value="evaluateInfo.score" disabled />
-        </a-col>
-        <a-col :span="6"><b>评价内容：</b>
-          {{ evaluateInfo.content ? evaluateInfo.content : '- -' }}
-        </a-col>
-        <a-col :span="6"><b>评价时间：</b>
-          {{ evaluateInfo.createDate ? evaluateInfo.createDate : '- -' }}
-        </a-col>
-      </a-row>
-      <br/>
-    </div>
-    <br/>
   </a-modal>
 </template>
 
 <script>
 import moment from 'moment'
-moment.locale('zh-cn')
+import {mapState} from 'vuex'
 function getBase64 (file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -179,8 +174,13 @@ function getBase64 (file) {
     reader.onerror = error => reject(error)
   })
 }
+moment.locale('zh-cn')
+const formItemLayout = {
+  labelCol: { span: 24 },
+  wrapperCol: { span: 24 }
+}
 export default {
-  name: 'orderView',
+  name: 'OrderAudit',
   props: {
     orderShow: {
       type: Boolean,
@@ -191,6 +191,9 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      currentUser: state => state.account.user
+    }),
     show: {
       get: function () {
         return this.orderShow
@@ -233,8 +236,16 @@ export default {
       }]
     }
   },
+  watch: {
+    orderShow: function (value) {
+      if (value) {
+        this.dataInit(this.orderData.id)
+      }
+    }
+  },
   data () {
     return {
+      formItemLayout,
       loading: false,
       fileList: [],
       previewVisible: false,
@@ -251,18 +262,17 @@ export default {
       addressInfo: null,
       staffInfo: null,
       evaluateInfo: null,
+      staffId: null,
+      staffList: []
     }
   },
-  watch: {
-    orderShow: function (value) {
-      if (value) {
-        this.dataInit(this.orderData.id)
-      }
-    }
+  mounted () {
+    this.selectStaffList()
   },
   methods: {
+    moment,
     dataInit (orderId) {
-      this.$get(`/cos/order-info/evaluate/${orderId}`).then((r) => {
+      this.$get(`/cos/order-info/${orderId}`).then((r) => {
         this.userInfo = r.data.user
         this.orderInfo = r.data.order
         this.merchantInfo = r.data.merchant
@@ -273,14 +283,19 @@ export default {
         this.imagesInit(this.merchantInfo.images)
       })
     },
-    imagesInit (images) {
-      if (images !== null && images !== '') {
-        let imageList = []
-        images.split(',').forEach((image, index) => {
-          imageList.push({uid: index, name: image, status: 'done', url: 'http://127.0.0.1:9527/imagesWeb/' + image})
-        })
-        this.fileList = imageList
+    selectStaffList () {
+      this.$get(`/cos/staff-info/selectStaffByMerchant/${this.currentUser.userId}`).then((r) => {
+        this.staffList = r.data.data
+      })
+    },
+    checkDealer () {
+      if (this.staffId === null) {
+        this.$message.warn('请选择配送员工')
+        return false
       }
+      this.$get(`/cos/order-info/checkDealer`, {orderCode: this.orderInfo.code, staffId: this.staffId}).then((r) => {
+        this.$emit('success')
+      })
     },
     handleCancel () {
       this.previewVisible = false
@@ -295,8 +310,36 @@ export default {
     picHandleChange ({ fileList }) {
       this.fileList = fileList
     },
+    imagesInit (images) {
+      if (images !== null && images !== '') {
+        let imageList = []
+        images.split(',').forEach((image, index) => {
+          imageList.push({uid: index, name: image, status: 'done', url: 'http://127.0.0.1:9527/imagesWeb/' + image})
+        })
+        this.fileList = imageList
+      }
+    },
+    submit () {
+      console.log(this.takeShop)
+      console.log(this.returnShop)
+      if (this.takeShop !== '' && this.returnShop !== '') {
+        this.$put(`/cos/order-info`, {
+          'takeShop': this.takeShop,
+          'returnShop': this.returnShop,
+          'id': this.orderInfo.id
+        }).then((r) => {
+          this.$emit('success')
+        })
+      } else {
+        this.$message.warn('请选择车店')
+      }
+    },
     onClose () {
       this.$emit('close')
+    },
+    cleanData () {
+      this.staffCheck = []
+      this.driverCheck = []
     }
   }
 }

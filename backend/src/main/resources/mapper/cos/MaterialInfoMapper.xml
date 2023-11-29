@@ -9,7 +9,7 @@
             code,
             name,
             content,
-            image,
+            images,
             integral,
             create_date,
             sale_num

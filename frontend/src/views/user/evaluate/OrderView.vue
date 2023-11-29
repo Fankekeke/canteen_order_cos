@@ -15,7 +15,7 @@
           {{ orderInfo.orderPrice ? orderInfo.orderPrice + '元' : '- -' }}
         </a-col>
         <a-col :span="6"><b>折后价格：</b>
-          {{ orderInfo.afterOrderPrice ? orderInfo.afterOrderPrice + '元' : '- -' }} 元
+          {{ orderInfo.afterOrderPrice ? orderInfo.afterOrderPrice + '元' : '- -' }}
         </a-col>
         <a-col :span="6"><b>会员折扣：</b>
           {{ orderInfo.discount }} 元
@@ -49,7 +49,7 @@
           {{ orderInfo.distributionPrice ? orderInfo.distributionPrice + '元' : '- -' }}
         </a-col>
         <a-col :span="6"><b>支付时间：</b>
-          {{ orderInfo.payDate ? orderInfo.payDate : '- -' }} 元
+          {{ orderInfo.payDate ? orderInfo.payDate : '- -' }}
         </a-col>
         <a-col :span="6"><b>送达时间：</b>
           {{ orderInfo.serviceDate }}
@@ -108,6 +108,7 @@
     <div style="font-size: 13px;font-family: SimHei" v-if="orderItemInfo.length !== 0">
       <a-row style="padding-left: 24px;padding-right: 24px;">
         <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">购买菜品</span></a-col>
+        <a-table :columns="columns" :data-source="orderItemInfo"></a-table>
       </a-row>
       <br/>
     </div>
@@ -152,7 +153,7 @@
       <a-row style="padding-left: 24px;padding-right: 24px;">
         <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">订单评价</span></a-col>
         <a-col :span="6"><b>评价分数：</b>
-          {{ evaluateInfo.score }}
+          <a-rate :default-value="evaluateInfo.score" disabled />
         </a-col>
         <a-col :span="6"><b>评价内容：</b>
           {{ evaluateInfo.content ? evaluateInfo.content : '- -' }}
@@ -196,6 +197,40 @@ export default {
       },
       set: function () {
       }
+    },
+    columns () {
+      return [{
+        title: '菜品名称',
+        dataIndex: 'dishesName'
+      }, {
+        title: '图片',
+        dataIndex: 'images',
+        customRender: (text, record, index) => {
+          if (!record.images) return <a-avatar shape="square" icon="user" />
+          return <a-popover>
+            <template slot="content">
+              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
+            </template>
+            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
+          </a-popover>
+        }
+      }, {
+        title: '购买数量',
+        dataIndex: 'amount'
+      }, {
+        title: '单价',
+        dataIndex: 'unitPrice'
+      }, {
+        title: '总价格',
+        dataIndex: 'totalPrice',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
+      }]
     }
   },
   data () {

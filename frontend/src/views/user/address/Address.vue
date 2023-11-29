@@ -10,23 +10,15 @@
                 label="用户名称"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.userName"/>
+                <a-input v-model="queryParams.name"/>
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="订单编号"
+                label="用户编号"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.orderCode"/>
-              </a-form-item>
-            </a-col>
-            <a-col :md="6" :sm="24">
-              <a-form-item
-                label="商家名称"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.merchantName"/>
+                <a-input v-model="queryParams.code"/>
               </a-form-item>
             </a-col>
           </div>
@@ -39,6 +31,7 @@
     </div>
     <div>
       <div class="operator">
+        <a-button type="primary" ghost @click="add">新增</a-button>
         <a-button @click="batchDelete">删除</a-button>
       </div>
       <!-- 表格区域 -->
@@ -51,39 +44,76 @@
                :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
                :scroll="{ x: 900 }"
                @change="handleTableChange">
+        <template slot="titleShow" slot-scope="text, record">
+          <template>
+            <a-badge status="processing" v-if="record.rackUp === 1"/>
+            <a-badge status="error" v-if="record.rackUp === 0"/>
+            <a-tooltip>
+              <template slot="title">
+                {{ record.title }}
+              </template>
+              {{ record.title.slice(0, 8) }} ...
+            </a-tooltip>
+          </template>
+        </template>
+        <template slot="contentShow" slot-scope="text, record">
+          <template>
+            <a-tooltip>
+              <template slot="title">
+                {{ record.content }}
+              </template>
+              {{ record.content.slice(0, 40) }} ...
+            </a-tooltip>
+          </template>
+        </template>
         <template slot="operation" slot-scope="text, record">
-          <a-icon type="file-search" @click="orderViewOpen(record)" title="详 情"></a-icon>
+          <a-icon type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="edit(record)" title="修 改"></a-icon>
+          <a-icon type="file-search" @click="addressViewOpen(record)" title="详 情" style="margin-left: 15px"></a-icon>
         </template>
       </a-table>
-      <order-view
-        @close="handleorderViewClose"
-        :orderShow="orderView.visiable"
-        :orderData="orderView.data">
-      </order-view>
     </div>
+    <address-add
+      v-if="addressAdd.visiable"
+      @close="handleaddressAddClose"
+      @success="handleaddressAddSuccess"
+      :addressAddVisiable="addressAdd.visiable">
+    </address-add>
+    <address-edit
+      ref="addressEdit"
+      @close="handleaddressEditClose"
+      @success="handleaddressEditSuccess"
+      :addressEditVisiable="addressEdit.visiable">
+    </address-edit>
+    <address-view
+      @close="handleaddressViewClose"
+      :addressShow="addressView.visiable"
+      :addressData="addressView.data">
+    </address-view>
   </a-card>
 </template>
 
 <script>
 import RangeDate from '@/components/datetime/RangeDate'
+import addressAdd from './AddressAdd'
+import addressEdit from './AddressEdit'
+import addressView from './AddressView.vue'
 import {mapState} from 'vuex'
 import moment from 'moment'
-import OrderView from './OrderView'
 moment.locale('zh-cn')
 
 export default {
-  name: 'evaluate',
-  components: {RangeDate, OrderView},
+  name: 'address',
+  components: {addressAdd, addressEdit, addressView, RangeDate},
   data () {
     return {
       advanced: false,
-      evaluateAdd: {
+      addressAdd: {
         visiable: false
       },
-      evaluateEdit: {
+      addressEdit: {
         visiable: false
       },
-      orderView: {
+      addressView: {
         visiable: false,
         data: null
       },
@@ -111,8 +141,8 @@ export default {
     }),
     columns () {
       return [{
-        title: '评价用户',
-        dataIndex: 'userName',
+        title: '所属用户',
+        dataIndex: 'name',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -121,59 +151,7 @@ export default {
           }
         }
       }, {
-        title: '用户头像',
-        dataIndex: 'userImages',
-        customRender: (text, record, index) => {
-          if (!record.userImages) return <a-avatar shape="square" icon="user" />
-          return <a-popover>
-            <template slot="content">
-              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.userImages.split(',')[0] } />
-            </template>
-            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.userImages.split(',')[0] } />
-          </a-popover>
-        }
-      }, {
-        title: '订单编号',
-        dataIndex: 'orderCode',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '折后价格',
-        dataIndex: 'afterOrderPrice',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text + '元'
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '评价得分',
-        dataIndex: 'score',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text + '分'
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '评价内容',
-        dataIndex: 'content',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '评价图片',
+        title: '头像',
         dataIndex: 'images',
         customRender: (text, record, index) => {
           if (!record.images) return <a-avatar shape="square" icon="user" />
@@ -185,8 +163,20 @@ export default {
           </a-popover>
         }
       }, {
-        title: '所属商家',
-        dataIndex: 'merchantName',
+        title: '地址编号',
+        dataIndex: 'code'
+      }, {
+        title: '省份',
+        dataIndex: 'province'
+      }, {
+        title: '市',
+        dataIndex: 'city'
+      }, {
+        title: '区',
+        dataIndex: 'area'
+      }, {
+        title: '详细地址',
+        dataIndex: 'address',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -195,8 +185,8 @@ export default {
           }
         }
       }, {
-        title: '获得积分',
-        dataIndex: 'integral',
+        title: '联系人',
+        dataIndex: 'contactPerson',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -205,7 +195,17 @@ export default {
           }
         }
       }, {
-        title: '评价时间',
+        title: '联系方式',
+        dataIndex: 'contactMethod',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '创建时间',
         dataIndex: 'createDate',
         customRender: (text, row, index) => {
           if (text !== null) {
@@ -225,12 +225,12 @@ export default {
     this.fetch()
   },
   methods: {
-    orderViewOpen (row) {
-      this.orderView.data = row
-      this.orderView.visiable = true
+    addressViewOpen (row) {
+      this.addressView.data = row
+      this.addressView.visiable = true
     },
-    handleorderViewClose () {
-      this.orderView.visiable = false
+    handleaddressViewClose () {
+      this.addressView.visiable = false
     },
     onSelectChange (selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
@@ -239,26 +239,26 @@ export default {
       this.advanced = !this.advanced
     },
     add () {
-      this.evaluateAdd.visiable = true
+      this.addressAdd.visiable = true
     },
-    handleevaluateAddClose () {
-      this.evaluateAdd.visiable = false
+    handleaddressAddClose () {
+      this.addressAdd.visiable = false
     },
-    handleevaluateAddSuccess () {
-      this.evaluateAdd.visiable = false
-      this.$message.success('新增评价成功')
+    handleaddressAddSuccess () {
+      this.addressAdd.visiable = false
+      this.$message.success('新增用户地址成功')
       this.search()
     },
     edit (record) {
-      this.$refs.evaluateEdit.setFormValues(record)
-      this.evaluateEdit.visiable = true
+      this.$refs.addressEdit.setFormValues(record)
+      this.addressEdit.visiable = true
     },
-    handleevaluateEditClose () {
-      this.evaluateEdit.visiable = false
+    handleaddressEditClose () {
+      this.addressEdit.visiable = false
     },
-    handleevaluateEditSuccess () {
-      this.evaluateEdit.visiable = false
-      this.$message.success('修改评价成功')
+    handleaddressEditSuccess () {
+      this.addressEdit.visiable = false
+      this.$message.success('修改用户地址成功')
       this.search()
     },
     handleDeptChange (value) {
@@ -276,7 +276,7 @@ export default {
         centered: true,
         onOk () {
           let ids = that.selectedRowKeys.join(',')
-          that.$delete('/cos/evaluate-info/' + ids).then(() => {
+          that.$delete('/cos/address-info/' + ids).then(() => {
             that.$message.success('删除成功')
             that.selectedRowKeys = []
             that.search()
@@ -346,10 +346,8 @@ export default {
         params.size = this.pagination.defaultPageSize
         params.current = this.pagination.defaultCurrent
       }
-      if (params.type === undefined) {
-        delete params.type
-      }
-      this.$get('/cos/evaluate-info/page', {
+      params.userId = this.currentUser.userId
+      this.$get('/cos/address-info/page', {
         ...params
       }).then((r) => {
         let data = r.data.data

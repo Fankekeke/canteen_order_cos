@@ -15,26 +15,18 @@
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="车辆编号"
+                label="用户名称"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.vehicleNo"/>
+                <a-input v-model="queryParams.userName"/>
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="车牌号码"
+                label="商家名称"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.vehicleNumber"/>
-              </a-form-item>
-            </a-col>
-            <a-col :md="6" :sm="24">
-              <a-form-item
-                label="订单名称"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.orderName"/>
+                <a-input v-model="queryParams.merchantName"/>
               </a-form-item>
             </a-col>
           </div>
@@ -47,7 +39,7 @@
     </div>
     <div>
       <div class="operator">
-        <!-- <a-button type="primary" ghost @click="add">添加订单</a-button> -->
+<!--        <a-button type="primary" ghost @click="add">添加订单</a-button>-->
         <a-button @click="batchDelete">删除</a-button>
       </div>
       <!-- 表格区域 -->
@@ -72,11 +64,24 @@
         </template>
         <template slot="operation" slot-scope="text, record">
           <a-icon type="file-search" @click="orderViewOpen(record)" title="详 情"></a-icon>
-          <a-icon v-if="record.status == -1" type="alipay" @click="orderPay(record)" title="支 付" style="margin-left: 15px"></a-icon>
-          <a-icon v-if="record.evaluateId == null" type="pushpin" @click="handleorderEvaluateOpen(record)" title="评 价" style="margin-left: 15px"></a-icon>
+<!--          <a-icon v-if="record.status == 2" type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="orderComplete(record)" title="订单完成" style="margin-left: 15px"></a-icon>-->
+<!--          <a-icon v-if="record.taskShop == null && record.returnShop == null" type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="orderAuditOpen(record)" title="修 改" style="margin-left: 15px"></a-icon>-->
+          <a-icon type="cluster" @click="orderMapOpen(record)" title="地 图" style="margin-left: 15px"></a-icon>
         </template>
       </a-table>
     </div>
+    <order-audit
+      @close="handleorderAuditViewClose"
+      @success="handleorderAuditViewSuccess"
+      :orderShow="orderAuditView.visiable"
+      :orderData="orderAuditView.data">
+    </order-audit>
+    <order-status
+      @close="handleorderStatusViewClose"
+      @success="handleorderStatusViewSuccess"
+      :orderStatusShow="orderStatusView.visiable"
+      :orderStatusData="orderStatusView.data">
+    </order-status>
     <order-view
       @close="handleorderViewClose"
       :orderShow="orderView.visiable"
@@ -87,12 +92,11 @@
       @success="handleorderAddSuccess"
       :orderAddShow="orderAdd.visiable">
     </order-add>
-    <order-evaluate
-      @close="handleorderEvaluateClose"
-      @success="handleorderEvaluateSuccess"
-      :orderEvaluateVisiable="orderEvaluate.visiable"
-      :orderData="orderEvaluate.data">
-    </order-evaluate>
+    <MapView
+      @close="handleorderMapViewClose"
+      :orderShow="orderMapView.visiable"
+      :orderData="orderMapView.data">
+    </MapView>
   </a-card>
 </template>
 
@@ -101,13 +105,15 @@ import RangeDate from '@/components/datetime/RangeDate'
 import {mapState} from 'vuex'
 import moment from 'moment'
 import OrderAdd from './OrderAdd'
-import OrderEvaluate from './OrderEvaluate'
+import OrderAudit from './OrderAudit'
 import OrderView from './OrderView'
+import OrderStatus from './OrderStatus.vue'
+import MapView from '../../manage/map/Map.vue'
 moment.locale('zh-cn')
 
 export default {
   name: 'order',
-  components: {OrderView, OrderEvaluate, RangeDate, OrderAdd},
+  components: {OrderView, OrderAudit, RangeDate, OrderStatus, OrderAdd, MapView},
   data () {
     return {
       advanced: false,
@@ -117,11 +123,15 @@ export default {
       orderEdit: {
         visiable: false
       },
+      orderMapView: {
+        visiable: false,
+        data: null
+      },
       orderView: {
         visiable: false,
         data: null
       },
-      orderEvaluate: {
+      orderStatusView: {
         visiable: false,
         data: null
       },
@@ -156,16 +166,6 @@ export default {
         title: '订单编号',
         dataIndex: 'code'
       }, {
-        title: '订单名称',
-        dataIndex: 'orderName',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
         title: '下单用户',
         dataIndex: 'userName',
         customRender: (text, row, index) => {
@@ -176,60 +176,20 @@ export default {
           }
         }
       }, {
-        title: '车辆编号',
-        dataIndex: 'vehicleNo',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '车牌号码',
-        dataIndex: 'vehicleNumber',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '车辆图片',
-        dataIndex: 'images',
+        title: '用户头像',
+        dataIndex: 'userImages',
         customRender: (text, record, index) => {
-          if (!record.images) return <a-avatar shape="square" icon="user" />
+          if (!record.userImages) return <a-avatar shape="square" icon="user" />
           return <a-popover>
             <template slot="content">
-              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
+              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.userImages.split(',')[0] } />
             </template>
-            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
+            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.userImages.split(',')[0] } />
           </a-popover>
         }
       }, {
-        title: '价格/日',
-        dataIndex: 'dayPrice',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text + '元'
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '订单总额',
-        dataIndex: 'total',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text + '元'
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '取车时间',
-        dataIndex: 'startDate',
+        title: '所属商家',
+        dataIndex: 'merchantName',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -238,11 +198,33 @@ export default {
           }
         }
       }, {
-        title: '还车时间',
-        dataIndex: 'endDate',
+        title: '商家图片',
+        dataIndex: 'merchantImages',
+        customRender: (text, record, index) => {
+          if (!record.merchantImages) return <a-avatar shape="square" icon="user" />
+          return <a-popover>
+            <template slot="content">
+              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.merchantImages.split(',')[0] } />
+            </template>
+            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.merchantImages.split(',')[0] } />
+          </a-popover>
+        }
+      }, {
+        title: '订单价格（元）',
+        dataIndex: 'orderPrice',
         customRender: (text, row, index) => {
           if (text !== null) {
-            return text
+            return text + '元'
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '折后价格（元）',
+        dataIndex: 'afterOrderPrice',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text + '元'
           } else {
             return '- -'
           }
@@ -252,12 +234,27 @@ export default {
         dataIndex: 'status',
         customRender: (text, row, index) => {
           switch (text) {
-            case '-1':
-              return <a-tag>未支付</a-tag>
             case '0':
-              return <a-tag>未完成</a-tag>
+              return <a-tag color="red">未支付</a-tag>
             case '1':
-              return <a-tag>已完成</a-tag>
+              return <a-tag>已支付</a-tag>
+            case '2':
+              return <a-tag>配送中</a-tag>
+            case '3':
+              return <a-tag>已收货</a-tag>
+            default:
+              return '- -'
+          }
+        }
+      }, {
+        title: '订单类型',
+        dataIndex: 'type',
+        customRender: (text, row, index) => {
+          switch (text) {
+            case '0':
+              return <a-tag>堂食</a-tag>
+            case '1':
+              return <a-tag>外送</a-tag>
             default:
               return '- -'
           }
@@ -283,23 +280,6 @@ export default {
     this.fetch()
   },
   methods: {
-    orderPay (record) {
-      let data = { outTradeNo: record.code, subject: `${record.createDate}缴费信息`, totalAmount: record.total, body: '' }
-      this.$post('/cos/pay/alipay', data).then((r) => {
-        // console.log(r.data.msg)
-        // 添加之前先删除一下，如果单页面，页面不刷新，添加进去的内容会一直保留在页面中，二次调用form表单会出错
-        const divForm = document.getElementsByTagName('div')
-        if (divForm.length) {
-          document.body.removeChild(divForm[0])
-        }
-        const div = document.createElement('div')
-        div.innerHTML = r.data.msg // data就是接口返回的form 表单字符串
-        // console.log(div.innerHTML)
-        document.body.appendChild(div)
-        document.forms[0].setAttribute('target', '_self') // 新开窗口跳转
-        document.forms[0].submit()
-      })
-    },
     orderComplete (row) {
       this.$get(`/cos/order-info/audit`, {
         'orderCode': row.code,
@@ -308,6 +288,13 @@ export default {
         this.$message.success('订单完成')
         this.fetch()
       })
+    },
+    orderMapOpen (row) {
+      this.orderMapView.data = row
+      this.orderMapView.visiable = true
+    },
+    handleorderMapViewClose () {
+      this.orderMapView.visiable = false
     },
     orderStatusOpen (row) {
       this.orderStatusView.data = row
@@ -337,7 +324,7 @@ export default {
     },
     handleorderAuditViewSuccess () {
       this.orderAuditView.visiable = false
-      this.$message.success('分配成功')
+      this.$message.success('设置成功')
       this.fetch()
     },
     onSelectChange (selectedRowKeys) {
@@ -352,21 +339,9 @@ export default {
     handleorderAddClose () {
       this.orderAdd.visiable = false
     },
-    handleorderEvaluateOpen (row) {
-      this.orderEvaluate.data = row
-      this.orderEvaluate.visiable = true
-    },
-    handleorderEvaluateClose () {
-      this.orderEvaluate.visiable = false
-    },
     handleorderAddSuccess () {
       this.orderAdd.visiable = false
       this.$message.success('添加平台订单成功')
-      this.search()
-    },
-    handleorderEvaluateSuccess () {
-      this.orderEvaluate.visiable = false
-      this.$message.success('订单评价成功')
       this.search()
     },
     edit (record) {
@@ -378,7 +353,7 @@ export default {
     },
     handleorderEditSuccess () {
       this.orderEdit.visiable = false
-      this.$message.success('修改产品成功')
+      this.$message.success('修改成功')
       this.search()
     },
     handleDeptChange (value) {
@@ -465,6 +440,9 @@ export default {
         // 如果分页信息为空，则设置为默认值
         params.size = this.pagination.defaultPageSize
         params.current = this.pagination.defaultCurrent
+      }
+      if (params.status === undefined) {
+        delete params.status
       }
       params.userId = this.currentUser.userId
       this.$get('/cos/order-info/page', {

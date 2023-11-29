@@ -111,9 +111,6 @@ export default {
     }),
     columns () {
       return [{
-        title: '用户编号',
-        dataIndex: 'orderCode'
-      }, {
         title: '评价用户',
         dataIndex: 'userName',
         customRender: (text, row, index) => {
@@ -146,16 +143,6 @@ export default {
           }
         }
       }, {
-        title: '订单价格',
-        dataIndex: 'orderPrice',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text + '元'
-          } else {
-            return '- -'
-          }
-        }
-      }, {
         title: '折后价格',
         dataIndex: 'afterOrderPrice',
         customRender: (text, row, index) => {
@@ -177,11 +164,17 @@ export default {
         }
       }, {
         title: '评价内容',
-        dataIndex: 'remark',
-        scopedSlots: { customRender: 'contentShow' }
+        dataIndex: 'content',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
       }, {
         title: '评价图片',
-        dataIndex: 'userImages',
+        dataIndex: 'images',
         customRender: (text, record, index) => {
           if (!record.images) return <a-avatar shape="square" icon="user" />
           return <a-popover>
@@ -199,19 +192,6 @@ export default {
             return text
           } else {
             return '- -'
-          }
-        }
-      }, {
-        title: '订单类型',
-        dataIndex: 'type',
-        customRender: (text, row, index) => {
-          switch (text) {
-            case 0:
-              return <a-tag>堂食</a-tag>
-            case 1:
-              return <a-tag>外送</a-tag>
-            default:
-              return '- -'
           }
         }
       }, {
@@ -369,7 +349,7 @@ export default {
       if (params.type === undefined) {
         delete params.type
       }
-      params.userId = this.currentUser.userId
+      params.useriId = this.currentUser.userId
       this.$get('/cos/evaluate-info/page', {
         ...params
       }).then((r) => {

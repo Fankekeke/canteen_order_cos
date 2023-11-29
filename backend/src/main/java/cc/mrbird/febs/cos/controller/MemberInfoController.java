@@ -3,13 +3,17 @@ package cc.mrbird.febs.cos.controller;
 
 import cc.mrbird.febs.common.utils.R;
 import cc.mrbird.febs.cos.entity.MemberInfo;
+import cc.mrbird.febs.cos.entity.MerchantInfo;
 import cc.mrbird.febs.cos.service.IMemberInfoService;
+import cc.mrbird.febs.cos.service.IMerchantInfoService;
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -22,6 +26,8 @@ import java.util.List;
 public class MemberInfoController {
 
     private final IMemberInfoService memberInfoService;
+
+    private final IMerchantInfoService merchantInfoService;
 
     /**
      * 分页获取会员积分信息
@@ -64,6 +70,11 @@ public class MemberInfoController {
      */
     @PostMapping
     public R save(MemberInfo memberInfo) {
+        // 获取所属商家
+        MerchantInfo merchantInfo = merchantInfoService.getOne(Wrappers.<MerchantInfo>lambdaQuery().eq(MerchantInfo::getUserId, memberInfo.getMerchantId()));
+        if (merchantInfo != null) {
+            memberInfo.setMerchantId(merchantInfo.getId());
+        }
         return R.ok(memberInfoService.save(memberInfo));
     }
 

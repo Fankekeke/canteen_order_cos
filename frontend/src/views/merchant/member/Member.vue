@@ -7,18 +7,10 @@
           <div :class="advanced ? null: 'fold'">
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="用户名称"
+                label="商家编号"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.userName"/>
-              </a-form-item>
-            </a-col>
-            <a-col :md="6" :sm="24">
-              <a-form-item
-                label="订单编号"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.orderCode"/>
+                <a-input v-model="queryParams.code"/>
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="24">
@@ -26,7 +18,7 @@
                 label="商家名称"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.merchantName"/>
+                <a-input v-model="queryParams.name"/>
               </a-form-item>
             </a-col>
           </div>
@@ -39,6 +31,7 @@
     </div>
     <div>
       <div class="operator">
+        <a-button type="primary" ghost @click="add" v-if="dataSource.length === 0">新增</a-button>
         <a-button @click="batchDelete">删除</a-button>
       </div>
       <!-- 表格区域 -->
@@ -51,41 +44,55 @@
                :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
                :scroll="{ x: 900 }"
                @change="handleTableChange">
+        <template slot="contentShow" slot-scope="text, record">
+          <template>
+            <a-tooltip>
+              <template slot="title">
+                {{ record.remark }}
+              </template>
+              {{ record.remark.slice(0, 10) }} ...
+            </a-tooltip>
+          </template>
+        </template>
         <template slot="operation" slot-scope="text, record">
-          <a-icon type="file-search" @click="orderViewOpen(record)" title="详 情"></a-icon>
+          <a-icon type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="edit(record)" title="修 改"></a-icon>
         </template>
       </a-table>
-      <order-view
-        @close="handleorderViewClose"
-        :orderShow="orderView.visiable"
-        :orderData="orderView.data">
-      </order-view>
+      <member-add
+        v-if="memberAdd.visiable"
+        @close="handlememberAddClose"
+        @success="handlememberAddSuccess"
+        :memberAddVisiable="memberAdd.visiable">
+      </member-add>
+      <member-edit
+        ref="memberEdit"
+        @close="handlememberEditClose"
+        @success="handlememberEditSuccess"
+        :memberEditVisiable="memberEdit.visiable">
+      </member-edit>
     </div>
   </a-card>
 </template>
 
 <script>
 import RangeDate from '@/components/datetime/RangeDate'
+import memberAdd from './MemberAdd'
+import memberEdit from './MemberEdit'
 import {mapState} from 'vuex'
 import moment from 'moment'
-import OrderView from './OrderView'
 moment.locale('zh-cn')
 
 export default {
-  name: 'evaluate',
-  components: {RangeDate, OrderView},
+  name: 'member',
+  components: {RangeDate, memberAdd, memberEdit},
   data () {
     return {
       advanced: false,
-      evaluateAdd: {
+      memberAdd: {
         visiable: false
       },
-      evaluateEdit: {
+      memberEdit: {
         visiable: false
-      },
-      orderView: {
-        visiable: false,
-        data: null
       },
       queryParams: {},
       filteredInfo: null,
@@ -111,8 +118,11 @@ export default {
     }),
     columns () {
       return [{
-        title: '评价用户',
-        dataIndex: 'userName',
+        title: '商家编号',
+        dataIndex: 'code'
+      }, {
+        title: '商家名称',
+        dataIndex: 'name',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -121,59 +131,7 @@ export default {
           }
         }
       }, {
-        title: '用户头像',
-        dataIndex: 'userImages',
-        customRender: (text, record, index) => {
-          if (!record.userImages) return <a-avatar shape="square" icon="user" />
-          return <a-popover>
-            <template slot="content">
-              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.userImages.split(',')[0] } />
-            </template>
-            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.userImages.split(',')[0] } />
-          </a-popover>
-        }
-      }, {
-        title: '订单编号',
-        dataIndex: 'orderCode',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '折后价格',
-        dataIndex: 'afterOrderPrice',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text + '元'
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '评价得分',
-        dataIndex: 'score',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text + '分'
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '评价内容',
-        dataIndex: 'content',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '评价图片',
+        title: '商家图片',
         dataIndex: 'images',
         customRender: (text, record, index) => {
           if (!record.images) return <a-avatar shape="square" icon="user" />
@@ -185,8 +143,8 @@ export default {
           </a-popover>
         }
       }, {
-        title: '所属商家',
-        dataIndex: 'merchantName',
+        title: '联系方式',
+        dataIndex: 'phone',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -195,7 +153,17 @@ export default {
           }
         }
       }, {
-        title: '获得积分',
+        title: '详细地址',
+        dataIndex: 'address',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '会员所需积分',
         dataIndex: 'integral',
         customRender: (text, row, index) => {
           if (text !== null) {
@@ -205,8 +173,8 @@ export default {
           }
         }
       }, {
-        title: '评价时间',
-        dataIndex: 'createDate',
+        title: '负责人',
+        dataIndex: 'principal',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -225,41 +193,34 @@ export default {
     this.fetch()
   },
   methods: {
-    orderViewOpen (row) {
-      this.orderView.data = row
-      this.orderView.visiable = true
+    add () {
+      this.memberAdd.visiable = true
     },
-    handleorderViewClose () {
-      this.orderView.visiable = false
+    handlememberAddClose () {
+      this.memberAdd.visiable = false
+    },
+    handlememberAddSuccess () {
+      this.memberAdd.visiable = false
+      this.$message.success('新增会员积分成功')
+      this.search()
+    },
+    edit (record) {
+      this.$refs.memberEdit.setFormValues(record)
+      this.memberEdit.visiable = true
+    },
+    handlememberEditClose () {
+      this.memberEdit.visiable = false
+    },
+    handlememberEditSuccess () {
+      this.memberEdit.visiable = false
+      this.$message.success('修改会员积分成功')
+      this.search()
     },
     onSelectChange (selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },
     toggleAdvanced () {
       this.advanced = !this.advanced
-    },
-    add () {
-      this.evaluateAdd.visiable = true
-    },
-    handleevaluateAddClose () {
-      this.evaluateAdd.visiable = false
-    },
-    handleevaluateAddSuccess () {
-      this.evaluateAdd.visiable = false
-      this.$message.success('新增评价成功')
-      this.search()
-    },
-    edit (record) {
-      this.$refs.evaluateEdit.setFormValues(record)
-      this.evaluateEdit.visiable = true
-    },
-    handleevaluateEditClose () {
-      this.evaluateEdit.visiable = false
-    },
-    handleevaluateEditSuccess () {
-      this.evaluateEdit.visiable = false
-      this.$message.success('修改评价成功')
-      this.search()
     },
     handleDeptChange (value) {
       this.queryParams.deptId = value || ''
@@ -276,7 +237,7 @@ export default {
         centered: true,
         onOk () {
           let ids = that.selectedRowKeys.join(',')
-          that.$delete('/cos/evaluate-info/' + ids).then(() => {
+          that.$delete('/cos/member-info/' + ids).then(() => {
             that.$message.success('删除成功')
             that.selectedRowKeys = []
             that.search()
@@ -349,7 +310,8 @@ export default {
       if (params.type === undefined) {
         delete params.type
       }
-      this.$get('/cos/evaluate-info/page', {
+      params.merchantId = this.currentUser.userId
+      this.$get('/cos/member-info/page', {
         ...params
       }).then((r) => {
         let data = r.data.data

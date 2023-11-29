@@ -16,7 +16,7 @@
             ui.mail,
             ui.address,
             mi.name as materialName,
-            mi.image as materialImages
+            mi.images as materialImages
         from
             exchange_info ei
                 left join user_info ui on
