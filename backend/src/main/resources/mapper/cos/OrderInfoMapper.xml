@@ -90,16 +90,21 @@
         select
         oi.id,
         oi.code,
-        oi.buy_user_id,
-        oi.sell_user_id,
-        oi.commodity_id,
-        oi.total_price,
-        oi.total_after_price,
-        oi.pay_status,
-        oi.pey_type,
-        oi.logistics,
+        oi.user_id,
+        oi.merchant_id,
+        oi.order_price,
+        oi.after_order_price,
+        oi.discount,
+        oi.integral,
+        oi.status,
+        oi.`type`,
+        oi.kilometre,
+        oi.distribution_price,
         oi.create_date,
-        oi.pay_time
+        oi.pay_date,
+        oi.service_date,
+        oi.address_id,
+        oi.staff_id
         from
         order_info oi
         where 1 = 1
@@ -117,9 +122,9 @@
         select sum(oii.amount) as count, di.name from
         order_item_info oii
         left join dishes_info di on
-        (di.id = oii.dishesId)
+        (di.id = oii.dishes_id)
         where 1 = 1
-        group by oii.dishesId
+        group by oii.dishes_id
     </select>
 
     <!-- 十天内订单数量统计 -->

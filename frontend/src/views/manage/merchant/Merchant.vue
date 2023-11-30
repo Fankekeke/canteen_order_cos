@@ -55,8 +55,8 @@
         <template slot="operation" slot-scope="text, record">
           <a-icon type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="edit(record)" title="修 改"></a-icon>
           <a-icon type="file-search" @click="merchantViewOpen(record)" title="详 情" style="margin-left: 15px"></a-icon>
-          <a-icon v-if="record.status === '1'" type="caret-down" @click="audit(record.id, 0)" title="上 架" style="margin-right: 10px"></a-icon>
-          <a-icon v-if="record.status === '0'" type="caret-up" @click="audit(record.id, 1)" title="下 架" style="margin-right: 10px"></a-icon>
+          <a-icon v-if="record.status === '1'" type="caret-down" @click="audit(record.id, 0)" title="上 架" style="margin-left: 15px"></a-icon>
+          <a-icon v-if="record.status === '0'" type="caret-up" @click="audit(record.id, 1)" title="下 架" style="margin-left: 15px"></a-icon>
         </template>
       </a-table>
     </div>
@@ -145,6 +145,19 @@ export default {
             </template>
             <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
           </a-popover>
+        }
+      }, {
+        title: '状态',
+        dataIndex: 'status',
+        customRender: (text, row, index) => {
+          switch (text) {
+            case '0':
+              return <a-tag color="red">休业</a-tag>
+            case '1':
+              return <a-tag color="green">营业</a-tag>
+            default:
+              return '- -'
+          }
         }
       }, {
         title: '具体地址',

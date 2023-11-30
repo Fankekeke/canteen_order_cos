@@ -111,10 +111,10 @@ export default {
     }),
     columns () {
       return [{
-        title: '记录编号',
+        title: '用户编号',
         dataIndex: 'code'
       }, {
-        title: '兑换记录用户',
+        title: '兑换用户',
         dataIndex: 'userName',
         customRender: (text, row, index) => {
           if (text !== null) {

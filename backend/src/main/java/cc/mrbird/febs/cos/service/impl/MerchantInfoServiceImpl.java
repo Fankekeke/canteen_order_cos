@@ -96,23 +96,23 @@ public class MerchantInfoServiceImpl extends ServiceImpl<MerchantInfoMapper, Mer
         result.put("monthOrderNum", CollectionUtil.isEmpty(orderMonthList) ? 0 : orderMonthList.size());
         BigDecimal orderPrice = orderMonthList.stream().map(OrderInfo::getAfterOrderPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
         // 获取本月收益
-        result.put("monthOrderPrice", orderPrice);
+        result.put("monthOrderTotal", orderPrice);
 
         // 本年订单数量
         List<OrderInfo> orderYearList = orderInfoMapper.selectOrderByYear(merchantInfo.getId());
         result.put("yearOrderNum", CollectionUtil.isEmpty(orderYearList) ? 0 : orderYearList.size());
         // 本年总收益
         BigDecimal orderYearPrice = orderYearList.stream().map(OrderInfo::getAfterOrderPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
-        result.put("yearOrderPrice", orderYearPrice);
+        result.put("yearOrderTotal", orderYearPrice);
 
         // 近十天销售订单统计
-        result.put("orderNumWithinDays", orderInfoMapper.selectOrderNumWithinDays(merchantInfo.getId()));
+        result.put("orderNumDayList", orderInfoMapper.selectOrderNumWithinDays(merchantInfo.getId()));
         // 近十天销售金额统计
-        result.put("orderPriceWithinDays", orderInfoMapper.selectOrderPriceWithinDays(merchantInfo.getId()));
+        result.put("priceDayList", orderInfoMapper.selectOrderPriceWithinDays(merchantInfo.getId()));
         // 销售菜品统计
         result.put("orderDrugType", orderInfoMapper.selectOrderDishesType(merchantInfo.getId()));
         // 公告信息
-        result.put("bulletin", bulletinInfoService.list(Wrappers.<BulletinInfo>lambdaQuery().eq(BulletinInfo::getRackUp, 1)));
+        result.put("bulletinInfoList", bulletinInfoService.list(Wrappers.<BulletinInfo>lambdaQuery().eq(BulletinInfo::getRackUp, 1)));
 
         return result;
     }
@@ -147,23 +147,23 @@ public class MerchantInfoServiceImpl extends ServiceImpl<MerchantInfoMapper, Mer
         result.put("monthOrderNum", CollectionUtil.isEmpty(orderMonthList) ? 0 : orderMonthList.size());
         BigDecimal orderPrice = orderMonthList.stream().map(OrderInfo::getAfterOrderPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
         // 获取本月收益
-        result.put("monthOrderPrice", orderPrice);
+        result.put("monthOrderTotal", orderPrice);
 
         // 本年订单数量
         List<OrderInfo> orderYearList = orderInfoMapper.selectOrderByYear(null);
         result.put("yearOrderNum", CollectionUtil.isEmpty(orderYearList) ? 0 : orderYearList.size());
         // 本年总收益
         BigDecimal orderYearPrice = orderYearList.stream().map(OrderInfo::getAfterOrderPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
-        result.put("yearOrderPrice", orderYearPrice);
+        result.put("yearOrderTotal", orderYearPrice);
 
         // 近十天销售订单统计
-        result.put("orderNumWithinDays", orderInfoMapper.selectOrderNumWithinDays(null));
+        result.put("orderNumDayList", orderInfoMapper.selectOrderNumWithinDays(null));
         // 近十天销售金额统计
-        result.put("orderPriceWithinDays", orderInfoMapper.selectOrderPriceWithinDays(null));
+        result.put("priceDayList", orderInfoMapper.selectOrderPriceWithinDays(null));
         // 销售菜品统计
         result.put("orderDrugType", orderInfoMapper.selectOrderDishesType(null));
         // 公告信息
-        result.put("bulletin", bulletinInfoService.list(Wrappers.<BulletinInfo>lambdaQuery().eq(BulletinInfo::getRackUp, 1)));
+        result.put("bulletinInfoList", bulletinInfoService.list(Wrappers.<BulletinInfo>lambdaQuery().eq(BulletinInfo::getRackUp, 1)));
 
         return result;
     }

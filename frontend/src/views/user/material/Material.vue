@@ -31,7 +31,7 @@
     </div>
     <div>
       <div class="operator">
-        <span>我的积分： {{ integral }}}</span>
+        <span style="margin: 12px;font-weight: 800;font-family: SimHei">我的积分： {{ integral }}</span>
       </div>
       <!-- 表格区域 -->
       <a-table ref="TableInfo"
@@ -44,7 +44,7 @@
                :scroll="{ x: 900 }"
                @change="handleTableChange">
         <template slot="operation" slot-scope="text, record">
-          <a-icon v-if="integral >= record.integral" type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="exchangeOrder(record)" title="兑 换"></a-icon>
+          <a-icon v-if="integral >= record.integral" type="retweet" @click="exchangeOrder(record)" title="兑 换"></a-icon>
         </template>
       </a-table>
     </div>
@@ -189,7 +189,7 @@ export default {
       })
     },
     selectDetailByUserId () {
-      this.$get(`/cos/user-info/list/detailByUserId/${this.currentUser.userId}`).then((r) => {
+      this.$get(`/cos/user-info/detailByUserId/${this.currentUser.userId}`).then((r) => {
         this.integral = r.data.data.integral
       })
     },

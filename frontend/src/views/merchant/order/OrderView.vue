@@ -153,7 +153,7 @@
       <a-row style="padding-left: 24px;padding-right: 24px;">
         <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">订单评价</span></a-col>
         <a-col :span="6"><b>评价分数：</b>
-          {{ evaluateInfo.score }}
+          <a-rate :default-value="evaluateInfo.score" disabled />
         </a-col>
         <a-col :span="6"><b>评价内容：</b>
           {{ evaluateInfo.content ? evaluateInfo.content : '- -' }}

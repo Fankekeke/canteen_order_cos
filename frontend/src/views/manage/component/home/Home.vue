@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-row style="margin-top: 15px" v-if="user.roleId != 74 ">
+    <a-row style="margin-top: 15px" v-if="user.roleId != 76 ">
       <a-col :span="24">
         <div style="background: #ECECEC; padding: 30px;">
           <a-row :gutter="16">
@@ -56,7 +56,7 @@
         </div>
       </a-col>
     </a-row>
-    <a-row style="margin-top: 15px" v-if="user.roleId != 74">
+    <a-row style="margin-top: 15px" v-if="user.roleId != 76" :gutter="15">
       <a-col :span="12">
         <a-card hoverable :bordered="false" style="width: 100%">
           <a-skeleton active v-if="loading" />
@@ -269,26 +269,50 @@ export default {
   },
   methods: {
     selectHomeData () {
-      this.$get('/cos/order-info/homeData').then((r) => {
-        let titleData = { vehicleNum: r.data.vehicleNum, repairNum: r.data.repairNum, totalPrice: r.data.totalPrice, totalNum: r.data.totalNum, shopNum: r.data.shopNum }
-        this.$emit('setTitle', titleData)
-        this.titleData.monthOrderNum = r.data.monthOrderNum
-        this.titleData.monthOrderTotal = r.data.monthOrderTotal
-        this.titleData.yearOrderNum = r.data.yearOrderNum
-        this.titleData.yearOrderTotal = r.data.yearOrderTotal
-        this.bulletinList = r.data.bulletinInfoList
-        let values = []
-        if (r.data.orderNumDayList !== null && r.data.orderNumDayList.length !== 0) {
-          if (this.chartOptions1.xaxis.categories.length === 0) {
-            this.chartOptions1.xaxis.categories = Array.from(r.data.orderNumDayList, ({days}) => days)
+      if (this.user.roleId === '74') {
+        this.$get('/cos/merchant-info/admin/homeData').then((r) => {
+          let titleData = { merchantNum: r.data.merchantNum, staffNum: r.data.staffNum, totalPrice: r.data.orderPrice, totalNum: r.data.orderNum }
+          this.$emit('setAdminTitle', titleData)
+          this.titleData.monthOrderNum = r.data.monthOrderNum
+          this.titleData.monthOrderTotal = r.data.monthOrderTotal
+          this.titleData.yearOrderNum = r.data.yearOrderNum
+          this.titleData.yearOrderTotal = r.data.yearOrderTotal
+          this.bulletinList = r.data.bulletinInfoList
+          let values = []
+          if (r.data.orderNumDayList !== null && r.data.orderNumDayList.length !== 0) {
+            if (this.chartOptions1.xaxis.categories.length === 0) {
+              this.chartOptions1.xaxis.categories = Array.from(r.data.orderNumDayList, ({days}) => days)
+            }
+            let itemData = { name: '订单数', data: Array.from(r.data.orderNumDayList, ({count}) => count) }
+            values.push(itemData)
+            this.series1 = values
           }
-          let itemData = { name: '订单数', data: Array.from(r.data.orderNumDayList, ({count}) => count) }
-          values.push(itemData)
-          this.series1 = values
-        }
-        this.series[0].data = Array.from(r.data.priceDayList, ({price}) => price)
-        this.chartOptions.xaxis.categories = Array.from(r.data.priceDayList, ({days}) => days)
-      })
+          this.series[0].data = Array.from(r.data.priceDayList, ({price}) => price)
+          this.chartOptions.xaxis.categories = Array.from(r.data.priceDayList, ({days}) => days)
+        })
+      }
+      if (this.user.roleId === '75') {
+        this.$get('/cos/merchant-info/homeData', {userId: this.user.userId}).then((r) => {
+          let titleData = { memberNum: r.data.memberNum, staffNum: r.data.staffNum, totalPrice: r.data.orderPrice, totalNum: r.data.orderNum }
+          this.$emit('setTitle', titleData)
+          this.titleData.monthOrderNum = r.data.monthOrderNum
+          this.titleData.monthOrderTotal = r.data.monthOrderTotal
+          this.titleData.yearOrderNum = r.data.yearOrderNum
+          this.titleData.yearOrderTotal = r.data.yearOrderTotal
+          this.bulletinList = r.data.bulletinInfoList
+          let values = []
+          if (r.data.orderNumDayList !== null && r.data.orderNumDayList.length !== 0) {
+            if (this.chartOptions1.xaxis.categories.length === 0) {
+              this.chartOptions1.xaxis.categories = Array.from(r.data.orderNumDayList, ({days}) => days)
+            }
+            let itemData = { name: '订单数', data: Array.from(r.data.orderNumDayList, ({count}) => count) }
+            values.push(itemData)
+            this.series1 = values
+          }
+          this.series[0].data = Array.from(r.data.priceDayList, ({price}) => price)
+          this.chartOptions.xaxis.categories = Array.from(r.data.priceDayList, ({days}) => days)
+        })
+      }
     }
   }
 }

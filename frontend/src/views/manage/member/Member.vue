@@ -164,16 +164,6 @@ export default {
             return '- -'
           }
         }
-      }, {
-        title: '创建时间',
-        dataIndex: 'createDate',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
       }]
     }
   },
