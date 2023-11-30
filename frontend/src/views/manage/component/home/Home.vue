@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-row style="margin-top: 15px" v-if="user.roleId == 74">
+    <a-row style="margin-top: 15px" v-if="user.roleId != 74 ">
       <a-col :span="24">
         <div style="background: #ECECEC; padding: 30px;">
           <a-row :gutter="16">
@@ -56,7 +56,7 @@
         </div>
       </a-col>
     </a-row>
-    <a-row style="margin-top: 15px" v-if="user.roleId == 74">
+    <a-row style="margin-top: 15px" v-if="user.roleId != 74">
       <a-col :span="12">
         <a-card hoverable :bordered="false" style="width: 100%">
           <a-skeleton active v-if="loading" />

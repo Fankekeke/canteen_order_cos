@@ -53,6 +53,65 @@
             oi.create_date desc
     </select>
 
+    <!-- 本月订单信息 -->
+    <select id="selectOrderByMonth" resultType="cc.mrbird.febs.cos.entity.OrderInfo">
+        select
+        oi.id,
+        oi.code,
+        oi.user_id,
+        oi.merchant_id,
+        oi.order_price,
+        oi.after_order_price,
+        oi.discount,
+        oi.integral,
+        oi.status,
+        oi.`type`,
+        oi.kilometre,
+        oi.distribution_price,
+        oi.create_date,
+        oi.pay_date,
+        oi.service_date,
+        oi.address_id,
+        oi.staff_id
+        from
+        order_info oi
+        where 1 = 1
+        <if test="merchantId != null">
+            AND oi.merchant_id = #{merchantId}
+        </if>
+        and oi.status != '0'
+        and DATE_FORMAT( oi.create_date, '%Y%m' ) = DATE_FORMAT(
+        CURDATE(),
+        '%Y%m')
+    </select>
+
+    <!-- 本年订单信息 -->
+    <select id="selectOrderByYear" resultType="cc.mrbird.febs.cos.entity.OrderInfo">
+        select
+        oi.id,
+        oi.code,
+        oi.buy_user_id,
+        oi.sell_user_id,
+        oi.commodity_id,
+        oi.total_price,
+        oi.total_after_price,
+        oi.pay_status,
+        oi.pey_type,
+        oi.logistics,
+        oi.create_date,
+        oi.pay_time
+        from
+        order_info oi
+        where 1 = 1
+        <if test="merchantId != null">
+            AND oi.merchant_id = #{merchantId}
+        </if>
+        and oi.status != '0'
+        and DATE_FORMAT( oi.create_date, '%Y' ) = DATE_FORMAT(
+        CURDATE(),
+        '%Y')
+    </select>
+
     <!-- 订单销售菜品类别统计 -->
     <select id="selectOrderDishesType" resultType="java.util.LinkedHashMap">
         select sum(oii.amount) as count, di.name from
@@ -94,8 +153,8 @@
         DATE_FORMAT( oi.create_date, '%Y-%m-%d' ) = DATE_FORMAT( spo.days, '%Y-%m-%d' )
         <if test="merchantId != null">
             AND oi.merchant_id = #{merchantId}
-            AND oi.status != '0'
         </if>
+        AND oi.status != '0'
         )
         GROUP BY
         days
@@ -134,8 +193,8 @@
         DATE_FORMAT( oi.create_date, '%Y-%m-%d' ) = DATE_FORMAT( spo.days, '%Y-%m-%d' )
         <if test="merchantId != null">
             AND oi.merchant_id = #{merchantId}
-            AND oi.status != '0'
         </if>
+        AND oi.status != '0'
         )
         GROUP BY
         days

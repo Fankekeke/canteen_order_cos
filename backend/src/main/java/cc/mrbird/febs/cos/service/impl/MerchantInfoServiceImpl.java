@@ -7,6 +7,7 @@ import cc.mrbird.febs.cos.entity.*;
 import cc.mrbird.febs.cos.dao.MerchantInfoMapper;
 import cc.mrbird.febs.cos.service.IBulletinInfoService;
 import cc.mrbird.febs.cos.service.IMerchantInfoService;
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -90,6 +91,20 @@ public class MerchantInfoServiceImpl extends ServiceImpl<MerchantInfoMapper, Mer
         result.put("staffNum", staffInfoMapper.selectCount(Wrappers.<StaffInfo>lambdaQuery().eq(StaffInfo::getCanteenId, merchantInfo.getId()).eq(StaffInfo::getStatus, "1")));
         result.put("memberNum", merchantMemberInfoMapper.selectCount(Wrappers.<MerchantMemberInfo>lambdaQuery().eq(MerchantMemberInfo::getMerchantId, merchantInfo.getId())));
 
+        // 本月订单数量
+        List<OrderInfo> orderMonthList = orderInfoMapper.selectOrderByMonth(merchantInfo.getId());
+        result.put("monthOrderNum", CollectionUtil.isEmpty(orderMonthList) ? 0 : orderMonthList.size());
+        BigDecimal orderPrice = orderMonthList.stream().map(OrderInfo::getAfterOrderPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+        // 获取本月收益
+        result.put("monthOrderPrice", orderPrice);
+
+        // 本年订单数量
+        List<OrderInfo> orderYearList = orderInfoMapper.selectOrderByYear(merchantInfo.getId());
+        result.put("yearOrderNum", CollectionUtil.isEmpty(orderYearList) ? 0 : orderYearList.size());
+        // 本年总收益
+        BigDecimal orderYearPrice = orderYearList.stream().map(OrderInfo::getAfterOrderPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+        result.put("yearOrderPrice", orderYearPrice);
+
         // 近十天销售订单统计
         result.put("orderNumWithinDays", orderInfoMapper.selectOrderNumWithinDays(merchantInfo.getId()));
         // 近十天销售金额统计
@@ -126,6 +141,20 @@ public class MerchantInfoServiceImpl extends ServiceImpl<MerchantInfoMapper, Mer
         result.put("orderPrice", totalPrice);
         result.put("staffNum", staffInfoMapper.selectCount(Wrappers.<StaffInfo>lambdaQuery().eq(StaffInfo::getStatus, "1")));
         result.put("merchantNum", merchantInfoMapper.selectCount(Wrappers.<MerchantInfo>lambdaQuery().eq(MerchantInfo::getStatus, "1")));
+
+        // 本月订单数量
+        List<OrderInfo> orderMonthList = orderInfoMapper.selectOrderByMonth(null);
+        result.put("monthOrderNum", CollectionUtil.isEmpty(orderMonthList) ? 0 : orderMonthList.size());
+        BigDecimal orderPrice = orderMonthList.stream().map(OrderInfo::getAfterOrderPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+        // 获取本月收益
+        result.put("monthOrderPrice", orderPrice);
+
+        // 本年订单数量
+        List<OrderInfo> orderYearList = orderInfoMapper.selectOrderByYear(null);
+        result.put("yearOrderNum", CollectionUtil.isEmpty(orderYearList) ? 0 : orderYearList.size());
+        // 本年总收益
+        BigDecimal orderYearPrice = orderYearList.stream().map(OrderInfo::getAfterOrderPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+        result.put("yearOrderPrice", orderYearPrice);
 
         // 近十天销售订单统计
         result.put("orderNumWithinDays", orderInfoMapper.selectOrderNumWithinDays(null));

@@ -31,6 +31,7 @@
     </div>
     <div>
       <div class="operator">
+        <span>我的积分： {{ integral }}}</span>
       </div>
       <!-- 表格区域 -->
       <a-table ref="TableInfo"
@@ -43,7 +44,7 @@
                :scroll="{ x: 900 }"
                @change="handleTableChange">
         <template slot="operation" slot-scope="text, record">
-          <a-icon type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="edit(record)" title="修 改"></a-icon>
+          <a-icon v-if="integral >= record.integral" type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="exchangeOrder(record)" title="兑 换"></a-icon>
         </template>
       </a-table>
     </div>
@@ -75,6 +76,7 @@ export default {
   components: {materialAdd, materialEdit, RangeDate},
   data () {
     return {
+      integral: 0,
       advanced: false,
       materialAdd: {
         visiable: false
@@ -172,8 +174,25 @@ export default {
   },
   mounted () {
     this.fetch()
+    this.selectDetailByUserId()
   },
   methods: {
+    exchangeOrder (row) {
+      this.$post(`/cos/exchange-info`, {
+        materialId: row.id,
+        userId: this.currentUser.userId,
+        integral: row.integral
+      }).then((r) => {
+        this.$message.success('兑换物品成功')
+        this.selectDetailByUserId()
+        this.fetch()
+      })
+    },
+    selectDetailByUserId () {
+      this.$get(`/cos/user-info/list/detailByUserId/${this.currentUser.userId}`).then((r) => {
+        this.integral = r.data.data.integral
+      })
+    },
     onSelectChange (selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
     },

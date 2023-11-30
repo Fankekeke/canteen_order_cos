@@ -5,6 +5,7 @@ import cc.mrbird.febs.common.utils.R;
 import cc.mrbird.febs.cos.entity.UserInfo;
 import cc.mrbird.febs.cos.service.IUserInfoService;
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,17 @@ public class UserInfoController {
     @GetMapping("/{id}")
     public R detail(@PathVariable("id") Integer id) {
         return R.ok(userInfoService.getById(id));
+    }
+
+    /**
+     * 获取用户ID获取用户详情
+     *
+     * @param userId 用户ID
+     * @return 结果
+     */
+    @GetMapping("/detailByUserId/{userId}")
+    public R detailByUserId(@PathVariable("userId") Integer userId) {
+        return R.ok(userInfoService.getOne(Wrappers.<UserInfo>lambdaQuery().eq(UserInfo::getUserId, userId)));
     }
 
     /**

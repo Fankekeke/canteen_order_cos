@@ -55,6 +55,8 @@
         <template slot="operation" slot-scope="text, record">
           <a-icon type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="edit(record)" title="修 改"></a-icon>
           <a-icon type="file-search" @click="merchantViewOpen(record)" title="详 情" style="margin-left: 15px"></a-icon>
+          <a-icon v-if="record.status === '1'" type="caret-down" @click="audit(record.id, 0)" title="上 架" style="margin-right: 10px"></a-icon>
+          <a-icon v-if="record.status === '0'" type="caret-up" @click="audit(record.id, 1)" title="下 架" style="margin-right: 10px"></a-icon>
         </template>
       </a-table>
     </div>
@@ -205,6 +207,12 @@ export default {
     this.fetch()
   },
   methods: {
+    audit (id, status) {
+      this.$get('/cos/merchant-info/audit', {merchantId: id, status}).then((r) => {
+        this.$message.success('修改成功')
+        this.search()
+      })
+    },
     merchantViewOpen (row) {
       this.merchantView.data = row
       this.merchantView.visiable = true

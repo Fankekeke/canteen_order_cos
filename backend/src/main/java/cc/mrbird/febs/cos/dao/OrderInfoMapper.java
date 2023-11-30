@@ -24,8 +24,25 @@ public interface OrderInfoMapper extends BaseMapper<OrderInfo> {
     IPage<LinkedHashMap<String, Object>> selectOrderPage(Page<OrderInfo> page, @Param("orderInfo") OrderInfo orderInfo);
 
     /**
+     * 本月订单信息
+     *
+     * @param merchantId 商家ID
+     * @return 结果
+     */
+    List<OrderInfo> selectOrderByMonth(@Param("merchantId") Integer merchantId);
+
+    /**
+     * 本年订单信息
+     *
+     * @param merchantId 商家ID
+     * @return 结果
+     */
+    List<OrderInfo> selectOrderByYear(@Param("merchantId") Integer merchantId);
+
+    /**
      * 十天内订单数量统计
      *
+     * @param merchantId 商家ID
      * @return 结果
      */
     List<LinkedHashMap<String, Object>> selectOrderNumWithinDays(@Param("merchantId") Integer merchantId);
@@ -33,6 +50,7 @@ public interface OrderInfoMapper extends BaseMapper<OrderInfo> {
     /**
      * 十天内订单收益统计
      *
+     * @param merchantId 商家ID
      * @return 结果
      */
     List<LinkedHashMap<String, Object>> selectOrderPriceWithinDays(@Param("merchantId") Integer merchantId);
@@ -40,6 +58,7 @@ public interface OrderInfoMapper extends BaseMapper<OrderInfo> {
     /**
      * 订单销售菜品类别统计
      *
+     * @param merchantId 商家ID
      * @return 结果
      */
     List<LinkedHashMap<String, Object>> selectOrderDishesType(@Param("merchantId") Integer merchantId);
