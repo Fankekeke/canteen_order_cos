@@ -1,32 +1,32 @@
 <template>
   <div style="background:#ECECEC; padding:30px;margin-top: 30px;margin-bottom: 30px">
-    <div style="height: 500px;">
+    <div style="height: 450px;">
       <div style="height: 350px;background-image: url(../static/img/house.jpg);padding: 50px">
         <div style="font-size: 35px;font-weight: 500;color: white;font-family: SimHei">你好 朋友</div>
-        <div style="font-size: 22px;font-weight: 500;color: white;font-family: SimHei">让您出行更轻松</div>
-        <div style="height: 250px;margin-top: 100px">
+        <div style="font-size: 22px;font-weight: 500;color: white;font-family: SimHei">开始点餐</div>
+        <div style="height: 180px;margin-top: 100px">
           <a-card :bordered="false" hoverable style="height: 100%;box-shadow: 3px 3px 3px rgba(0, 0, 0, .2);color:#fff">
             <a-row style="padding: 50px;margin: 0 auto">
               <a-col :span="16">
                 <a-row>
                   <a-col :span="18">
-                    <a-range-picker @change="onChange" style="width: 100%" size="large"/>
+                    <a-input v-model="key" placeholder="开始点餐"/>
                   </a-col>
                   <a-col :span="4" :offset="2">
-                    <a-button type="primary" size="large" @click="fetch">
+                    <a-button type="primary" @click="fetch">
                       查找
                     </a-button>
                   </a-col>
                   <a-col :span="24"></a-col>
                   <a-col :span="24" style="font-size: 15px;font-family: SimHei">
-                    <div style="margin-top: 10px">
-                      <a style="margin-right: 15px" v-for="(item, index) in roomTypeList" :key="index">{{ item.name }}</a>
+                    <div style="margin-top: 30px">
+                      <a style="margin-right: 15px">川菜</a>
+                      <a style="margin-right: 15px">湘菜</a>
+                      <a style="margin-right: 15px">粤菜</a>
+                      <a style="margin-right: 15px">快餐</a>
+                      <a style="margin-right: 15px">西餐</a>
+                      <a style="margin-right: 15px">中餐</a>
                     </div>
-                    <a-col :span="24" style="font-size: 15px;font-family: SimHei">
-                      <div style="margin-top: 10px">
-
-                      </div>
-                    </a-col>
                   </a-col>
                 </a-row>
               </a-col>
@@ -40,32 +40,35 @@
     <a-row :gutter="30" style="padding: 35px;margin: 0 auto">
       <a-col :span="6" v-for="(item, index) in roomList" :key="index">
         <div style="background: #e8e8e8">
-          <a-carousel autoplay style="height: 250px;" v-if="item.images !== undefined && item.images !== ''">
+          <a-carousel autoplay style="height: 200px;" v-if="item.images !== undefined && item.images !== ''">
             <div style="width: 100%;height: 150px" v-for="(item, index) in item.images.split(',')" :key="index">
-              <img :src="'http://127.0.0.1:9527/imagesWeb/'+item" style="width: 100%;height: 250px">
+              <img :src="'http://127.0.0.1:9527/imagesWeb/'+item" style="width: 100%;height: 200px">
             </div>
           </a-carousel>
           <a-card :bordered="false">
             <div slot="title">
               <div style="font-size: 14px;font-family: SimHei">
-                {{ item.vehicleNumber }} | <span style="color: red">￥{{ item.dayPrice }}/天</span>
+                <div>
+                  <a-badge status="success" v-if="item.currentStatus === '1'" style="display: contents;margin: 0 auto"/>
+                  <a-badge status="error" v-if="item.currentStatus === '0'" style="display: contents;margin: 0 auto"/>
+                  {{ item.name }}  <a-tag color="green" style="font-size: 11px">{{ item.dishes }}</a-tag>
+                </div>
+                <div style="font-size: 12px;margin-top: 4px">
+                  <a-icon type="environment" />  {{ item.address }}
+                </div>
               </div>
             </div>
             <template slot="actions" class="ant-card-actions">
-              <a-icon key="ellipsis" type="ellipsis" @click="view(item)"/>
+              <a-icon key="shopping" type="shopping" @click="view(item)"/>
             </template>
           </a-card>
         </div>
       </a-col>
     </a-row>
-    <vehicle-view
-      @close="handlevehicleViewClose"
-      @success="handlevehicleViewSuccess"
-      :vehicleShow="vehicleView.visiable"
-      :startDate="startDate"
-      :endDate="endDate"
-      :vehicleData="vehicleView.data">
-    </vehicle-view>
+    <Map :orderData="orderMapView.merchantInfo"
+         @close="handleorderMapViewClose"
+         :orderShow="orderMapView.visiable">
+    </Map>
   </div>
 </template>
 
@@ -73,11 +76,17 @@
 
 import {mapState} from 'vuex'
 import VehicleView from './VehicleView.vue'
+import Map from './Map.vue'
 export default {
   name: 'Work',
-  components: {VehicleView},
+  components: {Map, VehicleView},
   data () {
     return {
+      orderMapView: {
+        merchantInfo: null,
+        visiable: false
+      },
+      key: '',
       roomList: [],
       roomTypeList: [],
       loading: false,
@@ -100,7 +109,6 @@ export default {
   },
   mounted () {
     this.getWorkStatusList()
-    this.getRoomType()
   },
   methods: {
     handlevehicleViewClose () {
@@ -129,43 +137,24 @@ export default {
       })
     },
     view (record) {
-      if (this.startDate && this.endDate) {
-        this.vehicleView.visiable = true
-        this.vehicleView.data = record
-      } else {
-        this.$message.error('请选择租赁时间！')
-      }
+      this.orderMapView.merchantInfo = record
+      this.orderMapView.visiable = true
+    },
+    handleorderMapViewClose () {
+      this.orderMapView.visiable = false
     },
     getRoomType () {
       this.$get(`/cos/vehicle-type-info/list`).then((r) => {
         this.roomTypeList = r.data.data
       })
     },
-    getWorkStatusList (params) {
-      if (params) {
-        params.userId = this.currentUser.userId
-        this.$get(`/cos/vehicle-info/order/check`, params).then((r) => {
-          this.roomList = r.data.data
-        })
-      } else {
-        this.$get(`/cos/vehicle-info/order/check`, { userId: this.currentUser.userId }).then((r) => {
-          this.roomList = r.data.data
-        })
-      }
+    getWorkStatusList () {
+      this.$get(`/cos/order-info/selectMerchantList`, { key: this.key }).then((r) => {
+        this.roomList = r.data.data
+      })
     },
     fetch () {
-      if (this.startDate && this.endDate) {
-        let params = { startDate: this.startDate, endDate: this.endDate }
-        this.getWorkStatusList(params)
-      } else {
-        this.getWorkStatusList()
-      }
-    },
-    onChange (date, dateString) {
-      this.startDate = dateString[0]
-      this.endDate = dateString[1]
-      let params = { startDate: this.startDate, endDate: this.endDate }
-      this.getWorkStatusList(params)
+      this.getWorkStatusList()
     }
   }
 }

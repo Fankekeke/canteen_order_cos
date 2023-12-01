@@ -54,7 +54,7 @@ public interface IOrderInfoService extends IService<OrderInfo> {
      *
      * @return 结果
      */
-    List<MerchantInfo> selectMerchantList();
+    List<MerchantInfo> selectMerchantList(String key);
 
     /**
      * 获取订单评价详情

@@ -21,6 +21,13 @@ public interface UserConfigService extends IService<UserConfig> {
     void initDefaultUserConfig(String userId);
 
     /**
+     * 生成商家默认个性化配置
+     *
+     * @param userId 用户 ID
+     */
+    void initMerchantDefaultUserConfig(String userId);
+
+    /**
      * 通过用户 ID 删除个性化配置
      *
      * @param userIds 用户 ID 数组

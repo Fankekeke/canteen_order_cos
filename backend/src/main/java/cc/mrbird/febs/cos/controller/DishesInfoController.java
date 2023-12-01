@@ -51,7 +51,7 @@ public class DishesInfoController {
     @GetMapping("/selectDishesByMerchant/{merchantUserId}")
     public R selectDishesByMerchant(@PathVariable("merchantUserId") Integer merchantUserId) {
         // 获取所属商家
-        MerchantInfo merchantInfo = merchantInfoService.getOne(Wrappers.<MerchantInfo>lambdaQuery().eq(MerchantInfo::getUserId, merchantUserId));
+        MerchantInfo merchantInfo = merchantInfoService.getOne(Wrappers.<MerchantInfo>lambdaQuery().eq(MerchantInfo::getId, merchantUserId));
         if (merchantInfo == null) {
             return R.ok(Collections.emptyList());
         }

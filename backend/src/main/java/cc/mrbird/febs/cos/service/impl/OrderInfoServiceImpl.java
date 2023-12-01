@@ -251,9 +251,13 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
      * @return 结果
      */
     @Override
-    public List<MerchantInfo> selectMerchantList() {
+    public List<MerchantInfo> selectMerchantList(String key) {
         // 获取所有商家
-        List<MerchantInfo> merchantList = merchantInfoService.list(Wrappers.<MerchantInfo>lambdaQuery().eq(MerchantInfo::getStatus, "1"));
+        List<MerchantInfo> merchantList = merchantInfoService.list(Wrappers.<MerchantInfo>lambdaQuery().eq(MerchantInfo::getStatus, "1")
+                .like(StrUtil.isNotEmpty(key), MerchantInfo::getName, key).or()
+                .like(StrUtil.isNotEmpty(key), MerchantInfo::getDishes, key).or()
+                .like(StrUtil.isNotEmpty(key), MerchantInfo::getContent, key).or()
+                .like(StrUtil.isNotEmpty(key), MerchantInfo::getAddress, key));
         if (CollectionUtil.isEmpty(merchantList)) {
             return merchantList;
         }

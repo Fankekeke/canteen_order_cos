@@ -39,6 +39,24 @@ public class UserConfigServiceImpl extends ServiceImpl<UserConfigMapper, UserCon
         baseMapper.insert(userConfig);
     }
 
+    /**
+     * 生成商家默认个性化配置
+     *
+     * @param userId 用户 ID
+     */
+    @Override
+    public void initMerchantDefaultUserConfig(String userId) {
+        UserConfig userConfig = new UserConfig();
+        userConfig.setUserId(Long.valueOf(userId));
+        userConfig.setColor(UserConfig.DEFAULT_COLOR);
+        userConfig.setFixHeader(UserConfig.DEFAULT_FIX_HEADER);
+        userConfig.setFixSiderbar(UserConfig.DEFAULT_FIX_SIDERBAR);
+        userConfig.setLayout("side");
+        userConfig.setTheme(UserConfig.DEFAULT_THEME);
+        userConfig.setMultiPage(UserConfig.DEFAULT_MULTIPAGE);
+        baseMapper.insert(userConfig);
+    }
+
     @Override
     @Transactional
     public void deleteByUserId(String... userIds) {

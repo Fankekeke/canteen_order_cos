@@ -54,8 +54,8 @@ public class OrderInfoController {
      * @return 结果
      */
     @GetMapping("/selectMerchantList")
-    public R selectMerchantList() {
-        return R.ok(orderInfoService.selectMerchantList());
+    public R selectMerchantList(@RequestParam(value = "key", required = false) String key) {
+        return R.ok(orderInfoService.selectMerchantList(key));
     }
 
     /**
