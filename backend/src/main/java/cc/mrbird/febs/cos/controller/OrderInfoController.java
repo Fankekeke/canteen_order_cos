@@ -102,6 +102,29 @@ public class OrderInfoController {
     }
 
     /**
+     * 新增订单信息
+     *
+     * @param orderInfo 订单信息
+     * @return 结果
+     */
+    @PostMapping("/saveOrder")
+    public R saveOrder(OrderInfo orderInfo) throws FebsException {
+        return R.ok(orderInfoService.saveOrder(orderInfo));
+    }
+
+
+    /**
+     * 获取订单付款信息
+     *
+     * @param orderInfo 订单信息
+     * @return 结果
+     */
+    @PostMapping("/getPriceTotal")
+    public R getPriceTotal(OrderInfo orderInfo) {
+        return R.ok(orderInfoService.getPriceTotal(orderInfo));
+    }
+
+    /**
      * 修改订单信息
      *
      * @param orderInfo 订单信息

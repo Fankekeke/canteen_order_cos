@@ -11,164 +11,190 @@
     <div style="width: 100%">
       <a-icon type="arrow-left" style="position: absolute;z-index: 999;color: red;font-size: 20px;margin: 15px" @click="home"/>
       <a-row style="height:100vh;font-family: SimHei">
-        <a-col :span="17" style="height: 100%;">
+        <a-col :span="15" style="height: 100%;">
           <div id="areas" style="width: 100%;height: 100%;box-shadow: 3px 3px 3px rgba(0, 0, 0, .2);background:#ec9e3c;color:#fff"></div>
         </a-col>
-        <a-col :span="7" style="height: 100%;box-shadow: 3px 3px 3px rgba(0, 0, 0, .2);color:#fff">
+        <a-col :span="9" style="height: 100%;box-shadow: 3px 3px 3px rgba(0, 0, 0, .2);color:#fff">
           <div>
             <div class="scenicInfo" style="height: 100vh; overflow-y: auto;padding-left: 5px;overflow-x: hidden">
-              <a-carousel autoplay style="height: 300px;" v-if="orderData.images !== undefined && orderData.images !== ''">
-                <div style="width: 100%;height: 300px" v-for="(item, index) in orderData.images.split(',')" :key="index">
-                  <img :src="'http://127.0.0.1:9527/imagesWeb/'+item" style="width: 100%;height: 100%">
+              <a-carousel autoplay style="height: 300px;" v-if="merchantInfo.images !== undefined && merchantInfo.images !== ''">
+                <div style="width: 100%;height: 300px" v-for="(item, index) in merchantInfo.images.split(',')" :key="index">
+                  <img :src="'http://127.0.0.1:9527/imagesWeb/' + item" style="width: 100%;height: 100%">
                 </div>
               </a-carousel>
-              <a-card :title="orderData.startDate +' ~ '+ orderData.endDate" :bordered="false">
+              <a-card :title="merchantInfo.name" :bordered="false">
               </a-card>
               <div style="font-size: 12px;font-family: SimHei;color: #404040;margin-top: 15px">
-                <a-row style="padding-left: 24px;padding-right: 24px;">
-                  <a-col :span="24"><b>订单编号：</b>
-                    {{ orderData.code !== null ? orderData.code : '- -' }}
-                  </a-col>
-                </a-row>
-                <br/>
-                <a-row style="padding-left: 24px;padding-right: 24px;" v-if="userInfo != null">
-                  <a-col style="margin-bottom: 15px"><span style="font-size: 14px;font-weight: 650;color: #000c17">客户信息</span></a-col>
-                  <a-col :span="8"><b>客户编号：</b>
-                    {{ userInfo.code !== null ? userInfo.code : '- -' }}
-                  </a-col>
-                  <a-col :span="8"><b>客户名称：</b>
-                    {{ userInfo.name !== null ? userInfo.name : '- -' }}
-                  </a-col>
-                  <a-col :span="8"><b>联系方式：</b>
-                    {{ userInfo.phone !== null ? userInfo.phone : '- -' }}
-                  </a-col>
-                </a-row>
-                <br/>
-                <br/>
-                <a-row style="padding-left: 24px;padding-right: 24px;">
-                  <a-col style="margin-bottom: 15px"><span style="font-size: 14px;font-weight: 650;color: #000c17">订单信息</span></a-col>
-                  <a-col :span="8"><b>订单名称：</b>
-                    {{ orderData.orderName ? orderData.orderName : '- -' }}
-                  </a-col>
-                  <a-col :span="8"><b>车辆每日租金：</b>
-                    {{ orderData.dayPrice ? orderData.dayPrice : '- -' }} 元
-                  </a-col>
-                  <a-col :span="8"><b>总价格：</b>
-                    {{ orderData.total }} 元
-                  </a-col>
-                </a-row>
-                <br/>
-                <a-row style="padding-left: 24px;padding-right: 24px;">
-                  <a-col :span="8"><b>租车天数：</b>
-                    {{ orderData.rentDay }} 天
-                  </a-col>
-                  <a-col :span="8"><b>下单时间：</b>
-                    {{ orderData.createDate }}
-                  </a-col>
-                  <a-col :span="8"><b>订单状态：</b>
-                    <span v-if="orderData.status == -1">未支付</span>
-                    <span v-if="orderData.status == 0">未完成</span>
-                    <span v-if="orderData.status == 1">已完成</span>
-                  </a-col>
-                </a-row>
-                <br/>
-                <a-row style="padding-left: 24px;padding-right: 24px;">
-                  <a-col :span="24"><b>取车店铺：</b>
-                    {{ orderData.takeShop ? orderData.takeShop : '- -' }}
-                  </a-col>
+                <div style="font-size: 12px;font-family: SimHei" v-if="orderInfo !== null">
+                  <a-row style="padding-left: 24px;padding-right: 24px;">
+                    <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">订单信息</span></a-col>
+                    <a-col :span="8"><b>订单编号：</b>
+                      {{ orderInfo.code }}
+                    </a-col>
+                    <a-col :span="8"><b>订单价格：</b>
+                      {{ orderInfo.orderPrice ? orderInfo.orderPrice + '元' : '- -' }}
+                    </a-col>
+                    <a-col :span="8"><b>折后价格：</b>
+                      {{ orderInfo.afterOrderPrice ? orderInfo.afterOrderPrice + '元' : '- -' }}
+                    </a-col>
+                  </a-row>
                   <br/>
+                  <a-row style="padding-left: 24px;padding-right: 24px;">
+                    <a-col :span="8"><b>会员折扣：</b>
+                      {{ orderInfo.discount }} 元
+                    </a-col>
+                    <a-col :span="8"><b>订单积分：</b>
+                      {{ orderInfo.integral }}
+                    </a-col>
+                    <a-col :span="8"><b>订单状态：</b>
+                      <span v-if="orderInfo.status === '0'" style="color: red">未支付</span>
+                      <span v-if="orderInfo.status === '1'" style="color: blue">已支付</span>
+                      <span v-if="orderInfo.status === '2'" style="color: orange">配送中</span>
+                      <span v-if="orderInfo.status === '3'" style="color: green">已收货</span>
+                    </a-col>
+                  </a-row>
                   <br/>
-                  <a-col :span="24"><b>归还车辆店铺：</b>
-                    {{ orderData.returnShop ? orderData.returnShop : '- -' }}
-                  </a-col>
+                  <a-row style="padding-left: 24px;padding-right: 24px;" v-if="orderInfo.type === '1'">
+                    <a-col :span="8"><b>订单类型：</b>
+                      <span v-if="orderInfo.type === '0'">堂食</span>
+                      <span v-if="orderInfo.type === '1'">外送</span>
+                    </a-col>
+                    <a-col :span="8"><b>下单时间：</b>
+                      {{ orderInfo.createDate }}
+                    </a-col>
+                    <a-col :span="8"><b>公里数：</b>
+                      {{ orderInfo.kilometre }}公里
+                    </a-col>
+                  </a-row>
                   <br/>
+                  <a-row style="padding-left: 24px;padding-right: 24px;" v-if="orderInfo.type === '1'">
+                    <a-col :span="8"><b>配送价格：</b>
+                      {{ orderInfo.distributionPrice ? orderInfo.distributionPrice + '元' : '- -' }}
+                    </a-col>
+                    <a-col :span="8"><b>支付时间：</b>
+                      {{ orderInfo.payDate ? orderInfo.payDate : '- -' }}
+                    </a-col>
+                    <a-col :span="8"><b>送达时间：</b>
+                      {{ orderInfo.serviceDate }}
+                    </a-col>
+                  </a-row>
                   <br/>
-                  <a-col :span="24"><b>备注：</b>
-                    {{ orderData.remark ? orderData.remark : '- -' }}
-                  </a-col>
-                </a-row>
+                </div>
                 <br/>
+                <div style="font-size: 12px;font-family: SimHei" v-if="userInfo !== null">
+                  <a-row style="padding-left: 24px;padding-right: 24px;">
+                    <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">用户信息</span></a-col>
+                    <a-col :span="8"><b>会员编号：</b>
+                      {{ userInfo.code }}
+                    </a-col>
+                    <a-col :span="8"><b>用户姓名：</b>
+                      {{ userInfo.name ? userInfo.name : '- -' }}
+                    </a-col>
+                    <a-col :span="8"><b>邮箱地址：</b>
+                      {{ userInfo.mail ? userInfo.mail : '- -' }}
+                    </a-col>
+                  </a-row>
+                  <br/>
+                  <a-row style="padding-left: 24px;padding-right: 24px;">
+                    <a-col :span="8"><b>联系电话：</b>
+                      {{ userInfo.phone }}
+                    </a-col>
+                  </a-row>
+                  <br/>
+                </div>
                 <br/>
-                <a-row style="padding-left: 24px;padding-right: 24px;" v-if="vehicleInfo != null">
-                  <a-col style="margin-bottom: 15px"><span style="font-size: 14px;font-weight: 650;color: #000c17">车辆信息</span></a-col>
-                  <a-col :span="8"><b>车辆编号：</b>
-                    {{ vehicleInfo.vehicleNo }}
-                  </a-col>
-                  <a-col :span="8"><b>车牌号：</b>
-                    {{ vehicleInfo.vehicleNumber ? vehicleInfo.vehicleNumber : '- -' }}
-                  </a-col>
-                  <a-col :span="8"><b>车辆颜色：</b>
-                    {{ vehicleInfo.vehicleColor ? vehicleInfo.vehicleColor : '- -' }}
-                  </a-col>
-                </a-row>
+                <div style="font-size: 12px;font-family: SimHei" v-if="merchantInfo !== null">
+                  <a-row style="padding-left: 24px;padding-right: 24px;">
+                    <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">商家信息</span></a-col>
+                    <a-col :span="8"><b>商家编号：</b>
+                      {{ merchantInfo.code }}
+                    </a-col>
+                    <a-col :span="16"><b>商家名称：</b>
+                      {{ merchantInfo.name ? merchantInfo.name : '- -' }}
+                    </a-col>
+                  </a-row>
+                  <br/>
+                  <a-row style="padding-left: 24px;padding-right: 24px;">
+                    <a-col :span="8"><b>联系方式：</b>
+                      {{ merchantInfo.phone }}
+                    </a-col>
+                    <a-col :span="8"><b>菜系：</b>
+                      {{ merchantInfo.dishes ? merchantInfo.dishes : '- -' }}
+                    </a-col>
+                    <a-col :span="8"><b>负责人：</b>
+                      {{ merchantInfo.principal }}
+                    </a-col>
+                  </a-row>
+                  <br/>
+                  <a-row style="padding-left: 24px;padding-right: 24px;">
+                    <a-col :span="24"><b>地 址：</b>
+                      {{ merchantInfo.address ? merchantInfo.address : '- -' }}
+                    </a-col>
+                  </a-row>
+                  <br/>
+                </div>
                 <br/>
-                <a-row style="padding-left: 24px;padding-right: 24px;" v-if="vehicleInfo != null">
-                  <a-col :span="8"><b>车辆名称：</b>
-                    {{ vehicleInfo.name }}
-                  </a-col>
-                  <a-col :span="8"><b>载客数量：</b>
-                    {{ vehicleInfo.carryPassengers }}
-                  </a-col>
-                  <a-col :span="8"><b>发动机号码：</b>
-                    {{ vehicleInfo.engineNo }}
-                  </a-col>
-                </a-row>
+                <div style="font-size: 12px;font-family: SimHei" v-if="orderItemInfo.length !== 0">
+                  <a-row style="padding-left: 24px;padding-right: 24px;">
+                    <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">购买菜品</span></a-col>
+                    <a-table :columns="columns" :data-source="orderItemInfo" :pagination="false"></a-table>
+                  </a-row>
+                  <br/>
+                </div>
                 <br/>
-                <a-row style="padding-left: 24px;padding-right: 24px;" v-if="vehicleInfo != null">
-                  <a-col :span="8"><b>车辆状态：</b>
-                    <span v-if="vehicleInfo.status == 0" style="color: red">空闲</span>
-                    <span v-if="vehicleInfo.status == 1" style="color: green">使用中</span>
-                    <span v-if="vehicleInfo.status == 2" style="color: green">维修中</span>
-                    <span v-if="vehicleInfo.status == 3" style="color: green">已报废</span>
-                  </a-col>
-                  <a-col :span="8"><b>负责人：</b>
-                    {{ vehicleInfo.principal }}
-                  </a-col>
-                  <a-col :span="8"><b>联系电话：</b>
-                    {{ vehicleInfo.phone }}
-                  </a-col>
-                </a-row>
+                <div style="font-size: 12px;font-family: SimHei" v-if="addressInfo !== null">
+                  <a-row style="padding-left: 24px;padding-right: 24px;">
+                    <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">收货地址</span></a-col>
+                    <a-col :span="8"><b>收货编号：</b>
+                      {{ addressInfo.code }}
+                    </a-col>
+                    <a-col :span="8"><b>详细地址：</b>
+                      {{ addressInfo.address ? addressInfo.address : '- -' }}
+                    </a-col>
+                    <a-col :span="8"><b>联系人：</b>
+                      {{ addressInfo.contactPerson ? addressInfo.contactPerson : '- -' }}
+                    </a-col>
+                    <br/>
+                    <br/>
+                    <a-col :span="8"><b>联系方式：</b>
+                      {{ addressInfo.contactMethod }}
+                    </a-col>
+                  </a-row>
+                  <br/>
+                </div>
                 <br/>
-                <a-row style="padding-left: 24px;padding-right: 24px;" v-if="vehicleInfo != null">
-                  <a-col :span="8"><b>出厂日期：</b>
-                    {{ vehicleInfo.factoryDate }}
-                  </a-col>
-                  <a-col :span="8"><b>排放标准：</b>
-                    {{ vehicleInfo.emissionStandard }}
-                  </a-col>
-                  <a-col :span="8"><b>燃料类型：</b>
-                    <span v-if="vehicleInfo.fuelType == 1" style="color: green">燃油</span>
-                    <span v-if="vehicleInfo.fuelType == 2" style="color: green">柴油</span>
-                    <span v-if="vehicleInfo.fuelType == 3" style="color: green">油电混动</span>
-                    <span v-if="vehicleInfo.fuelType == 4" style="color: green">电能</span>
-                  </a-col>
-                </a-row>
+                <div style="font-size: 12px;font-family: SimHei" v-if="staffInfo !== null">
+                  <a-row style="padding-left: 24px;padding-right: 24px;">
+                    <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">配送员信息</span></a-col>
+                    <a-col :span="8"><b>员工姓名：</b>
+                      {{ staffInfo.name }}
+                    </a-col>
+                    <a-col :span="8"><b>性别：</b>
+                      <span v-if="orderInfo.type === '1'">男</span>
+                      <span v-if="orderInfo.type === '2'">女</span>
+                    </a-col>
+                    <a-col :span="8"><b>员工工号：</b>
+                      {{ staffInfo.code }}
+                    </a-col>
+                  </a-row>
+                  <br/>
+                </div>
                 <br/>
-                <br/>
-                <a-row style="padding-left: 24px;padding-right: 24px;">
-                  <a-col style="margin-bottom: 15px"><span style="font-size: 14px;font-weight: 650;color: #000c17">地图标点</span></a-col>
-                  <a-col :span="24">
-                    <a-radio-group button-style="solid" style="width: 100%" @change="gisOnChange">
-                      <a-radio-button value="1" style="width: 50%;text-align: center">
-                        取车地址
-                      </a-radio-button>
-                      <a-radio-button value="2" style="width: 50%;text-align: center">
-                        还车地址
-                      </a-radio-button>
-                    </a-radio-group>
-                  </a-col>
-                </a-row>
-                <br/>
-                <br/>
-                <a-row style="padding-left: 24px;padding-right: 24px;" v-if="evaluateInfo != null">
-                  <a-col><span style="font-size: 14px;font-weight: 650;color: #000c17">订单评价</span></a-col>
-                </a-row>
-                <a-card v-if="evaluateInfo != null" hoverable :bordered="false" style="width: 100%">
-                  <a-skeleton active v-if="checkLoading" />
-                  <apexchart v-if="!checkLoading" type="radar" height="300" :options="chartOptions" :series="series"></apexchart>
-                </a-card>
-                <br/>
-                <br/>
+                <div style="font-size: 12px;font-family: SimHei" v-if="evaluateInfo !== null">
+                  <a-row style="padding-left: 24px;padding-right: 24px;">
+                    <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">订单评价</span></a-col>
+                    <a-col :span="8"><b>评价分数：</b>
+                      <a-rate :default-value="evaluateInfo.score" disabled />
+                    </a-col>
+                    <a-col :span="8"><b>评价内容：</b>
+                      {{ evaluateInfo.content ? evaluateInfo.content : '- -' }}
+                    </a-col>
+                    <a-col :span="8"><b>评价时间：</b>
+                      {{ evaluateInfo.createDate ? evaluateInfo.createDate : '- -' }}
+                    </a-col>
+                  </a-row>
+                  <br/>
+                </div>
               </div>
             </div>
           </div>
@@ -193,10 +219,14 @@ export default {
   },
   data () {
     return {
-      staffList: [],
-      evaluateInfo: null,
-      vehicleInfo: null,
       userInfo: null,
+      orderInfo: null,
+      merchantInfo: null,
+      orderItemInfo: [],
+      addressInfo: null,
+      staffInfo: null,
+      evaluateInfo: null,
+      staffList: [],
       communityRent: 0,
       rentShow: false,
       communityShow: false,
@@ -233,36 +263,73 @@ export default {
       }
     }
   },
+  computed: {
+    columns () {
+      return [{
+        title: '菜品名称',
+        dataIndex: 'dishesName'
+      }, {
+        title: '图片',
+        dataIndex: 'images',
+        customRender: (text, record, index) => {
+          if (!record.images) return <a-avatar shape="square" icon="user" />
+          return <a-popover>
+            <template slot="content">
+              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
+            </template>
+            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
+          </a-popover>
+        }
+      }, {
+        title: '购买数量',
+        dataIndex: 'amount'
+      }, {
+        title: '单价',
+        dataIndex: 'unitPrice'
+      }, {
+        title: '总价格',
+        dataIndex: 'totalPrice',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
+      }]
+    }
+  },
   watch: {
     'orderShow': function (value) {
       if (value) {
         this.dataInit(this.orderData.id)
-        setTimeout(() => {
-          baiduMap.initMap('areas')
-          this.getLocal()
-        }, 200)
       }
     }
   },
   methods: {
     dataInit (orderId) {
-      this.checkLoading = true
-      this.$get(`/cos/vehicle-info/order/detail/${orderId}`).then((r) => {
+      this.$get(`/cos/order-info/${orderId}`).then((r) => {
         this.userInfo = r.data.user
         this.orderInfo = r.data.order
-        this.vehicleInfo = r.data.vehicle
-        this.getShop = r.data.getShop
-        this.putShop = r.data.putShop
-        this.checkLoading = false
+        this.merchantInfo = r.data.merchant
+        this.orderItemInfo = r.data.orderItem
+        this.addressInfo = r.data.address
+        this.staffInfo = r.data.staff
+        this.evaluateInfo = r.data.evaluate
+        setTimeout(() => {
+          baiduMap.initMap('areas')
+          this.getLocal()
+          this.navigation(this.addressInfo, this.merchantInfo)
+        }, 200)
       })
     },
-    navigation (data) {
+    navigation (address, merchant) {
       baiduMap.clearOverlays()
       baiduMap.rMap().enableScrollWheelZoom(true)
       // eslint-disable-next-line no-undef
       let driving = new BMap.DrivingRoute(baiduMap.rMap(), {renderOptions: {map: baiduMap.rMap(), autoViewport: true}})
       // eslint-disable-next-line no-undef
-      driving.search(new BMap.Point(data.startLongitude, data.startLatitude), new BMap.Point(data.endLongitude, data.endLatitude))
+      driving.search(new BMap.Point(merchant.longitude, merchant.latitude), new BMap.Point(address.longitude, address.latitude))
       // this.getRoadData()
     },
     getRoadData () {
@@ -344,7 +411,7 @@ export default {
     font-family: SimHei;
   }
   >>> .ant-card-meta-description {
-    font-size: 12px;
+    font-size: 13px;
     font-family: SimHei;
   }
   >>> .ant-divider-with-text-left {

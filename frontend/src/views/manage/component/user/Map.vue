@@ -33,7 +33,7 @@
                           <div style="color: #f5222d; font-size: 13px;float: left">{{ item.unitPrice }}元</div>
                         </a-col>
                         <a-col :span="6" style="height: 100%;text-align: right">
-                          <a-icon type="plus-square" theme="twoTone" style="font-size: 20px;margin-right: 5px;margin-top: 10px;cursor: pointer;" @click="dishesAdd(item)"/>
+                          <a-icon type="plus-square" theme="twoTone" style="font-size: 20px;margin-right: 5px;margin-top: 10px;cursor: pointer;" @click="dishesAdd(item)" v-show="nextFlag == 1"/>
                         </a-col>
                       </a-row>
                     </div>
@@ -103,13 +103,40 @@
                     <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">购买信息</span></a-col>
                   </a-row>
                   <div v-if="checkList.length !== 0" style="font-size: 12px;font-family: SimHei">
-                    <a-table :columns="columns" :rowKey="record => record.id" :data-source="checkList" :pagination="false">
-                      <template slot="operation" slot-scope="text, record">
-                        <a-icon type="minus-square" theme="twoTone" @click="dishesRemove(record)" title="删 除" style="cursor: pointer;"></a-icon>
-                      </template>
+                    <a-table :columns="columns1" :rowKey="record => record.id" :data-source="checkList" :pagination="false">
                     </a-table>
-                    <div style="padding-left: 20px;margin-top: 25px;text-align: right;padding-right: 30px"><span>合计</span>
+                    <a-row style="padding-left: 20px;padding-right: 20px;margin-top: 30px">
+                      <a-col style="margin-bottom: 15px"><span style="font-size: 13px;font-weight: 650;color: #000c17">选择 外送/堂食</span></a-col>
+                      <a-col :span="24">
+                        <a-radio-group button-style="solid" v-model="type">
+                          <a-radio-button value="0">
+                            堂食
+                          </a-radio-button>
+                          <a-radio-button value="1">
+                            外送
+                          </a-radio-button>
+                        </a-radio-group>
+                      </a-col>
+                    </a-row>
+                    <a-row style="padding-left: 20px;padding-right: 20px;margin-top: 30px"  v-if="type == 1">
+                      <a-col style="margin-bottom: 15px"><span style="font-size: 13px;font-weight: 650;color: #000c17">选择 外送地址</span></a-col>
+                      <a-col :span="12" v-if="type == 1">
+                        <a-select v-model="addressId" style="width: 100%" @change="handleChange">
+                          <a-select-option v-for="(item, index) in addressList" :value="item.id" :key="index">{{ item.address }}</a-select-option>
+                        </a-select>
+                      </a-col>
+                    </a-row>
+                    <div style="padding-left: 20px;margin-top: 25px;text-align: right;padding-right: 30px"><span>菜品合计</span>
                       <span style="color: red">{{ totalPrice }} 元</span>
+                    </div>
+                    <div style="padding-left: 20px;margin-top: 5px;text-align: right;padding-right: 30px" v-if="orderAddInfo.isMember == 1"><span>会员折扣</span>
+                      <span style="color: red">{{ orderAddInfo.discount }} 元</span>
+                    </div>
+                    <div style="padding-left: 20px;margin-top: 5px;text-align: right;padding-right: 30px" v-if="orderAddInfo.addressId != null"><span>配送费用</span>
+                      {{ orderAddInfo.kilometre }} 千米  <span style="color: red">{{ orderAddInfo.distributionPrice }} 元</span>
+                    </div>
+                    <div style="padding-left: 20px;margin-top: 5px;text-align: right;padding-right: 30px"><span>折后价格</span>
+                      <span style="color: red">{{ orderAddInfo.afterOrderPrice }} 元</span>
                     </div>
                   </div>
                   <div style="margin-top: 150px;text-align: center"  v-if="checkList.length === 0">
@@ -118,27 +145,6 @@
                   </div>
                 </div>
               </div>
-              <a-row style="padding-left: 20px;padding-right: 20px;margin-top: 30px">
-                <a-col style="margin-bottom: 15px"><span style="font-size: 13px;font-weight: 650;color: #000c17">选择 外送/堂食</span></a-col>
-                <a-col :span="24">
-                  <a-radio-group button-style="solid" v-model="type">
-                    <a-radio-button value="0">
-                      堂食
-                    </a-radio-button>
-                    <a-radio-button value="1">
-                      外送
-                    </a-radio-button>
-                  </a-radio-group>
-                </a-col>
-              </a-row>
-              <a-row style="padding-left: 20px;padding-right: 20px;margin-top: 30px"  v-if="type == 1">
-                <a-col style="margin-bottom: 15px"><span style="font-size: 13px;font-weight: 650;color: #000c17">选择 外送地址</span></a-col>
-                <a-col :span="12" v-if="type == 1">
-                  <a-select v-model="addressId" style="width: 100%">
-                    <a-select-option v-for="(item, index) in addressList" :value="item.id" :key="index">{{ item.address }}</a-select-option>
-                  </a-select>
-                </a-col>
-              </a-row>
               <br/>
               <br/>
             </div>
@@ -150,7 +156,7 @@
           <a-button style="margin-right: .8rem">取消</a-button>
         </a-popconfirm>
         <a-button @click="next" type="primary" v-if="nextFlag == 1">下一步</a-button>
-        <a-button @click="pay" type="primary" v-if="nextFlag == 2">支付</a-button>
+        <a-button @click="orderPay" type="primary" v-if="nextFlag == 2">支付</a-button>
       </div>
     </div>
   </a-drawer>
@@ -211,10 +217,45 @@ export default {
         dataIndex: 'operation',
         scopedSlots: {customRender: 'operation'}
       }]
+    },
+    columns1 () {
+      return [{
+        title: '菜品名称',
+        dataIndex: 'name'
+      }, {
+        title: '图片',
+        dataIndex: 'images',
+        customRender: (text, record, index) => {
+          if (!record.images) return <a-avatar shape="square" icon="user" />
+          return <a-popover>
+            <template slot="content">
+              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
+            </template>
+            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
+          </a-popover>
+        }
+      }, {
+        title: '购买数量',
+        dataIndex: 'amount'
+      }, {
+        title: '单价',
+        dataIndex: 'unitPrice'
+      }, {
+        title: '总价格',
+        dataIndex: 'totalPrice',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
+      }]
     }
   },
   data () {
     return {
+      orderAddInfo: null,
       addressId: null,
       addressList: [],
       type: '0',
@@ -284,6 +325,42 @@ export default {
     }
   },
   methods: {
+    orderPay (record) {
+      this.orderAddInfo.userId = this.currentUser.userId
+      this.$post('/cos/pay/alipay', this.orderAddInfo).then((r) => {
+        // console.log(r.data.msg)
+        // 添加之前先删除一下，如果单页面，页面不刷新，添加进去的内容会一直保留在页面中，二次调用form表单会出错
+        const divForm = document.getElementsByTagName('div')
+        if (divForm.length) {
+          document.body.removeChild(divForm[0])
+        }
+        const div = document.createElement('div')
+        div.innerHTML = r.data.msg // data就是接口返回的form 表单字符串
+        // console.log(div.innerHTML)
+        document.body.appendChild(div)
+        document.forms[0].setAttribute('target', '_self') // 新开窗口跳转
+        document.forms[0].submit()
+      })
+    },
+    getPriceTotal () {
+      this.$post(`/cos/order-info/getPriceTotal`, {
+        userId: this.currentUser.userId,
+        merchantId: this.orderData.id,
+        orderPrice: this.totalPrice,
+        type: this.type,
+        addressId: this.addressId,
+        orderItemListStr: JSON.stringify(this.checkList)
+      }).then((r) => {
+        this.orderAddInfo = r.data.data
+      })
+    },
+    handleChange (value) {
+      if (value) {
+        this.getPriceTotal()
+        let addressList = this.addressList.filter(e => e.id === value)
+        this.navigation(addressList[0])
+      }
+    },
     selectAddress () {
       this.$get(`/cos/address-info/listByUserId/${this.currentUser.userId}`).then((r) => {
         this.addressList = r.data.data
@@ -291,6 +368,7 @@ export default {
     },
     next () {
       this.nextFlag = 2
+      this.getPriceTotal()
     },
     dishesRemove (row) {
       let checkList = this.checkList
@@ -312,10 +390,12 @@ export default {
       this.checkList = checkList
     },
     dishesAdd (row) {
+      row.dishesId = row.id
       let checkList = this.checkList
       this.checkList = []
       let check = false
       checkList.forEach(e => {
+        e.dishesId = e.id
         if (e.id === row.id) {
           check = true
           e.amount = e.amount + 1
@@ -340,24 +420,13 @@ export default {
         this.dishesList = r.data.data
       })
     },
-    dataInit (orderId) {
-      this.checkLoading = true
-      this.$get(`/cos/vehicle-info/order/detail/${orderId}`).then((r) => {
-        this.userInfo = r.data.user
-        this.orderInfo = r.data.order
-        this.vehicleInfo = r.data.vehicle
-        this.getShop = r.data.getShop
-        this.putShop = r.data.putShop
-        this.checkLoading = false
-      })
-    },
     navigation (data) {
       baiduMap.clearOverlays()
       baiduMap.rMap().enableScrollWheelZoom(true)
       // eslint-disable-next-line no-undef
       let driving = new BMap.DrivingRoute(baiduMap.rMap(), {renderOptions: {map: baiduMap.rMap(), autoViewport: true}})
       // eslint-disable-next-line no-undef
-      driving.search(new BMap.Point(data.startLongitude, data.startLatitude), new BMap.Point(data.endLongitude, data.endLatitude))
+      driving.search(new BMap.Point(this.orderData.longitude, this.orderData.latitude), new BMap.Point(data.longitude, data.latitude))
       // this.getRoadData()
     },
     getRoadData () {

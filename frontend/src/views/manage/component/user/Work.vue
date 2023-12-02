@@ -132,11 +132,15 @@ export default {
     collectAdd (roomCode) {
       let data = { userId: this.currentUser.userId, roomCode }
       this.$post(`/cos/collect-info`, data).then((r) => {
-        this.$message.success('收藏成功')
+        this.$message.success('成功')
         this.fetch()
       })
     },
     view (record) {
+      // if (record.currentStatus === '0') {
+      //   this.$message.warn('此商家不在营业时间内')
+      //   return false
+      // }
       this.orderMapView.merchantInfo = record
       this.orderMapView.visiable = true
     },

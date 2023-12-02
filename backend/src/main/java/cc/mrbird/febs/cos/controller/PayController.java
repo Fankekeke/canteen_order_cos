@@ -1,9 +1,13 @@
 package cc.mrbird.febs.cos.controller;
 
+import cc.mrbird.febs.common.exception.FebsException;
 import cc.mrbird.febs.common.utils.R;
 import cc.mrbird.febs.cos.entity.AlipayBean;
+import cc.mrbird.febs.cos.entity.OrderInfo;
+import cc.mrbird.febs.cos.service.IOrderInfoService;
 import cc.mrbird.febs.cos.service.PayService;
 import com.alipay.api.AlipayApiException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,10 +15,32 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/cos/pay")
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class PayController {
 
-    @Autowired
-    private PayService payService;
+    private final PayService payService;
+
+    private final IOrderInfoService orderInfoService;
+
+    /**
+     * 新增订单信息
+     *
+     * @param orderInfo 订单信息
+     * @return 结果
+     */
+    @PostMapping("/alipay")
+    public R saveOrder(OrderInfo orderInfo) throws AlipayApiException {
+        orderInfo.setCode("ORD-" + System.currentTimeMillis());
+        orderInfo.setIntegral(orderInfo.getAfterOrderPrice());
+        orderInfoService.saveOrder(orderInfo);
+        AlipayBean alipayBean = new AlipayBean();
+        alipayBean.setOut_trade_no(orderInfo.getCode());
+        alipayBean.setSubject(orderInfo.getMerchantName() + System.currentTimeMillis());
+        alipayBean.setTotal_amount(orderInfo.getAfterOrderPrice().toString());
+        alipayBean.setBody("");
+        String result = payService.aliPay(alipayBean);
+        return R.ok(result);
+    }
 
     /**
      * 阿里支付
@@ -23,7 +49,7 @@ public class PayController {
      * @return
      * @throws AlipayApiException
      */
-    @PostMapping(value = "/alipay")
+    @PostMapping(value = "/test")
     public R alipay(String outTradeNo, String subject, String totalAmount, String body) throws AlipayApiException {
         AlipayBean alipayBean = new AlipayBean();
         alipayBean.setOut_trade_no(outTradeNo);

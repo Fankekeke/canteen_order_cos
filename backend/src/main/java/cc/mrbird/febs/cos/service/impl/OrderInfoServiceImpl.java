@@ -11,6 +11,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -101,7 +102,6 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
             double distance = LocationUtils.getDistance(merchantInfo.getLongitude().doubleValue(), merchantInfo.getLatitude().doubleValue(), addressInfo.getLongitude().doubleValue(), addressInfo.getLatitude().doubleValue());
             orderInfo.setDiscount(NumberUtil.div(new BigDecimal(distance), 1000));
 
-
             // 每公里两米
             orderInfo.setDistributionPrice(NumberUtil.mul(orderInfo.getDistributionPrice(), 2));
             orderInfo.setOrderPrice(NumberUtil.add(orderInfo.getOrderPrice(), orderInfo.getDistributionPrice()));
@@ -128,6 +128,74 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
             orderItem.setOrderId(orderInfo.getId());
         }
         return orderItemInfoService.saveBatch(orderItemList);
+    }
+
+    /**
+     * 新增订单信息
+     *
+     * @param orderInfo 订单信息
+     * @return 结果
+     */
+    @Override
+    public boolean saveOrder(OrderInfo orderInfo) {
+        orderInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
+        // 用户信息
+        UserInfo userInfo = userInfoService.getOne(Wrappers.<UserInfo>lambdaQuery().eq(UserInfo::getUserId, orderInfo.getUserId()));
+
+        orderInfo.setUserId(userInfo.getId());
+
+        // 添加订单
+        orderInfo.setStatus("0");
+        this.save(orderInfo);
+
+        List<OrderItemInfo> orderItemList = JSONUtil.toList(orderInfo.getOrderItemListStr(), OrderItemInfo.class);
+
+        // 添加订单详情
+        for (OrderItemInfo orderItem : orderItemList) {
+            orderItem.setOrderId(orderInfo.getId());
+        }
+        return orderItemInfoService.saveBatch(orderItemList);
+    }
+
+    /**
+     * 获取订单付款信息
+     *
+     * @param orderInfo 订单信息
+     * @return 结果
+     */
+    @Override
+    public OrderInfo getPriceTotal(OrderInfo orderInfo) {
+        // 用户信息
+        UserInfo userInfo = userInfoService.getOne(Wrappers.<UserInfo>lambdaQuery().eq(UserInfo::getUserId, orderInfo.getUserId()));
+
+        // 如果为外送 计算配送费用
+        if ("1".equals(orderInfo.getType())) {
+            // 获取送货地址
+            AddressInfo addressInfo = addressInfoService.getById(orderInfo.getAddressId());
+            // 获取商家地址
+            MerchantInfo merchantInfo = merchantInfoService.getById(orderInfo.getMerchantId());
+
+            // 计算公里数与配送费用
+            double distance = LocationUtils.getDistance(merchantInfo.getLongitude().doubleValue(), merchantInfo.getLatitude().doubleValue(), addressInfo.getLongitude().doubleValue(), addressInfo.getLatitude().doubleValue());
+            orderInfo.setKilometre(NumberUtil.round(NumberUtil.div(new BigDecimal(distance), 1000), 2));
+
+            // 每公里两米
+            orderInfo.setDistributionPrice(NumberUtil.mul(orderInfo.getKilometre(), 2));
+            orderInfo.setOrderPrice(NumberUtil.add(orderInfo.getOrderPrice(), orderInfo.getDistributionPrice()));
+        }
+
+        // 判断用户是否为此店会员
+        int count = merchantMemberInfoService.count(Wrappers.<MerchantMemberInfo>lambdaQuery().eq(MerchantMemberInfo::getMerchantId, orderInfo.getMerchantId()).eq(MerchantMemberInfo::getUserId, orderInfo.getUserId()));
+        if (count > 0) {
+            BigDecimal discount = NumberUtil.sub(orderInfo.getOrderPrice(), NumberUtil.mul(orderInfo.getOrderPrice(), 0.8));
+            orderInfo.setDiscount(NumberUtil.round(discount,2));
+            orderInfo.setAfterOrderPrice(NumberUtil.mul(orderInfo.getOrderPrice(), 0.8));
+            orderInfo.setIsMember("1");
+        } else {
+            orderInfo.setAfterOrderPrice(orderInfo.getOrderPrice());
+            orderInfo.setIsMember("0");
+        }
+        return orderInfo;
     }
 
     /**
@@ -283,7 +351,27 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
 
             // 判断是否在营业日期内
             String week = cc.mrbird.febs.common.utils.DateUtil.getWeekOfDate(new Date());
-            if (!merchantInfo.getOperateDay().contains(week)) {
+
+            Map<String, String> weekMap = new HashMap<String, String>() {
+                {
+                    put("1", "周一");
+                    put("2", "周二");
+                    put("3", "周三");
+                    put("4", "周四");
+                    put("5", "周五");
+                    put("6", "周六");
+                    put("7", "周日");
+                }
+            };
+            if (StrUtil.isNotEmpty(merchantInfo.getOperateDay())) {
+                List<String> operateDayList = StrUtil.split(merchantInfo.getOperateDay(), ",");
+                List<String> operateDayResult = new ArrayList<>();
+                for (String s : operateDayList) {
+                    operateDayResult.add(weekMap.get(s));
+                }
+                merchantInfo.setOperateDayList(operateDayResult);
+            }
+            if (!merchantInfo.getOperateDayList().contains(week)) {
                 merchantInfo.setCurrentStatus("0");
                 continue;
             }

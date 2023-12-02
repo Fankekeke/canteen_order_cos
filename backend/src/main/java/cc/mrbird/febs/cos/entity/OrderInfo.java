@@ -117,6 +117,15 @@ public class OrderInfo implements Serializable {
     @TableField(exist = false)
     List<OrderItemInfo> orderItemList;
 
+    /**
+     * 是否为会员 0否 1是
+     */
+    @TableField(exist = false)
+    private String isMember;
+
+    @TableField(exist = false)
+    private String orderItemListStr;
+
     @TableField(exist = false)
     private String merchantName;
 
