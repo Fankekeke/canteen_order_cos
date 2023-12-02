@@ -11,7 +11,7 @@
     <div style="width: 100%">
       <a-icon type="arrow-left" style="position: absolute;z-index: 999;color: red;font-size: 20px;margin: 15px" @click="home"/>
       <a-row style="height:100vh;font-family: SimHei">
-        <a-col :span="17" style="height: 100%;">
+        <a-col :span="15" style="height: 100%;">
           <div style="width: 100%;height: 100%;box-shadow: 3px 3px 3px rgba(0, 0, 0, .2);color:#fff">
             <a-row :gutter="20" style="padding: 50px">
               <a-col :span="8" v-for="(item, index) in dishesList" :key="index" style="margin-bottom: 15px">
@@ -33,7 +33,7 @@
                           <div style="color: #f5222d; font-size: 13px;float: left">{{ item.unitPrice }}元</div>
                         </a-col>
                         <a-col :span="6" style="height: 100%;text-align: right">
-                          <a-icon type="plus" style="font-size: 20px;margin-right: 5px;margin-top: 10px;cursor: pointer;"/>
+                          <a-icon type="plus-square" theme="twoTone" style="font-size: 20px;margin-right: 5px;margin-top: 10px;cursor: pointer;" @click="dishesAdd(item)"/>
                         </a-col>
                       </a-row>
                     </div>
@@ -43,9 +43,9 @@
             </a-row>
           </div>
         </a-col>
-        <a-col :span="7" style="height: 100%;box-shadow: 3px 3px 3px rgba(0, 0, 0, .2);color:#fff">
+        <a-col :span="9" style="height: 100%;box-shadow: 3px 3px 3px rgba(0, 0, 0, .2);color:#fff">
           <div>
-            <div class="scenicInfo" style="height: 100vh; overflow-y: auto;padding-left: 5px;overflow-x: hidden;color: #4a4a48;font-size: 12px;font-family: SimHei" v-if="orderData != null">
+            <div class="scenicInfo" style="height: 100vh; overflow-y: auto;padding-left: 5px;overflow-x: hidden;color: #4a4a48;font-size: 12px;font-family: SimHei" v-if="orderData != null && nextFlag == 1">
               <a-card :title="orderData.name" :bordered="false">
                 <a-row style="padding-left: 24px;padding-right: 24px;font-size: 11px;font-family: SimHei">
                   <a-col :span="24" style="margin-top: 10px;margin-bottom: 10px">
@@ -78,22 +78,87 @@
                   <a-row style="padding-left: 24px;padding-right: 24px;font-size: 11px;font-family: SimHei">
                     <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">购买信息</span></a-col>
                   </a-row>
-                  <div style="margin-top: 150px;text-align: center">
+                  <div v-if="checkList.length !== 0" style="font-size: 12px;font-family: SimHei">
+                    <a-table :columns="columns" :rowKey="record => record.id" :data-source="checkList" :pagination="false">
+                      <template slot="operation" slot-scope="text, record">
+                        <a-icon type="minus-square" theme="twoTone" @click="dishesRemove(record)" title="删 除" style="cursor: pointer;"></a-icon>
+                      </template>
+                    </a-table>
+                    <div style="padding-left: 20px;margin-top: 25px"><span>合计</span>
+                    <span style="color: red">{{ totalPrice }} 元</span>
+                    </div>
+                  </div>
+                  <div style="margin-top: 150px;text-align: center"  v-if="checkList.length === 0">
                     <a-icon type="smile" theme="twoTone" style="font-size: 75px"/>
-                    <h1>请选择菜品</h1>
+                    <h1 style="margin-top: 20px">请选择菜品</h1>
                   </div>
                 </div>
               </div>
             </div>
+            <div v-if="nextFlag == 2" style="height: 100vh; overflow-y: auto;padding-left: 5px;overflow-x: hidden;color: #4a4a48;font-size: 12px;font-family: SimHei">
+              <div style="font-size: 12px;font-family: SimHei;color: #404040;">
+                <div v-if="type == 1" id="areas" style="width: 100%;height: 350px;box-shadow: 3px 3px 3px rgba(0, 0, 0, .2);background:#ec9e3c;color:#fff;margin-bottom: 20px"></div>
+                <div style="margin-top: 25px">
+                  <a-row style="padding-left: 24px;padding-right: 24px;font-size: 11px;font-family: SimHei">
+                    <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">购买信息</span></a-col>
+                  </a-row>
+                  <div v-if="checkList.length !== 0" style="font-size: 12px;font-family: SimHei">
+                    <a-table :columns="columns" :rowKey="record => record.id" :data-source="checkList" :pagination="false">
+                      <template slot="operation" slot-scope="text, record">
+                        <a-icon type="minus-square" theme="twoTone" @click="dishesRemove(record)" title="删 除" style="cursor: pointer;"></a-icon>
+                      </template>
+                    </a-table>
+                    <div style="padding-left: 20px;margin-top: 25px;text-align: right;padding-right: 30px"><span>合计</span>
+                      <span style="color: red">{{ totalPrice }} 元</span>
+                    </div>
+                  </div>
+                  <div style="margin-top: 150px;text-align: center"  v-if="checkList.length === 0">
+                    <a-icon type="smile" theme="twoTone" style="font-size: 75px"/>
+                    <h1 style="margin-top: 20px">请选择菜品</h1>
+                  </div>
+                </div>
+              </div>
+              <a-row style="padding-left: 20px;padding-right: 20px;margin-top: 30px">
+                <a-col style="margin-bottom: 15px"><span style="font-size: 13px;font-weight: 650;color: #000c17">选择 外送/堂食</span></a-col>
+                <a-col :span="24">
+                  <a-radio-group button-style="solid" v-model="type">
+                    <a-radio-button value="0">
+                      堂食
+                    </a-radio-button>
+                    <a-radio-button value="1">
+                      外送
+                    </a-radio-button>
+                  </a-radio-group>
+                </a-col>
+              </a-row>
+              <a-row style="padding-left: 20px;padding-right: 20px;margin-top: 30px"  v-if="type == 1">
+                <a-col style="margin-bottom: 15px"><span style="font-size: 13px;font-weight: 650;color: #000c17">选择 外送地址</span></a-col>
+                <a-col :span="12" v-if="type == 1">
+                  <a-select v-model="addressId" style="width: 100%">
+                    <a-select-option v-for="(item, index) in addressList" :value="item.id" :key="index">{{ item.address }}</a-select-option>
+                  </a-select>
+                </a-col>
+              </a-row>
+              <br/>
+              <br/>
+            </div>
           </div>
         </a-col>
       </a-row>
+      <div class="drawer-bootom-button">
+        <a-popconfirm title="确定放弃编辑？" @confirm="home" okText="确定" cancelText="取消">
+          <a-button style="margin-right: .8rem">取消</a-button>
+        </a-popconfirm>
+        <a-button @click="next" type="primary" v-if="nextFlag == 1">下一步</a-button>
+        <a-button @click="pay" type="primary" v-if="nextFlag == 2">支付</a-button>
+      </div>
     </div>
   </a-drawer>
 </template>
 
 <script>
 import baiduMap from '@/utils/map/baiduMap'
+import {mapState} from 'vuex'
 export default {
   name: 'Map',
   props: {
@@ -105,9 +170,58 @@ export default {
       type: Object
     }
   },
+  computed: {
+    ...mapState({
+      currentUser: state => state.account.user
+    }),
+    columns () {
+      return [{
+        title: '菜品名称',
+        dataIndex: 'name'
+      }, {
+        title: '图片',
+        dataIndex: 'images',
+        customRender: (text, record, index) => {
+          if (!record.images) return <a-avatar shape="square" icon="user" />
+          return <a-popover>
+            <template slot="content">
+              <a-avatar shape="square" size={132} icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
+            </template>
+            <a-avatar shape="square" icon="user" src={ 'http://127.0.0.1:9527/imagesWeb/' + record.images.split(',')[0] } />
+          </a-popover>
+        }
+      }, {
+        title: '购买数量',
+        dataIndex: 'amount'
+      }, {
+        title: '单价',
+        dataIndex: 'unitPrice'
+      }, {
+        title: '总价格',
+        dataIndex: 'totalPrice',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
+      }, {
+        title: '操作',
+        dataIndex: 'operation',
+        scopedSlots: {customRender: 'operation'}
+      }]
+    }
+  },
   data () {
     return {
+      addressId: null,
+      addressList: [],
+      type: '0',
+      nextFlag: 1,
+      totalPrice: 0,
       dishesList: [],
+      checkList: [],
       evaluateInfo: null,
       vehicleInfo: null,
       userInfo: null,
@@ -150,11 +264,77 @@ export default {
   watch: {
     'orderShow': function (value) {
       if (value) {
+        this.checkList = []
+        this.addressId = null
+        this.addressList = []
+        this.type = '0'
+        this.nextFlag = 1
+        this.totalPrice = 0
         this.selectDishesByMerchant(this.orderData.id)
+        this.selectAddress()
+      }
+    },
+    'type': function (value) {
+      if (value.toString() === '1') {
+        setTimeout(() => {
+          baiduMap.initMap('areas')
+          this.getLocal()
+        }, 200)
       }
     }
   },
   methods: {
+    selectAddress () {
+      this.$get(`/cos/address-info/listByUserId/${this.currentUser.userId}`).then((r) => {
+        this.addressList = r.data.data
+      })
+    },
+    next () {
+      this.nextFlag = 2
+    },
+    dishesRemove (row) {
+      let checkList = this.checkList
+      this.checkList = []
+      checkList.forEach(e => {
+        if (e.id === row.id) {
+          e.amount = e.amount - 1
+          e.totalPrice = (e.unitPrice * e.amount).toFixed(2)
+          if (e.amount === 0) {
+            checkList = checkList.filter(e => e.id !== row.id)
+          }
+        }
+      })
+      let totalPrice = 0
+      checkList.forEach(e => {
+        totalPrice = Number(e.totalPrice) + Number(totalPrice)
+      })
+      this.totalPrice = totalPrice.toFixed(2)
+      this.checkList = checkList
+    },
+    dishesAdd (row) {
+      let checkList = this.checkList
+      this.checkList = []
+      let check = false
+      checkList.forEach(e => {
+        if (e.id === row.id) {
+          check = true
+          e.amount = e.amount + 1
+          e.totalPrice = (e.unitPrice * e.amount).toFixed(2)
+        }
+      })
+      if (!check) {
+        let data = row
+        data.amount = 1
+        data.totalPrice = data.unitPrice
+        checkList.push(data)
+      }
+      let totalPrice = 0
+      checkList.forEach(e => {
+        totalPrice = Number(e.totalPrice) + Number(totalPrice)
+      })
+      this.totalPrice = totalPrice.toFixed(2)
+      this.checkList = checkList
+    },
     selectDishesByMerchant (merchantId) {
       this.$get(`/cos/dishes-info/selectDishesByMerchant/${merchantId}`).then((r) => {
         this.dishesList = r.data.data
