@@ -112,6 +112,18 @@ public class OrderInfoController {
         return R.ok(orderInfoService.saveOrder(orderInfo));
     }
 
+    /**
+     * 订单收货
+     *
+     * @param orderCode 订单编号
+     * @param status    状态
+     * @return 结果
+     */
+    @GetMapping("/audit")
+    public R audit(@RequestParam("orderCode") String orderCode, @RequestParam("status") String status) {
+        return R.ok(orderInfoService.audit(orderCode, status));
+    }
+
 
     /**
      * 获取订单付款信息

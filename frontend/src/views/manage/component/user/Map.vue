@@ -151,7 +151,29 @@
           </div>
         </a-col>
       </a-row>
+      <a-drawer
+        title="商家评价"
+        width="600"
+        :closable="false"
+        :visible="childrenDrawer"
+        @close="onChildrenDrawerClose"
+      >
+        <a-list item-layout="horizontal" :data-source="evaluateList">
+          <a-list-item slot="renderItem" slot-scope="item, index">
+            <a-list-item-meta
+              :description="item.content"
+            >
+              <a slot="title">{{ item.userName }}</a>
+              <a-avatar
+                slot="avatar"
+                :src="'http://127.0.0.1:9527/imagesWeb/' + item.userImages"
+              />
+            </a-list-item-meta>
+          </a-list-item>
+        </a-list>
+      </a-drawer>
       <div class="drawer-bootom-button">
+        <a-button @click="showChildrenDrawer" style="margin-right: .8rem">评价信息</a-button>
         <a-popconfirm title="确定放弃编辑？" @confirm="home" okText="确定" cancelText="取消">
           <a-button style="margin-right: .8rem">取消</a-button>
         </a-popconfirm>
@@ -255,6 +277,7 @@ export default {
   },
   data () {
     return {
+      childrenDrawer: false,
       orderAddInfo: null,
       addressId: null,
       addressList: [],
@@ -262,6 +285,7 @@ export default {
       nextFlag: 1,
       totalPrice: 0,
       dishesList: [],
+      evaluateList: [],
       checkList: [],
       evaluateInfo: null,
       vehicleInfo: null,
@@ -312,6 +336,7 @@ export default {
         this.nextFlag = 1
         this.totalPrice = 0
         this.selectDishesByMerchant(this.orderData.id)
+        this.selectMerchantEvaluate(this.orderData.id)
         this.selectAddress()
       }
     },
@@ -325,6 +350,12 @@ export default {
     }
   },
   methods: {
+    showChildrenDrawer () {
+      this.childrenDrawer = true
+    },
+    onChildrenDrawerClose () {
+      this.childrenDrawer = false
+    },
     orderPay (record) {
       this.orderAddInfo.userId = this.currentUser.userId
       this.$post('/cos/pay/alipay', this.orderAddInfo).then((r) => {
@@ -367,6 +398,10 @@ export default {
       })
     },
     next () {
+      if (this.checkList.length === 0) {
+        this.$message.warn('请选择菜品信息')
+        return false
+      }
       this.nextFlag = 2
       this.getPriceTotal()
     },
@@ -418,6 +453,11 @@ export default {
     selectDishesByMerchant (merchantId) {
       this.$get(`/cos/dishes-info/selectDishesByMerchant/${merchantId}`).then((r) => {
         this.dishesList = r.data.data
+      })
+    },
+    selectMerchantEvaluate (merchantId) {
+      this.$get(`/cos/merchant-info/selectEvaluateByMerchant`, {merchantId}).then((r) => {
+        this.evaluateList = r.data.data
       })
     },
     navigation (data) {

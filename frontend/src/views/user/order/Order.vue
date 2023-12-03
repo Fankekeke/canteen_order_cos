@@ -64,9 +64,9 @@
         </template>
         <template slot="operation" slot-scope="text, record">
           <a-icon type="file-search" @click="orderViewOpen(record)" title="详 情"></a-icon>
-<!--          <a-icon v-if="record.status == 2" type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="orderComplete(record)" title="订单完成" style="margin-left: 15px"></a-icon>-->
-<!--          <a-icon v-if="record.taskShop == null && record.returnShop == null" type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="orderAuditOpen(record)" title="修 改" style="margin-left: 15px"></a-icon>-->
+          <a-icon v-if="record.status == 2 && record.type == 1" type="check" @click="orderComplete(record)" title="订单完成" style="margin-left: 15px"></a-icon>
           <a-icon v-if="record.type == 1" type="cluster" @click="orderMapOpen(record)" title="地 图" style="margin-left: 15px"></a-icon>
+          <a-icon v-if="record.evaluateId == null && record.status == 3" type="reconciliation" theme="twoTone" twoToneColor="#4a9ff5" @click="orderEvaluateOpen(record)" title="评 价" style="margin-left: 15px"></a-icon>
         </template>
       </a-table>
     </div>
@@ -87,16 +87,22 @@
       :orderShow="orderView.visiable"
       :orderData="orderView.data">
     </order-view>
-    <order-add
-      @close="handleorderAddClose"
-      @success="handleorderAddSuccess"
-      :orderAddShow="orderAdd.visiable">
-    </order-add>
+<!--    <order-add-->
+<!--      @close="handleorderAddClose"-->
+<!--      @success="handleorderAddSuccess"-->
+<!--      :orderAddShow="orderAdd.visiable">-->
+<!--    </order-add>-->
     <MapView
       @close="handleorderMapViewClose"
       :orderShow="orderMapView.visiable"
       :orderData="orderMapView.data">
     </MapView>
+    <order-evaluate
+      @close="handleorderAddClose"
+      @success="handleorderAddSuccess"
+      :evaluateAddVisiable="orderEvaluateView.visiable"
+      :orderData="orderEvaluateView.data">
+    </order-evaluate>
   </a-card>
 </template>
 
@@ -108,12 +114,13 @@ import OrderAdd from './OrderAdd'
 import OrderAudit from './OrderAudit'
 import OrderView from './OrderView'
 import OrderStatus from './OrderStatus.vue'
+import OrderEvaluate from './OrderEvaluate'
 import MapView from '../../manage/map/Map.vue'
 moment.locale('zh-cn')
 
 export default {
   name: 'order',
-  components: {OrderView, OrderAudit, RangeDate, OrderStatus, OrderAdd, MapView},
+  components: {OrderView, OrderAudit, RangeDate, OrderStatus, OrderAdd, MapView, OrderEvaluate},
   data () {
     return {
       advanced: false,
@@ -128,6 +135,10 @@ export default {
         data: null
       },
       orderView: {
+        visiable: false,
+        data: null
+      },
+      orderEvaluateView: {
         visiable: false,
         data: null
       },
@@ -280,6 +291,10 @@ export default {
     this.fetch()
   },
   methods: {
+    orderEvaluateOpen (row) {
+      this.orderEvaluateView.data = row
+      this.orderEvaluateView.visiable = true
+    },
     orderComplete (row) {
       this.$get(`/cos/order-info/audit`, {
         'orderCode': row.code,
@@ -337,11 +352,11 @@ export default {
       this.orderAdd.visiable = true
     },
     handleorderAddClose () {
-      this.orderAdd.visiable = false
+      this.orderEvaluateView.visiable = false
     },
     handleorderAddSuccess () {
-      this.orderAdd.visiable = false
-      this.$message.success('添加平台订单成功')
+      this.orderEvaluateView.visiable = false
+      this.$message.success('新增评价成功')
       this.search()
     },
     edit (record) {

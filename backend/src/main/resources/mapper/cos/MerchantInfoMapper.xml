@@ -67,12 +67,13 @@
         (mi.id = ei.merchant_id)
         where
         1 = 1
-        <if test="evaluateInfo.merchantId != null">
-            AND mi.id = #{evaluateInfo.merchantId}
+        <if test="merchantId != null">
+            AND mi.id = #{merchantId}
         </if>
-        <if test="evaluateInfo.dishesId != null">
-            AND oii.dishes_id = #{evaluateInfo.dishesId}
+        <if test="dishesId != null">
+            AND oii.dishes_id = #{dishesId}
         </if>
+        group by  ei.id
         order by
         ei.create_date desc
     </select>

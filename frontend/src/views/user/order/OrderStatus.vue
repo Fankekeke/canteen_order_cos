@@ -157,7 +157,12 @@
             {{ evaluateInfo.score }}
           </a-col>
           <a-col :span="6"><b>评价内容：</b>
-            {{ evaluateInfo.content ? evaluateInfo.content : '- -' }}
+            <a-tooltip>
+              <template slot="title">
+                {{ evaluateInfo.content}}
+              </template>
+              {{ evaluateInfo.content.slice(0, 8) }} ...
+            </a-tooltip>
           </a-col>
           <a-col :span="6"><b>评价时间：</b>
             {{ evaluateInfo.createDate ? evaluateInfo.createDate : '- -' }}

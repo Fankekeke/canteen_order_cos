@@ -25,13 +25,16 @@
             ui.name as userName,
             ui.images as userImages,
             mi.name as merchantName,
-            mi.images as merchantImages
+            mi.images as merchantImages,
+            ei.id as evaluateId
         from
             order_info oi
                 left join user_info ui on
                 (ui.id = oi.user_id)
                 left join merchant_info mi on
                 (mi.id = oi.merchant_id)
+                left join evaluate_info ei on
+                (ei.order_id = oi.id)
         where
             1 = 1
         <if test="orderInfo.code != null and orderInfo.code != ''">

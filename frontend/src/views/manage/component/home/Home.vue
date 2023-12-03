@@ -77,7 +77,7 @@
 <!--          <apexchart v-if="!loading" type="donut" height="270" :options="chartOptions2" :series="series2"></apexchart>-->
 <!--        </a-card>-->
 <!--      </a-col>-->
-      <a-col :span="15">
+      <a-col :span="15" v-if="user.roleId != 76">
         <a-card hoverable :loading="loading" :bordered="false" title="公告信息" style="margin-top: 15px">
           <div style="padding: 0 22px">
             <a-list item-layout="vertical" :pagination="pagination" :data-source="bulletinList">

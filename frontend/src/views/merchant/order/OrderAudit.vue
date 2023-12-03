@@ -112,7 +112,7 @@
       <a-row style="padding-left: 24px;padding-right: 24px;" :gutter="15">
         <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">购买菜品</span></a-col>
         <a-col :span="18">
-          <a-table :columns="columns" :data-source="orderItemInfo"></a-table>
+          <a-table :columns="columns" :data-source="orderItemInfo" :pagination="false"></a-table>
         </a-col>
         <a-col :span="6">
           <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">选择配送员</span></a-col>

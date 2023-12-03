@@ -158,6 +158,31 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     }
 
     /**
+     * 订单收货
+     *
+     * @param orderCode 订单编号
+     * @param status    状态
+     * @return 结果
+     */
+    @Override
+    public boolean audit(String orderCode, String status) {
+        OrderInfo order = this.getOne(Wrappers.<OrderInfo>lambdaQuery().eq(OrderInfo::getCode, orderCode));
+
+        UserInfo userInfo = userInfoService.getById(order.getUserId());
+
+        // 邮箱通知
+        if (StrUtil.isNotEmpty(userInfo.getMail())) {
+            MerchantInfo merchantInfo = merchantInfoService.getById(order.getMerchantId());
+            Context context = new Context();
+            context.setVariable("today", DateUtil.formatDate(new Date()));
+            context.setVariable("custom", userInfo.getName() + "，您好，在 " + merchantInfo.getName() + " 消费订单 " + order.getCode() + " 已完成，可进行评价");
+            String emailContent = templateEngine.process("registerEmail", context);
+            mailService.sendHtmlMail(userInfo.getMail(), DateUtil.formatDate(new Date()) + "订单完成", emailContent);
+        }
+        return this.update(Wrappers.<OrderInfo>lambdaUpdate().set(OrderInfo::getStatus, status).eq(OrderInfo::getCode, orderCode));
+    }
+
+    /**
      * 获取订单付款信息
      *
      * @param orderInfo 订单信息
@@ -185,7 +210,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         }
 
         // 判断用户是否为此店会员
-        int count = merchantMemberInfoService.count(Wrappers.<MerchantMemberInfo>lambdaQuery().eq(MerchantMemberInfo::getMerchantId, orderInfo.getMerchantId()).eq(MerchantMemberInfo::getUserId, orderInfo.getUserId()));
+        int count = merchantMemberInfoService.count(Wrappers.<MerchantMemberInfo>lambdaQuery().eq(MerchantMemberInfo::getMerchantId, orderInfo.getMerchantId()).eq(MerchantMemberInfo::getUserId, userInfo.getId()));
         if (count > 0) {
             BigDecimal discount = NumberUtil.sub(orderInfo.getOrderPrice(), NumberUtil.mul(orderInfo.getOrderPrice(), 0.8));
             orderInfo.setDiscount(NumberUtil.round(discount,2));

@@ -1,8 +1,11 @@
 <template>
-  <a-modal v-model="show" title="订单详情" @cancel="onClose" :width="1500">
+  <a-modal v-model="show" title="订单评价" @cancel="onClose" :width="1000">
     <template slot="footer">
-      <a-button key="back" @click="onClose" type="danger">
-        关闭
+      <a-button key="back" @click="onClose">
+        取消
+      </a-button>
+      <a-button key="submit" type="primary" :loading="loading" @click="handleSubmit">
+        提交
       </a-button>
     </template>
     <div style="font-size: 13px;font-family: SimHei" v-if="orderInfo !== null">
@@ -57,125 +60,60 @@
       </a-row>
       <br/>
     </div>
-    <br/>
-    <div style="font-size: 13px;font-family: SimHei" v-if="userInfo !== null">
-      <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">用户信息</span></a-col>
-        <a-col :span="6"><b>会员编号：</b>
-          {{ userInfo.code }}
-        </a-col>
-        <a-col :span="6"><b>用户姓名：</b>
-          {{ userInfo.name ? userInfo.name : '- -' }}
-        </a-col>
-        <a-col :span="6"><b>邮箱地址：</b>
-          {{ userInfo.mail ? userInfo.mail : '- -' }}
-        </a-col>
-        <a-col :span="6"><b>联系电话：</b>
-          {{ userInfo.phone }}
-        </a-col>
-      </a-row>
-      <br/>
-    </div>
-    <br/>
-    <div style="font-size: 13px;font-family: SimHei" v-if="merchantInfo !== null">
-      <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">商家信息</span></a-col>
-        <a-col :span="6"><b>商家编号：</b>
-          {{ merchantInfo.code }}
-        </a-col>
-        <a-col :span="6"><b>商家名称：</b>
-          {{ merchantInfo.name ? merchantInfo.name : '- -' }}
-        </a-col>
-        <a-col :span="6"><b>地 址：</b>
-          {{ merchantInfo.address ? merchantInfo.address : '- -' }}
-        </a-col>
-        <a-col :span="6"><b>负责人：</b>
-          {{ merchantInfo.principal }}
-        </a-col>
-      </a-row>
-      <br/>
-      <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col :span="6"><b>联系方式：</b>
-          {{ merchantInfo.phone }}
-        </a-col>
-        <a-col :span="6"><b>菜系：</b>
-          {{ merchantInfo.dishes ? merchantInfo.dishes : '- -' }}
-        </a-col>
-      </a-row>
-      <br/>
-    </div>
-    <br/>
     <div style="font-size: 13px;font-family: SimHei" v-if="orderItemInfo.length !== 0">
       <a-row style="padding-left: 24px;padding-right: 24px;">
         <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">购买菜品</span></a-col>
-        <a-table :columns="columns" :data-source="orderItemInfo"></a-table>
+        <a-table :columns="columns" :data-source="orderItemInfo" :pagination="false"></a-table>
       </a-row>
       <br/>
     </div>
-    <br/>
-    <div style="font-size: 13px;font-family: SimHei" v-if="addressInfo !== null">
-      <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">收货地址</span></a-col>
-        <a-col :span="6"><b>收货编号：</b>
-          {{ addressInfo.code }}
+    <a-form :form="form" layout="vertical" style="padding: 20px">
+      <a-row :gutter="20">
+        <a-col :span="12">
+          <a-form-item label='评价分数' v-bind="formItemLayout">
+            <a-rate v-decorator="[
+            'score',
+            { rules: [{ required: true, message: '请输入评价分数!' }] }
+            ]" />
+          </a-form-item>
         </a-col>
-        <a-col :span="6"><b>详细地址：</b>
-          {{ addressInfo.address ? addressInfo.address : '- -' }}
+        <a-col :span="24">
+          <a-form-item label='评价内容' v-bind="formItemLayout">
+            <a-textarea :rows="6" v-decorator="[
+            'content',
+             { rules: [{ required: true, message: '请输入评价内容!' }] }
+            ]"/>
+          </a-form-item>
         </a-col>
-        <a-col :span="6"><b>联系人：</b>
-          {{ addressInfo.contactPerson ? addressInfo.contactPerson : '- -' }}
-        </a-col>
-        <a-col :span="6"><b>联系方式：</b>
-          {{ addressInfo.contactMethod }}
-        </a-col>
-      </a-row>
-      <br/>
-    </div>
-    <br/>
-    <div style="font-size: 13px;font-family: SimHei" v-if="staffInfo !== null">
-      <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">配送员信息</span></a-col>
-        <a-col :span="6"><b>员工姓名：</b>
-          {{ staffInfo.name }}
-        </a-col>
-        <a-col :span="6"><b>性别：</b>
-          <span v-if="orderInfo.type === '1'">男</span>
-          <span v-if="orderInfo.type === '2'">女</span>
-        </a-col>
-        <a-col :span="6"><b>员工工号：</b>
-          {{ staffInfo.code }}
-        </a-col>
-      </a-row>
-      <br/>
-    </div>
-    <br/>
-    <div style="font-size: 13px;font-family: SimHei" v-if="evaluateInfo !== null">
-      <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">订单评价</span></a-col>
-        <a-col :span="6"><b>评价分数：</b>
-          <a-rate :default-value="evaluateInfo.score" disabled />
-        </a-col>
-        <a-col :span="6"><b>评价内容：</b>
-          <a-tooltip>
-            <template slot="title">
-              {{ evaluateInfo.content}}
-            </template>
-            {{ evaluateInfo.content.slice(0, 8) }} ...
-          </a-tooltip>
-        </a-col>
-        <a-col :span="6"><b>评价时间：</b>
-          {{ evaluateInfo.createDate ? evaluateInfo.createDate : '- -' }}
+        <a-col :span="24">
+          <a-form-item label='图册' v-bind="formItemLayout">
+            <a-upload
+              name="avatar"
+              action="http://127.0.0.1:9527/file/fileUpload/"
+              list-type="picture-card"
+              :file-list="fileList"
+              @preview="handlePreview"
+              @change="picHandleChange"
+            >
+              <div v-if="fileList.length < 8">
+                <a-icon type="plus" />
+                <div class="ant-upload-text">
+                  Upload
+                </div>
+              </div>
+            </a-upload>
+            <a-modal :visible="previewVisible" :footer="null" @cancel="handleCancel">
+              <img alt="example" style="width: 100%" :src="previewImage" />
+            </a-modal>
+          </a-form-item>
         </a-col>
       </a-row>
-      <br/>
-    </div>
-    <br/>
+    </a-form>
   </a-modal>
 </template>
 
 <script>
-import moment from 'moment'
-moment.locale('zh-cn')
+import {mapState} from 'vuex'
 function getBase64 (file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -184,11 +122,14 @@ function getBase64 (file) {
     reader.onerror = error => reject(error)
   })
 }
+const formItemLayout = {
+  labelCol: { span: 24 },
+  wrapperCol: { span: 24 }
+}
 export default {
-  name: 'orderView',
+  name: 'evaluateAdd',
   props: {
-    orderShow: {
-      type: Boolean,
+    evaluateAddVisiable: {
       default: false
     },
     orderData: {
@@ -196,9 +137,12 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      currentUser: state => state.account.user
+    }),
     show: {
       get: function () {
-        return this.orderShow
+        return this.evaluateAddVisiable
       },
       set: function () {
       }
@@ -240,15 +184,18 @@ export default {
   },
   data () {
     return {
+      formItemLayout,
+      form: this.$form.createForm(this),
       loading: false,
       fileList: [],
       previewVisible: false,
       previewImage: '',
-      repairInfo: null,
-      reserveInfo: null,
       durgList: [],
       logisticsList: [],
       current: 0,
+      buyer: null,
+      sale: null,
+      commodityData: null,
       userInfo: null,
       orderInfo: null,
       merchantInfo: null,
@@ -259,8 +206,9 @@ export default {
     }
   },
   watch: {
-    orderShow: function (value) {
+    evaluateAddVisiable: function (value) {
       if (value) {
+        this.fileList = []
         this.dataInit(this.orderData.id)
       }
     }
@@ -275,17 +223,7 @@ export default {
         this.addressInfo = r.data.address
         this.staffInfo = r.data.staff
         this.evaluateInfo = r.data.evaluate
-        this.imagesInit(this.merchantInfo.images)
       })
-    },
-    imagesInit (images) {
-      if (images !== null && images !== '') {
-        let imageList = []
-        images.split(',').forEach((image, index) => {
-          imageList.push({uid: index, name: image, status: 'done', url: 'http://127.0.0.1:9527/imagesWeb/' + image})
-        })
-        this.fileList = imageList
-      }
     },
     handleCancel () {
       this.previewVisible = false
@@ -300,8 +238,37 @@ export default {
     picHandleChange ({ fileList }) {
       this.fileList = fileList
     },
+    reset () {
+      this.loading = false
+      this.form.resetFields()
+    },
     onClose () {
+      this.reset()
       this.$emit('close')
+    },
+    handleSubmit () {
+      // 获取图片List
+      let images = []
+      this.fileList.forEach(image => {
+        images.push(image.response)
+      })
+      this.form.validateFields((err, values) => {
+        values.orderId = this.orderData.id
+        values.userId = this.orderData.userId
+        values.merchantId = this.orderData.merchantId
+        values.images = images.length > 0 ? images.join(',') : null
+        if (!err) {
+          this.loading = true
+          this.$post('/cos/evaluate-info', {
+            ...values
+          }).then((r) => {
+            this.reset()
+            this.$emit('success')
+          }).catch(() => {
+            this.loading = false
+          })
+        }
+      })
     }
   }
 }

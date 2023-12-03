@@ -51,6 +51,16 @@
                :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
                :scroll="{ x: 900 }"
                @change="handleTableChange">
+        <template slot="evaluateShow" slot-scope="text, record">
+          <template>
+            <a-tooltip>
+              <template slot="title">
+                {{ record.content }}
+              </template>
+              {{ record.content.slice(0, 10) }} ...
+            </a-tooltip>
+          </template>
+        </template>
         <template slot="operation" slot-scope="text, record">
           <a-icon type="file-search" @click="orderViewOpen(record)" title="详 情"></a-icon>
         </template>
@@ -165,13 +175,7 @@ export default {
       }, {
         title: '评价内容',
         dataIndex: 'content',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
+        scopedSlots: {customRender: 'evaluateShow'}
       }, {
         title: '评价图片',
         dataIndex: 'images',
@@ -349,7 +353,7 @@ export default {
       if (params.type === undefined) {
         delete params.type
       }
-      params.useriId = this.currentUser.userId
+      params.userId = this.currentUser.userId
       this.$get('/cos/evaluate-info/page', {
         ...params
       }).then((r) => {
