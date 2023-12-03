@@ -105,6 +105,7 @@
                   <div v-if="checkList.length !== 0" style="font-size: 12px;font-family: SimHei">
                     <a-table :columns="columns1" :rowKey="record => record.id" :data-source="checkList" :pagination="false">
                     </a-table>
+                    <a-alert :message="'购买菜品热量【'+totalHeat+'】 超过600，请合理规划饮食' " banner v-if="totalHeat > 600"/>
                     <a-row style="padding-left: 20px;padding-right: 20px;margin-top: 30px">
                       <a-col style="margin-bottom: 15px"><span style="font-size: 13px;font-weight: 650;color: #000c17">选择 外送/堂食</span></a-col>
                       <a-col :span="24">
@@ -222,6 +223,9 @@ export default {
         title: '购买数量',
         dataIndex: 'amount'
       }, {
+        title: '热量',
+        dataIndex: 'heat'
+      }, {
         title: '单价',
         dataIndex: 'unitPrice'
       }, {
@@ -284,6 +288,7 @@ export default {
       type: '0',
       nextFlag: 1,
       totalPrice: 0,
+      totalHeat: 0,
       dishesList: [],
       evaluateList: [],
       checkList: [],
@@ -335,6 +340,7 @@ export default {
         this.type = '0'
         this.nextFlag = 1
         this.totalPrice = 0
+        this.totalHeat = 0
         this.selectDishesByMerchant(this.orderData.id)
         this.selectMerchantEvaluate(this.orderData.id)
         this.selectAddress()
@@ -412,16 +418,20 @@ export default {
         if (e.id === row.id) {
           e.amount = e.amount - 1
           e.totalPrice = (e.unitPrice * e.amount).toFixed(2)
+          e.totalHeat = (e.heat * e.amount).toFixed(2)
           if (e.amount === 0) {
             checkList = checkList.filter(e => e.id !== row.id)
           }
         }
       })
       let totalPrice = 0
+      let totalHeat = 0
       checkList.forEach(e => {
         totalPrice = Number(e.totalPrice) + Number(totalPrice)
+        totalHeat = Number(e.totalHeat) + Number(totalHeat)
       })
       this.totalPrice = totalPrice.toFixed(2)
+      this.totalHeat = totalHeat.toFixed(2)
       this.checkList = checkList
     },
     dishesAdd (row) {
@@ -435,19 +445,24 @@ export default {
           check = true
           e.amount = e.amount + 1
           e.totalPrice = (e.unitPrice * e.amount).toFixed(2)
+          e.totalHeat = (e.heat * e.amount).toFixed(2)
         }
       })
       if (!check) {
         let data = row
         data.amount = 1
         data.totalPrice = data.unitPrice
+        data.totalHeat = data.heat
         checkList.push(data)
       }
       let totalPrice = 0
+      let totalHeat = 0
       checkList.forEach(e => {
         totalPrice = Number(e.totalPrice) + Number(totalPrice)
+        totalHeat = Number(e.totalHeat) + Number(totalHeat)
       })
       this.totalPrice = totalPrice.toFixed(2)
+      this.totalHeat = totalHeat.toFixed(2)
       this.checkList = checkList
     },
     selectDishesByMerchant (merchantId) {

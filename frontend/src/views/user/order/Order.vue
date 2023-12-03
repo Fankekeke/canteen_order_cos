@@ -64,6 +64,7 @@
         </template>
         <template slot="operation" slot-scope="text, record">
           <a-icon type="file-search" @click="orderViewOpen(record)" title="详 情"></a-icon>
+          <a-icon v-if="record.status ==  0" type="alipay" @click="orderPay(record)" title="支 付" style="margin-left: 15px"></a-icon>
           <a-icon v-if="record.status == 2 && record.type == 1" type="check" @click="orderComplete(record)" title="订单完成" style="margin-left: 15px"></a-icon>
           <a-icon v-if="record.type == 1" type="cluster" @click="orderMapOpen(record)" title="地 图" style="margin-left: 15px"></a-icon>
           <a-icon v-if="record.evaluateId == null && record.status == 3" type="reconciliation" theme="twoTone" twoToneColor="#4a9ff5" @click="orderEvaluateOpen(record)" title="评 价" style="margin-left: 15px"></a-icon>
@@ -291,6 +292,23 @@ export default {
     this.fetch()
   },
   methods: {
+    orderPay (record) {
+      let data = { outTradeNo: record.code, subject: `${record.createDate}缴费信息`, totalAmount: record.afterOrderPrice, body: '' }
+      this.$post('/cos/pay/test', data).then((r) => {
+        // console.log(r.data.msg)
+        // 添加之前先删除一下，如果单页面，页面不刷新，添加进去的内容会一直保留在页面中，二次调用form表单会出错
+        const divForm = document.getElementsByTagName('div')
+        if (divForm.length) {
+          document.body.removeChild(divForm[0])
+        }
+        const div = document.createElement('div')
+        div.innerHTML = r.data.msg // data就是接口返回的form 表单字符串
+        // console.log(div.innerHTML)
+        document.body.appendChild(div)
+        document.forms[0].setAttribute('target', '_self') // 新开窗口跳转
+        document.forms[0].submit()
+      })
+    },
     orderEvaluateOpen (row) {
       this.orderEvaluateView.data = row
       this.orderEvaluateView.visiable = true
