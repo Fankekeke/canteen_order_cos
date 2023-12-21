@@ -1,4 +1,4 @@
-基于SpringBoot点餐配送系统.
+### 基于SpringBoot + Vue点餐配送系统.
 
 #### 安装环境
 
