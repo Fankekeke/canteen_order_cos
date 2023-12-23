@@ -170,8 +170,8 @@
                       {{ staffInfo.name }}
                     </a-col>
                     <a-col :span="8"><b>性别：</b>
-                      <span v-if="orderInfo.type === '1'">男</span>
-                      <span v-if="orderInfo.type === '2'">女</span>
+                      <span v-if="staffInfo.sex == '1'">男</span>
+                      <span v-if="staffInfo.sex == '2'">女</span>
                     </a-col>
                     <a-col :span="8"><b>员工工号：</b>
                       {{ staffInfo.code }}
