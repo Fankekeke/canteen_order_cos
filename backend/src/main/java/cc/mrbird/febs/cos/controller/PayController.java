@@ -6,6 +6,7 @@ import cc.mrbird.febs.cos.entity.AlipayBean;
 import cc.mrbird.febs.cos.entity.OrderInfo;
 import cc.mrbird.febs.cos.service.IOrderInfoService;
 import cc.mrbird.febs.cos.service.PayService;
+import cn.hutool.core.util.NumberUtil;
 import com.alipay.api.AlipayApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +32,12 @@ public class PayController {
     @PostMapping("/alipay")
     public R saveOrder(OrderInfo orderInfo) throws AlipayApiException {
         orderInfo.setCode("ORD-" + System.currentTimeMillis());
+        orderInfo.setAfterOrderPrice(NumberUtil.round(orderInfo.getAfterOrderPrice(), 2));
         orderInfo.setIntegral(orderInfo.getAfterOrderPrice());
         orderInfoService.saveOrder(orderInfo);
         AlipayBean alipayBean = new AlipayBean();
         alipayBean.setOut_trade_no(orderInfo.getCode());
-        alipayBean.setSubject(orderInfo.getMerchantName() + System.currentTimeMillis());
+        alipayBean.setSubject(orderInfo.getCode());
         alipayBean.setTotal_amount(orderInfo.getAfterOrderPrice().toString());
         alipayBean.setBody("");
         String result = payService.aliPay(alipayBean);

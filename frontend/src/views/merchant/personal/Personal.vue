@@ -390,8 +390,8 @@ export default {
           let user = this.form.getFieldsValue()
           user.images = images.length > 0 ? images.join(',') : null
           user.operateDay = this.checkedList.join(',')
-          values.operateStartTime = moment(values.operateStartTime).format('HH:mm:ss')
-          values.operateEndTime = moment(values.operateEndTime).format('HH:mm:ss')
+          user.operateStartTime = moment(user.operateStartTime).format('HH:mm:ss')
+          user.operateEndTime = moment(user.operateEndTime).format('HH:mm:ss')
           user.id = this.rowId
           this.$put('/cos/merchant-info', {
             ...user
