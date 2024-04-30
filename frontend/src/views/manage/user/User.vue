@@ -60,8 +60,33 @@
             </a-tooltip>
           </template>
         </template>
+        <template slot="operation" slot-scope="text, record">
+          <a-icon type="reconciliation" @click="showModal(record)" title="分配额度" style="margin-left: 15px"></a-icon>
+        </template>
       </a-table>
     </div>
+    <a-modal
+      title="添加额度"
+      :visible="visible"
+      :confirm-loading="confirmLoading"
+      :width="800"
+      @ok="auditQuota"
+      @cancel="handleCancel"
+    >
+      <a-row style="padding-left: 24px;padding-right: 24px;" v-if="userInfo !== null">
+        <a-col :span="8"><b>用户编号：</b>
+          {{ userInfo.code }}
+        </a-col>
+        <a-col :span="8"><b>用户名称：</b>
+          {{ userInfo.name ? userInfo.name : '- -' }}
+        </a-col>
+        <a-col :span="8"><b>当前额度：</b>
+          {{ userInfo.quota }}
+        </a-col>
+        <a-col style="margin-bottom: 15px;margin-top: 50px"><span style="font-size: 15px;font-weight: 650;color: #000c17">添加额度:</span></a-col>
+        <a-input-number style="width: 100%" :min="1" :step="1" v-model="quota"/>
+      </a-row>
+    </a-modal>
   </a-card>
 </template>
 
@@ -76,6 +101,8 @@ export default {
   components: {RangeDate},
   data () {
     return {
+      visible: false,
+      confirmLoading: false,
       advanced: false,
       userAdd: {
         visiable: false
@@ -83,6 +110,8 @@ export default {
       userEdit: {
         visiable: false
       },
+      quota: 1,
+      userInfo: null,
       queryParams: {},
       filteredInfo: null,
       sortedInfo: null,
@@ -133,6 +162,16 @@ export default {
           }
         }
       }, {
+        title: '额度',
+        dataIndex: 'quota',
+        customRender: (text, row, index) => {
+          if (text !== null) {
+            return text
+          } else {
+            return '- -'
+          }
+        }
+      }, {
         title: '头像',
         dataIndex: 'images',
         customRender: (text, record, index) => {
@@ -154,6 +193,10 @@ export default {
             return '- -'
           }
         }
+      }, {
+        title: '操作',
+        dataIndex: 'operation',
+        scopedSlots: {customRender: 'operation'}
       }]
     }
   },
@@ -161,6 +204,28 @@ export default {
     this.fetch()
   },
   methods: {
+    showModal (row) {
+      this.userInfo = row
+      this.visible = true
+    },
+    handleOk (e) {
+      this.confirmLoading = true
+      setTimeout(() => {
+        this.visible = false
+        this.confirmLoading = false
+      }, 2000)
+    },
+    handleCancel (e) {
+      console.log('Clicked cancel button')
+      this.visible = false
+    },
+    auditQuota () {
+      this.$post('/cos/user-info/auditQuota', { userId: this.userInfo.id, quota: this.quota }).then((r) => {
+        this.$message.success('修改成功')
+        this.visible = false
+        this.fetch()
+      })
+    },
     editStatus (row, status) {
       this.$post('/cos/user-info/account/status', { staffId: row.id, status }).then((r) => {
         this.$message.success('修改成功')

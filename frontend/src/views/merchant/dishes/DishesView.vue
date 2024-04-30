@@ -32,8 +32,8 @@
       </a-row>
       <br/>
       <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col :span="8"><b>销量：</b>
-          {{ dishesData.saleNum }}
+        <a-col :span="8"><b>余量：</b>
+          {{ dishesData.laveNum }}
         </a-col>
         <a-col :span="8"><b>上架状态：</b>
           <span v-if="dishesData.status == 0" style="color: red">下架</span>

@@ -92,4 +92,9 @@ public class UserInfo implements Serializable {
      * 积分余额
      */
     private BigDecimal integral;
+
+    /**
+     * 额度
+     */
+    private BigDecimal quota;
 }

@@ -45,8 +45,8 @@
         <a-col :span="8"><b>物品编号：</b>
           {{ materialInfo.code ? materialInfo.code : '- -' }}
         </a-col>
-        <a-col :span="8"><b>销量：</b>
-          {{ materialInfo.saleNum ? materialInfo.saleNum : '- -' }}
+        <a-col :span="8"><b>余量：</b>
+          {{ materialInfo.laveNum ? materialInfo.laveNum : '- -' }}
         </a-col>
         <br/>
         <br/>

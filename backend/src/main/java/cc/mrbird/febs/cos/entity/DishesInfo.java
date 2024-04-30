@@ -104,6 +104,11 @@ public class DishesInfo implements Serializable {
      */
     private BigDecimal fat;
 
+    /**
+     * 余量
+     */
+    private Integer laveNum;
+
     @TableField(exist = false)
     private String merchantName;
 

@@ -1,5 +1,5 @@
 <template>
-  <a-modal v-model="show" title="兑换详情" @cancel="onClose" :width="1000">
+  <a-modal v-model="show" title="额度记录详情" @cancel="onClose" :width="1000">
     <template slot="footer">
       <a-button key="back" @click="onClose" type="danger">
         关闭
@@ -7,12 +7,16 @@
     </template>
     <div style="font-size: 13px;font-family: SimHei">
       <a-row style="padding-left: 24px;padding-right: 24px;" v-if="exchangeData !== null">
-        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">兑换信息</span></a-col>
-        <a-col :span="8"><b>兑换时间：</b>
+        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">额度记录信息</span></a-col>
+        <a-col :span="8"><b>额度添加时间：</b>
           {{ exchangeData.createDate }}
         </a-col>
-        <a-col :span="8"><b>消耗积分：</b>
-          {{ exchangeData.integral ? exchangeData.integral : '- -' }}
+        <a-col :span="8"><b>添加额度：</b>
+          {{ exchangeData.quota ? exchangeData.quota : '- -' }}
+        </a-col>
+        <a-col :span="8"><b>类型：</b>
+          <span v-if="exchangeData.type == 0">管理员添加</span>
+          <span v-if="exchangeData.type == 1">充值</span>
         </a-col>
       </a-row>
       <br/>
@@ -30,48 +34,8 @@
           </a-col>
         </a-row>
         <br/>
-        <a-row style="padding-left: 24px;padding-right: 24px;">
-          <a-col :span="8"><b>收货地址：</b>
-            {{ userInfo.address }}
-          </a-col>
-        </a-row>
       </div>
       <br/>
-      <a-row style="padding-left: 24px;padding-right: 24px;" v-if="materialInfo != null">
-        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">物品信息</span></a-col>
-        <a-col :span="8"><b>物品名称：</b>
-          {{ materialInfo.name }}
-        </a-col>
-        <a-col :span="8"><b>物品编号：</b>
-          {{ materialInfo.code ? materialInfo.code : '- -' }}
-        </a-col>
-        <a-col :span="8"><b>余量：</b>
-          {{ materialInfo.laveNum ? materialInfo.laveNum : '- -' }}
-        </a-col>
-        <br/>
-        <br/>
-        <a-col :span="24"><b></b>
-          {{ materialInfo.content ? materialInfo.content : '- -' }}
-        </a-col>
-      </a-row>
-      <br/>
-      <a-row style="padding-left: 24px;padding-right: 24px;">
-        <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">图册</span></a-col>
-        <a-col :span="24">
-          <a-upload
-            name="avatar"
-            action="http://127.0.0.1:9527/file/fileUpload/"
-            list-type="picture-card"
-            :file-list="fileList"
-            @preview="handlePreview"
-            @change="picHandleChange"
-          >
-          </a-upload>
-          <a-modal :visible="previewVisible" :footer="null" @cancel="handleCancel">
-            <img alt="example" style="width: 100%" :src="previewImage" />
-          </a-modal>
-        </a-col>
-      </a-row>
     </div>
   </a-modal>
 </template>
@@ -125,9 +89,6 @@ export default {
   },
   watch: {
     exchangeShow: function (value) {
-      if (value) {
-        this.changeDetail(this.exchangeData.id)
-      }
     }
   },
   methods: {

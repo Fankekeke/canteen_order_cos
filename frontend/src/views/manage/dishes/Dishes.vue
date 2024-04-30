@@ -220,8 +220,8 @@ export default {
           }
         }
       }, {
-        title: '销量',
-        dataIndex: 'saleNum',
+        title: '余量',
+        dataIndex: 'laveNum',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text

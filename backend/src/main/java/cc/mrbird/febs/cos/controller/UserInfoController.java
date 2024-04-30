@@ -2,9 +2,12 @@ package cc.mrbird.febs.cos.controller;
 
 
 import cc.mrbird.febs.common.utils.R;
+import cc.mrbird.febs.cos.entity.QuotaRecordInfo;
 import cc.mrbird.febs.cos.entity.UserInfo;
+import cc.mrbird.febs.cos.service.IQuotaRecordInfoService;
 import cc.mrbird.febs.cos.service.IUserInfoService;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,8 @@ public class UserInfoController {
 
     private final IUserInfoService userInfoService;
 
+    private final IQuotaRecordInfoService quotaRecordService;
+
     /**
      * 分页获取用户信息
      *
@@ -34,6 +39,24 @@ public class UserInfoController {
     @GetMapping("/page")
     public R page(Page<UserInfo> page, UserInfo userInfo) {
         return R.ok(userInfoService.selectUserPage(page, userInfo));
+    }
+
+    /**
+     * 管理员分配额度
+     *
+     * @param quotaRecordInfo 额度分配
+     * @return 结果
+     */
+    @PostMapping("/auditQuota")
+    public R auditQuota(QuotaRecordInfo quotaRecordInfo) {
+        quotaRecordInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
+        quotaRecordInfo.setType("0");
+        // 添加额度记录
+        quotaRecordService.save(quotaRecordInfo);
+        // 更新用户额度
+        UserInfo userInfo = userInfoService.getById(quotaRecordInfo.getUserId());
+        userInfo.setQuota(NumberUtil.add(userInfo.getQuota(), quotaRecordInfo.getQuota()));
+        return R.ok(userInfoService.updateById(userInfo));
     }
 
     /**

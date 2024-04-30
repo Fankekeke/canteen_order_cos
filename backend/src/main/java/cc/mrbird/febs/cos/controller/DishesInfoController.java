@@ -2,12 +2,12 @@ package cc.mrbird.febs.cos.controller;
 
 
 import cc.mrbird.febs.common.utils.R;
-import cc.mrbird.febs.cos.entity.DishesInfo;
-import cc.mrbird.febs.cos.entity.MerchantInfo;
-import cc.mrbird.febs.cos.entity.UserInfo;
+import cc.mrbird.febs.cos.entity.*;
 import cc.mrbird.febs.cos.service.IDishesInfoService;
+import cc.mrbird.febs.cos.service.IDishesRecordInfoService;
 import cc.mrbird.febs.cos.service.IMerchantInfoService;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +29,8 @@ public class DishesInfoController {
     private final IDishesInfoService dishesInfoService;
 
     private final IMerchantInfoService merchantInfoService;
+
+    private final IDishesRecordInfoService dishesRecordInfoService;
 
     /**
      * 分页获取菜品信息
@@ -56,6 +58,23 @@ public class DishesInfoController {
             return R.ok(Collections.emptyList());
         }
         return R.ok(dishesInfoService.list(Wrappers.<DishesInfo>lambdaQuery().eq(DishesInfo::getMerchantId, merchantInfo.getId()).eq(DishesInfo::getStatus, "1")));
+    }
+
+    /**
+     * 商家添加库存
+     *
+     * @param dishesRecordInfo 库存信息
+     * @return 结果
+     */
+    @PostMapping("/auditQuota")
+    public R auditQuota(DishesRecordInfo dishesRecordInfo) {
+        dishesRecordInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
+        // 添加额度记录
+        dishesRecordInfoService.save(dishesRecordInfo);
+        // 更新餐品库存
+        DishesInfo dishesInfo = dishesInfoService.getById(dishesRecordInfo.getDishesId());
+        dishesInfo.setLaveNum(dishesInfo.getLaveNum() + dishesRecordInfo.getNum());
+        return R.ok(dishesInfoService.updateById(dishesInfo));
     }
 
     /**

@@ -7,14 +7,6 @@
           <div :class="advanced ? null: 'fold'">
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="菜品编号"
-                :labelCol="{span: 5}"
-                :wrapperCol="{span: 18, offset: 1}">
-                <a-input v-model="queryParams.code"/>
-              </a-form-item>
-            </a-col>
-            <a-col :md="6" :sm="24">
-              <a-form-item
                 label="菜品名称"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
@@ -23,7 +15,7 @@
             </a-col>
             <a-col :md="6" :sm="24">
               <a-form-item
-                label="商家名称"
+                label="店铺名称"
                 :labelCol="{span: 5}"
                 :wrapperCol="{span: 18, offset: 1}">
                 <a-input v-model="queryParams.merchantName"/>
@@ -39,7 +31,6 @@
     </div>
     <div>
       <div class="operator">
-        <a-button type="primary" ghost @click="add">新增</a-button>
         <a-button @click="batchDelete">删除</a-button>
       </div>
       <!-- 表格区域 -->
@@ -53,113 +44,43 @@
                :scroll="{ x: 900 }"
                @change="handleTableChange">
         <template slot="operation" slot-scope="text, record">
-          <a-icon type="setting" theme="twoTone" twoToneColor="#4a9ff5" @click="edit(record)" title="修 改"></a-icon>
-          <a-icon type="file-search" @click="dishesViewOpen(record)" title="详 情" style="margin-left: 15px"></a-icon>
-          <a-icon type="reconciliation" @click="showModal(record)" title="添加库存" style="margin-left: 15px"></a-icon>
+          <a-icon type="file-search" @click="exchangeViewOpen(record)" title="详 情" style="margin-left: 15px"></a-icon>
         </template>
       </a-table>
+      <exchange-view
+        @close="handleexchangeViewClose"
+        :exchangeShow="exchangeView.visiable"
+        :exchangeData="exchangeView.data">
+      </exchange-view>
     </div>
-    <dishes-add
-      v-if="dishesAdd.visiable"
-      @close="handledishesAddClose"
-      @success="handledishesAddSuccess"
-      :dishesAddVisiable="dishesAdd.visiable">
-    </dishes-add>
-    <dishes-edit
-      ref="dishesEdit"
-      @close="handledishesEditClose"
-      @success="handledishesEditSuccess"
-      :dishesEditVisiable="dishesEdit.visiable">
-    </dishes-edit>
-    <dishes-view
-      @close="handledishesViewClose"
-      :dishesShow="dishesView.visiable"
-      :dishesData="dishesView.data">
-    </dishes-view>
-    <a-modal
-      title="添加库存"
-      :visible="visible"
-      :confirm-loading="confirmLoading"
-      :width="950"
-      @ok="auditQuota"
-      @cancel="handleCancel"
-    >
-      <a-row style="padding-left: 24px;padding-right: 24px;" v-if="dishesInfo !== null">
-        <a-row style="padding-left: 24px;padding-right: 24px;">
-          <a-col style="margin-bottom: 15px"><span style="font-size: 15px;font-weight: 650;color: #000c17">基础信息</span></a-col>
-          <a-col :span="8"><b>菜品编号：</b>
-            {{ dishesInfo.code }}
-          </a-col>
-          <a-col :span="8"><b>菜品名称：</b>
-            {{ dishesInfo.name ? dishesInfo.name : '- -' }}
-          </a-col>
-          <a-col :span="8"><b>原料：</b>
-            {{ dishesInfo.rawMaterial ? dishesInfo.rawMaterial : '- -' }}
-          </a-col>
-        </a-row>
-        <br/>
-        <a-row style="padding-left: 24px;padding-right: 24px;">
-          <a-col :span="8"><b>份量：</b>
-            {{ dishesInfo.portion }}
-          </a-col>
-          <a-col :span="8"><b>口味：</b>
-            {{ dishesInfo.taste }}
-          </a-col>
-          <a-col :span="8"><b>价格：</b>
-            {{ dishesInfo.unitPrice }} 元
-          </a-col>
-        </a-row>
-        <br/>
-        <a-row style="padding-left: 24px;padding-right: 24px;">
-          <a-col :span="8"><b>余量：</b>
-            {{ dishesInfo.laveNum }}
-          </a-col>
-          <a-col :span="8"><b>上架状态：</b>
-            <span v-if="dishesInfo.status == 0" style="color: red">下架</span>
-            <span v-if="dishesInfo.status == 1" style="color: green">上架</span>
-          </a-col>
-          <a-col :span="8"><b>创建时间：</b>
-            {{ dishesInfo.createDate }}
-          </a-col>
-        </a-row>
-        <a-col style="margin-bottom: 15px;margin-top: 50px"><span style="font-size: 15px;font-weight: 650;color: #000c17">添加库存:</span></a-col>
-        <a-input-number style="width: 100%" :min="1" :step="1" v-model="quota"/>
-      </a-row>
-    </a-modal>
   </a-card>
 </template>
 
 <script>
 import RangeDate from '@/components/datetime/RangeDate'
-import dishesAdd from './DishesAdd'
-import dishesEdit from './DishesEdit'
-import dishesView from './DishesView.vue'
+import exchangeView from './RecordView.vue'
 import {mapState} from 'vuex'
 import moment from 'moment'
 moment.locale('zh-cn')
 
 export default {
-  name: 'dishes',
-  components: {dishesAdd, dishesEdit, dishesView, RangeDate},
+  name: 'exchange',
+  components: {RangeDate, exchangeView},
   data () {
     return {
-      visible: false,
-      confirmLoading: false,
       advanced: false,
-      dishesAdd: {
+      exchangeAdd: {
         visiable: false
       },
-      dishesEdit: {
+      exchangeEdit: {
         visiable: false
       },
-      dishesView: {
+      exchangeView: {
         visiable: false,
         data: null
       },
-      quota: 1,
       queryParams: {},
       filteredInfo: null,
-      dishesInfo: null,
       sortedInfo: null,
       paginationInfo: null,
       dataSource: [],
@@ -184,6 +105,9 @@ export default {
       return [{
         title: '菜品编号',
         dataIndex: 'code'
+      }, {
+        title: '采购数量',
+        dataIndex: 'num'
       }, {
         title: '菜品名称',
         dataIndex: 'name'
@@ -222,8 +146,8 @@ export default {
           </a-popover>
         }
       }, {
-        title: '原料',
-        dataIndex: 'rawMaterial',
+        title: '采购时间',
+        dataIndex: 'createDate',
         customRender: (text, row, index) => {
           if (text !== null) {
             return text
@@ -231,63 +155,6 @@ export default {
             return '- -'
           }
         }
-      }, {
-        title: '份量',
-        dataIndex: 'portion',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '口味',
-        dataIndex: 'taste',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '价格',
-        dataIndex: 'unitPrice',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text + '元'
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '状态',
-        dataIndex: 'status',
-        customRender: (text, row, index) => {
-          switch (text) {
-            case '0':
-              return <a-tag color="red">下架</a-tag>
-            case '1':
-              return <a-tag color="green">上架</a-tag>
-            default:
-              return '- -'
-          }
-        }
-      }, {
-        title: '余量',
-        dataIndex: 'laveNum',
-        customRender: (text, row, index) => {
-          if (text !== null) {
-            return text
-          } else {
-            return '- -'
-          }
-        }
-      }, {
-        title: '操作',
-        dataIndex: 'operation',
-        scopedSlots: {customRender: 'operation'}
       }]
     }
   },
@@ -295,27 +162,12 @@ export default {
     this.fetch()
   },
   methods: {
-    showModal (row) {
-      this.dishesInfo = row
-      this.visible = true
+    exchangeViewOpen (row) {
+      this.exchangeView.data = row
+      this.exchangeView.visiable = true
     },
-    handleCancel (e) {
-      console.log('Clicked cancel button')
-      this.visible = false
-    },
-    auditQuota () {
-      this.$post('/cos/dishes-info/auditQuota', { dishesId: this.dishesInfo.id, num: this.quota }).then((r) => {
-        this.$message.success('修改成功')
-        this.visible = false
-        this.fetch()
-      })
-    },
-    dishesViewOpen (row) {
-      this.dishesView.data = row
-      this.dishesView.visiable = true
-    },
-    handledishesViewClose () {
-      this.dishesView.visiable = false
+    handleexchangeViewClose () {
+      this.exchangeView.visiable = false
     },
     onSelectChange (selectedRowKeys) {
       this.selectedRowKeys = selectedRowKeys
@@ -324,26 +176,26 @@ export default {
       this.advanced = !this.advanced
     },
     add () {
-      this.dishesAdd.visiable = true
+      this.exchangeAdd.visiable = true
     },
-    handledishesAddClose () {
-      this.dishesAdd.visiable = false
+    handleexchangeAddClose () {
+      this.exchangeAdd.visiable = false
     },
-    handledishesAddSuccess () {
-      this.dishesAdd.visiable = false
-      this.$message.success('新增菜品成功')
+    handleexchangeAddSuccess () {
+      this.exchangeAdd.visiable = false
+      this.$message.success('新增成功')
       this.search()
     },
     edit (record) {
-      this.$refs.dishesEdit.setFormValues(record)
-      this.dishesEdit.visiable = true
+      this.$refs.exchangeEdit.setFormValues(record)
+      this.exchangeEdit.visiable = true
     },
-    handledishesEditClose () {
-      this.dishesEdit.visiable = false
+    handleexchangeEditClose () {
+      this.exchangeEdit.visiable = false
     },
-    handledishesEditSuccess () {
-      this.dishesEdit.visiable = false
-      this.$message.success('修改菜品成功')
+    handleexchangeEditSuccess () {
+      this.exchangeEdit.visiable = false
+      this.$message.success('修改成功')
       this.search()
     },
     handleDeptChange (value) {
@@ -361,7 +213,7 @@ export default {
         centered: true,
         onOk () {
           let ids = that.selectedRowKeys.join(',')
-          that.$delete('/cos/dishes-info/' + ids).then(() => {
+          that.$delete('/cos/dishes-record-info/' + ids).then(() => {
             that.$message.success('删除成功')
             that.selectedRowKeys = []
             that.search()
@@ -431,8 +283,10 @@ export default {
         params.size = this.pagination.defaultPageSize
         params.current = this.pagination.defaultCurrent
       }
-      params.merchantId = this.currentUser.userId
-      this.$get('/cos/dishes-info/page', {
+      if (params.type === undefined) {
+        delete params.type
+      }
+      this.$get('/cos/dishes-record-info/page', {
         ...params
       }).then((r) => {
         let data = r.data.data
