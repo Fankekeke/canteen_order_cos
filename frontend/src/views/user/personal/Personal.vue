@@ -3,6 +3,12 @@
     <a-col :span="6">
       <a-card :loading="loading" :bordered="false">
         <a-form :form="form" layout="vertical">
+          <div v-if="this.expertInfo != null">
+            <a-form-item label='我的额度'>
+              <h3 style="display: inline;font-size: 18px">{{ this.expertInfo.quota }}</h3>元
+              <a-button type="primary" @click="showModal" size="small" style="margin-left: 50px">充值</a-button>
+            </a-form-item>
+          </div>
           <a-row :gutter="20">
             <a-col :span="12">
               <a-form-item label='用户编号' v-bind="formItemLayout">
@@ -112,6 +118,29 @@
         </a-card>
       </div>
     </a-col>
+    <a-modal
+      title="额度充值"
+      :visible="visible"
+      :confirm-loading="confirmLoading"
+      :width="600"
+      @ok="auditQuota"
+      @cancel="handleCancel1"
+    >
+      <a-radio-group v-model="quota" button-style="solid">
+        <a-radio-button value="50">
+          50元
+        </a-radio-button>
+        <a-radio-button value="100">
+          100元
+        </a-radio-button>
+        <a-radio-button value="200">
+          200元
+        </a-radio-button>
+        <a-radio-button value="500">
+          500元
+        </a-radio-button>
+      </a-radio-group>
+    </a-modal>
   </a-row>
 </template>
 
@@ -140,6 +169,8 @@ export default {
   },
   data () {
     return {
+      visible: false,
+      confirmLoading: false,
       form: this.$form.createForm(this),
       formItemLayout,
       loading: false,
@@ -147,6 +178,7 @@ export default {
       dataLoading: false,
       fileList: [],
       previewVisible: false,
+      quota: 50,
       previewImage: '',
       expertInfo: null
     }
@@ -155,6 +187,27 @@ export default {
     this.getExpertInfo(this.currentUser.userId)
   },
   methods: {
+    showModal () {
+      this.visible = true
+    },
+    handleCancel1 (e) {
+      console.log('Clicked cancel button')
+      this.visible = false
+    },
+    auditQuota () {
+      this.$post('/cos/pay/saveUserQuota', { userId: this.currentUser.userId, quota: this.quota, type: 1 }).then((r) => {
+        const divForm = document.getElementsByTagName('div')
+        if (divForm.length) {
+          document.body.removeChild(divForm[0])
+        }
+        const div = document.createElement('div')
+        div.innerHTML = r.data.msg // data就是接口返回的form 表单字符串
+        // console.log(div.innerHTML)
+        document.body.appendChild(div)
+        document.forms[0].setAttribute('target', '_self') // 新开窗口跳转
+        document.forms[0].submit()
+      })
+    },
     isDuringDate (beginDateStr, endDateStr, curDataStr) {
       let curDate = new Date(curDataStr)
       let beginDate = new Date(beginDateStr)

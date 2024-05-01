@@ -57,6 +57,8 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
 
     private final IMailService mailService;
 
+    private final IQuotaRecordInfoService quizRecordInfoService;
+
 
     /**
      * 分页获取订单信息
@@ -158,6 +160,33 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     }
 
     /**
+     * 新增订单信息【额度支付】
+     *
+     * @param orderInfo 订单信息
+     * @return 结果
+     */
+    @Override
+    public boolean saveOrderByQutao(OrderInfo orderInfo) {
+        orderInfo.setCreateDate(DateUtil.formatDateTime(new Date()));
+        // 用户信息
+        UserInfo userInfo = userInfoService.getOne(Wrappers.<UserInfo>lambdaQuery().eq(UserInfo::getUserId, orderInfo.getUserId()));
+
+        orderInfo.setUserId(userInfo.getId());
+
+        // 添加订单
+        orderInfo.setStatus("1");
+        this.save(orderInfo);
+
+        List<OrderItemInfo> orderItemList = JSONUtil.toList(orderInfo.getOrderItemListStr(), OrderItemInfo.class);
+
+        // 添加订单详情
+        for (OrderItemInfo orderItem : orderItemList) {
+            orderItem.setOrderId(orderInfo.getId());
+        }
+        return orderItemInfoService.saveBatch(orderItemList);
+    }
+
+    /**
      * 订单收货
      *
      * @param orderCode 订单编号
@@ -213,7 +242,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         int count = merchantMemberInfoService.count(Wrappers.<MerchantMemberInfo>lambdaQuery().eq(MerchantMemberInfo::getMerchantId, orderInfo.getMerchantId()).eq(MerchantMemberInfo::getUserId, userInfo.getId()));
         if (count > 0) {
             BigDecimal discount = NumberUtil.sub(orderInfo.getOrderPrice(), NumberUtil.mul(orderInfo.getOrderPrice(), 0.8));
-            orderInfo.setDiscount(NumberUtil.round(discount,2));
+            orderInfo.setDiscount(NumberUtil.round(discount, 2));
             orderInfo.setAfterOrderPrice(NumberUtil.mul(orderInfo.getOrderPrice(), 0.8));
             orderInfo.setIsMember("1");
         } else {
@@ -489,63 +518,73 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean orderPay(String orderCode) {
-        // 获取订单信息
-        OrderInfo orderInfo = this.getOne(Wrappers.<OrderInfo>lambdaQuery().eq(OrderInfo::getCode, orderCode));
-        orderInfo.setStatus("1");
-        orderInfo.setPayDate(DateUtil.formatDateTime(new Date()));
-
-        // 用户添加积分
-        UserInfo userInfo = userInfoService.getById(orderInfo.getUserId());
-        userInfo.setIntegral(NumberUtil.add(userInfo.getIntegral(), orderInfo.getIntegral()));
-
-        // 判断用户是否为此商家会员
-        MerchantMemberInfo merchantMember = merchantMemberInfoService.getOne(Wrappers.<MerchantMemberInfo>lambdaQuery().eq(MerchantMemberInfo::getMerchantId, orderInfo.getMerchantId()).eq(MerchantMemberInfo::getUserId, orderInfo.getUserId()));
-        if (merchantMember == null) {
-            // 统计用户积分是否达到此商家会员
-            List<OrderInfo> orderInfoList = this.list(Wrappers.<OrderInfo>lambdaQuery().eq(OrderInfo::getUserId, orderInfo.getUserId()).eq(OrderInfo::getMerchantId, orderInfo.getMerchantId()));
-            BigDecimal totalIntegral = orderInfoList.stream().map(OrderInfo::getIntegral).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            // 查询此商家会员积分要求
-            MemberInfo memberInfo = memberInfoService.getOne(Wrappers.<MemberInfo>lambdaQuery().eq(MemberInfo::getMerchantId, orderInfo.getMerchantId()));
-            if (memberInfo != null && memberInfo.getIntegral().compareTo((totalIntegral.add(orderInfo.getIntegral()))) <= 0) {
-                // 设置用户为此商家会员
-                MerchantMemberInfo merchantMemberInfo = new MerchantMemberInfo();
-                merchantMemberInfo.setMerchantId(orderInfo.getMerchantId());
-                merchantMemberInfo.setUserId(orderInfo.getUserId());
-                // 总消费
-                merchantMemberInfo.setConsumption(totalIntegral.add(orderInfo.getIntegral()));
-                merchantMemberInfo.setLastDate(DateUtil.formatDateTime(new Date()));
-                merchantMemberInfoService.save(merchantMemberInfo);
-                // 邮箱通知
-                if (StrUtil.isNotEmpty(userInfo.getMail())) {
-                    MerchantInfo merchantInfo = merchantInfoService.getById(orderInfo.getMerchantId());
-                    Context context = new Context();
-                    context.setVariable("today", DateUtil.formatDate(new Date()));
-                    context.setVariable("custom", userInfo.getName() + "，您好，在 " + merchantInfo.getName() + " 您已消费 " + memberInfo.getIntegral() + "元。获得此店会员资格（所有餐品消费八折）");
-                    String emailContent = templateEngine.process("registerEmail", context);
-                    mailService.sendHtmlMail(userInfo.getMail(), DateUtil.formatDate(new Date()) + "会员通知", emailContent);
-                }
-            }
+        // 获取订单编号区分是否为额度充值
+        if (orderCode.contains("QR-")) {
+            // 获取充值订单
+            QuotaRecordInfo quotaRecordInfo = quizRecordInfoService.getOne(Wrappers.<QuotaRecordInfo>lambdaQuery().eq(QuotaRecordInfo::getCode, orderCode));
+            // 获取用户信息
+            UserInfo userInfo = userInfoService.getOne(Wrappers.<UserInfo>lambdaQuery().eq(UserInfo::getId, quotaRecordInfo.getUserId()));
+            userInfo.setQuota(NumberUtil.add(userInfo.getQuota(), quotaRecordInfo.getQuota()));
+            return userInfoService.updateById(userInfo);
         } else {
-            // 更新消费记录
-            merchantMember.setConsumption(merchantMember.getConsumption().add(orderInfo.getIntegral()));
-            merchantMember.setLastDate(DateUtil.formatDateTime(new Date()));
-            merchantMemberInfoService.updateById(merchantMember);
-        }
-        // 用户下单发送邮件
-        if (StrUtil.isNotEmpty(userInfo.getMail())) {
-            MerchantInfo merchantInfo = merchantInfoService.getById(orderInfo.getMerchantId());
-            Context context = new Context();
-            context.setVariable("today", DateUtil.formatDate(new Date()));
-            context.setVariable("custom", userInfo.getName() + "，您好，在 " + merchantInfo.getName() + " 消费订单 " + orderCode + "，已支付" + orderInfo.getAfterOrderPrice() + "元。");
-            String emailContent = templateEngine.process("registerEmail", context);
-            mailService.sendHtmlMail(userInfo.getMail(), DateUtil.formatDate(new Date()) + "支付通知", emailContent);
-        }
+            // 获取订单信息
+            OrderInfo orderInfo = this.getOne(Wrappers.<OrderInfo>lambdaQuery().eq(OrderInfo::getCode, orderCode));
+            orderInfo.setStatus("1");
+            orderInfo.setPayDate(DateUtil.formatDateTime(new Date()));
 
-        // 更新用户积分
-        userInfoService.updateById(userInfo);
-        // 更新订单状态
-        return this.updateById(orderInfo);
+            // 用户添加积分
+            UserInfo userInfo = userInfoService.getById(orderInfo.getUserId());
+            userInfo.setIntegral(NumberUtil.add(userInfo.getIntegral(), orderInfo.getIntegral()));
+
+            // 判断用户是否为此商家会员
+            MerchantMemberInfo merchantMember = merchantMemberInfoService.getOne(Wrappers.<MerchantMemberInfo>lambdaQuery().eq(MerchantMemberInfo::getMerchantId, orderInfo.getMerchantId()).eq(MerchantMemberInfo::getUserId, orderInfo.getUserId()));
+            if (merchantMember == null) {
+                // 统计用户积分是否达到此商家会员
+                List<OrderInfo> orderInfoList = this.list(Wrappers.<OrderInfo>lambdaQuery().eq(OrderInfo::getUserId, orderInfo.getUserId()).eq(OrderInfo::getMerchantId, orderInfo.getMerchantId()));
+                BigDecimal totalIntegral = orderInfoList.stream().map(OrderInfo::getIntegral).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                // 查询此商家会员积分要求
+                MemberInfo memberInfo = memberInfoService.getOne(Wrappers.<MemberInfo>lambdaQuery().eq(MemberInfo::getMerchantId, orderInfo.getMerchantId()));
+                if (memberInfo != null && memberInfo.getIntegral().compareTo((totalIntegral.add(orderInfo.getIntegral()))) <= 0) {
+                    // 设置用户为此商家会员
+                    MerchantMemberInfo merchantMemberInfo = new MerchantMemberInfo();
+                    merchantMemberInfo.setMerchantId(orderInfo.getMerchantId());
+                    merchantMemberInfo.setUserId(orderInfo.getUserId());
+                    // 总消费
+                    merchantMemberInfo.setConsumption(totalIntegral.add(orderInfo.getIntegral()));
+                    merchantMemberInfo.setLastDate(DateUtil.formatDateTime(new Date()));
+                    merchantMemberInfoService.save(merchantMemberInfo);
+                    // 邮箱通知
+                    if (StrUtil.isNotEmpty(userInfo.getMail())) {
+                        MerchantInfo merchantInfo = merchantInfoService.getById(orderInfo.getMerchantId());
+                        Context context = new Context();
+                        context.setVariable("today", DateUtil.formatDate(new Date()));
+                        context.setVariable("custom", userInfo.getName() + "，您好，在 " + merchantInfo.getName() + " 您已消费 " + memberInfo.getIntegral() + "元。获得此店会员资格（所有餐品消费八折）");
+                        String emailContent = templateEngine.process("registerEmail", context);
+                        mailService.sendHtmlMail(userInfo.getMail(), DateUtil.formatDate(new Date()) + "会员通知", emailContent);
+                    }
+                }
+            } else {
+                // 更新消费记录
+                merchantMember.setConsumption(merchantMember.getConsumption().add(orderInfo.getIntegral()));
+                merchantMember.setLastDate(DateUtil.formatDateTime(new Date()));
+                merchantMemberInfoService.updateById(merchantMember);
+            }
+            // 用户下单发送邮件
+            if (StrUtil.isNotEmpty(userInfo.getMail())) {
+                MerchantInfo merchantInfo = merchantInfoService.getById(orderInfo.getMerchantId());
+                Context context = new Context();
+                context.setVariable("today", DateUtil.formatDate(new Date()));
+                context.setVariable("custom", userInfo.getName() + "，您好，在 " + merchantInfo.getName() + " 消费订单 " + orderCode + "，已支付" + orderInfo.getAfterOrderPrice() + "元。");
+                String emailContent = templateEngine.process("registerEmail", context);
+                mailService.sendHtmlMail(userInfo.getMail(), DateUtil.formatDate(new Date()) + "支付通知", emailContent);
+            }
+
+            // 更新用户积分
+            userInfoService.updateById(userInfo);
+            // 更新订单状态
+            return this.updateById(orderInfo);
+        }
     }
 
     /**

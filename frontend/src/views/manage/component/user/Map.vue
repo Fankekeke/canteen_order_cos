@@ -28,7 +28,8 @@
                         <a-col :span="18">
                           <div>
                             <span>{{ item.rawMaterial }}</span> |
-                            <span  style="margin-left: 2px">{{ item.taste }}</span>
+                            <span style="margin-left: 2px">{{ item.taste }}</span> |
+                            <span style="margin-left: 2px;">余量：<span style="color: red">{{ item.laveNum }}</span></span>
                           </div>
                           <div style="color: #f5222d; font-size: 13px;float: left">{{ item.unitPrice }}元</div>
                         </a-col>
@@ -180,6 +181,7 @@
         </a-popconfirm>
         <a-button @click="next" type="primary" v-if="nextFlag == 1">下一步</a-button>
         <a-button @click="orderPay" type="primary" v-if="nextFlag == 2">支付</a-button>
+        <a-button @click="orderPayByQuota" type="primary" v-if="orderAddInfo != null && orderAddInfo.afterOrderPrice && userInfo != null && nextFlag == 2 && orderAddInfo.afterOrderPrice <= userInfo.quota">额度支付【{{ userInfo.quota }}】</a-button>
       </div>
     </div>
   </a-drawer>
@@ -344,6 +346,7 @@ export default {
         this.selectDishesByMerchant(this.orderData.id)
         this.selectMerchantEvaluate(this.orderData.id)
         this.selectAddress()
+        this.selectUserInfo()
       }
     },
     'type': function (value) {
@@ -356,11 +359,22 @@ export default {
     }
   },
   methods: {
+    selectUserInfo () {
+      this.$get(`/cos/user-info/detailByUserId/${this.currentUser.userId}`).then((r) => {
+        this.userInfo = r.data.data
+      })
+    },
     showChildrenDrawer () {
       this.childrenDrawer = true
     },
     onChildrenDrawerClose () {
       this.childrenDrawer = false
+    },
+    orderPayByQuota () {
+      this.orderAddInfo.userId = this.currentUser.userId
+      this.$post(`/cos/pay/alipay/quota`, this.orderAddInfo).then((r) => {
+        this.$router.push('/user/pay')
+      })
     },
     orderPay (record) {
       this.orderAddInfo.userId = this.currentUser.userId
@@ -443,6 +457,10 @@ export default {
         e.dishesId = e.id
         if (e.id === row.id) {
           check = true
+          if (e.amount + 1 > row.laveNum) {
+            this.$message.warn('该菜品库存不足')
+            return false
+          }
           e.amount = e.amount + 1
           e.totalPrice = (e.unitPrice * e.amount).toFixed(2)
           e.totalHeat = (e.heat * e.amount).toFixed(2)
