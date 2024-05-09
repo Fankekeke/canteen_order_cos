@@ -30,6 +30,19 @@
           </a-form-item>
         </a-col>
         <a-col :span="12">
+          <a-form-item label='员工类型' v-bind="formItemLayout">
+            <a-select v-decorator="[
+              'type',
+              { rules: [{ required: true, message: '请输入员工类型!' }] }
+              ]">
+              <a-select-option value="1">外卖员</a-select-option>
+              <a-select-option value="2">后厨</a-select-option>
+              <a-select-option value="2">厨师长</a-select-option>
+              <a-select-option value="2">收银</a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :span="12">
           <a-form-item label='在职状态' v-bind="formItemLayout">
             <a-radio-group button-style="solid" v-decorator="[
               'status',

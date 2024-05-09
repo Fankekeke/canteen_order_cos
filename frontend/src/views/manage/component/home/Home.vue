@@ -69,6 +69,12 @@
           <apexchart v-if="!loading" type="bar" height="300" :options="chartOptions1" :series="series1"></apexchart>
         </a-card>
       </a-col>
+      <a-col :span="24">
+        <a-card hoverable :bordered="false" style="width: 100%">
+          <a-skeleton active v-if="loading" />
+          <apexchart v-if="!loading" type="bar" height="300" :options="chartOptions4" :series="series4"></apexchart>
+        </a-card>
+      </a-col>
     </a-row>
     <a-row style="margin-top: 15px">
 <!--      <a-col :span="9">-->
@@ -197,6 +203,49 @@ export default {
           }
         }
       },
+      series4: [],
+      chartOptions4: {
+        chart: {
+          type: 'bar',
+          height: 300
+        },
+        title: {
+          text: '菜品销售排行',
+          align: 'left'
+        },
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            columnWidth: '55%'
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          show: true,
+          width: 2,
+          colors: ['transparent']
+        },
+        xaxis: {
+          categories: []
+        },
+        yaxis: {
+          title: {
+            text: ''
+          }
+        },
+        fill: {
+          opacity: 1
+        },
+        tooltip: {
+          y: {
+            formatter: function (val) {
+              return val + ' 单'
+            }
+          }
+        }
+      },
       series2: [],
       chartOptions2: {
         chart: {
@@ -286,6 +335,15 @@ export default {
             let itemData = { name: '订单数', data: Array.from(r.data.orderNumDayList, ({count}) => count) }
             values.push(itemData)
             this.series1 = values
+          }
+          let values2 = []
+          if (r.data.orderDrugType !== null && r.data.orderDrugType.length !== 0) {
+            if (this.chartOptions4.xaxis.categories.length === 0) {
+              this.chartOptions4.xaxis.categories = Array.from(r.data.orderDrugType, ({name}) => name)
+            }
+            let itemData = { name: '销售量数', data: Array.from(r.data.orderDrugType, ({count}) => count) }
+            values2.push(itemData)
+            this.series4 = values2
           }
           this.series[0].data = Array.from(r.data.priceDayList, ({price}) => price)
           this.chartOptions.xaxis.categories = Array.from(r.data.priceDayList, ({days}) => days)

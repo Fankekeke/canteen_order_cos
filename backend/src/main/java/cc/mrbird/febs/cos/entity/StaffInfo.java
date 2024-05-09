@@ -64,6 +64,11 @@ public class StaffInfo implements Serializable {
     private String createDate;
 
     /**
+     * 员工类型（1.外卖员 2.后厨 3.厨师长 4.收银）
+     */
+    private String type;
+
+    /**
      * 所属账户
      */
     private Long userId;

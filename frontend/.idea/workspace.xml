@@ -22,8 +22,15 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2b51975f-5e37-45a1-bd9d-0f3c12f944d0" name="Default Changelist" comment="fix -数据统计">
+    <list default="true" id="2b51975f-5e37-45a1-bd9d-0f3c12f944d0" name="Default Changelist" comment="fix -地图展示">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/manage/component/home/Home.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/manage/component/home/Home.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/manage/staff/Staff.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/manage/staff/Staff.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/manage/staff/StaffAdd.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/manage/staff/StaffAdd.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/manage/staff/StaffEdit.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/manage/staff/StaffEdit.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/merchant/staff/Staff.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/merchant/staff/Staff.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/merchant/staff/StaffAdd.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/merchant/staff/StaffAdd.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/views/merchant/staff/StaffEdit.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/views/merchant/staff/StaffEdit.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,7 +64,7 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;G:/Project/租车系统/vehicle_rent/frontend/src/views/manage/component/user&quot;,
+    &quot;last_opened_file_path&quot;: &quot;G:/Project/点餐配送系统/canteen_order_cos/frontend/src/views/merchant&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -70,11 +77,14 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="G:\Project\租车系统\vehicle_rent\frontend\src\views\manage\component\user" />
-      <recent name="G:\Project\租车系统\vehicle_rent\frontend\src\views\manage\shop" />
-      <recent name="G:\Project\租车系统\vehicle_rent\frontend\src\views\manage\Brand" />
-      <recent name="G:\Project\药品销售平台\drug_sales\frontend\src\views\manage\inventory" />
-      <recent name="G:\Project\药品销售平台\drug_sales\frontend\src\utils" />
+      <recent name="G:\Project\点餐配送系统\canteen_order_cos\frontend\src\views\merchant" />
+      <recent name="G:\Project\点餐配送系统\canteen_order_cos\frontend\src\views\manage\record" />
+      <recent name="G:\Project\点餐配送系统\canteen_order_cos\frontend\src\views\user" />
+      <recent name="G:\Project\点餐配送系统\canteen_order_cos\frontend\src\views\manage\quota" />
+      <recent name="G:\Project\点餐配送系统\canteen_order_cos\frontend\src\views\user\order" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="G:\Project\点餐配送系统\canteen_order_cos\frontend\src\views\merchant\personal" />
     </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -218,6 +228,50 @@
       <workItem from="1698066656407" duration="130000" />
       <workItem from="1698067271340" duration="49000" />
       <workItem from="1698070061053" duration="334000" />
+      <workItem from="1700272518422" duration="598000" />
+      <workItem from="1700275879137" duration="602000" />
+      <workItem from="1700296439292" duration="2087000" />
+      <workItem from="1700357977193" duration="2372000" />
+      <workItem from="1700663279179" duration="3735000" />
+      <workItem from="1700747515548" duration="1198000" />
+      <workItem from="1700751021602" duration="1461000" />
+      <workItem from="1700829917353" duration="1069000" />
+      <workItem from="1700917454149" duration="4833000" />
+      <workItem from="1700964535767" duration="5620000" />
+      <workItem from="1701004391220" duration="1204000" />
+      <workItem from="1701088536954" duration="899000" />
+      <workItem from="1701177648122" duration="597000" />
+      <workItem from="1701179002639" duration="4337000" />
+      <workItem from="1701259920787" duration="9729000" />
+      <workItem from="1701347995773" duration="4785000" />
+      <workItem from="1701353856262" duration="3360000" />
+      <workItem from="1701435489203" duration="11639000" />
+      <workItem from="1701483369353" duration="5600000" />
+      <workItem from="1701489956675" duration="109000" />
+      <workItem from="1701511303935" duration="12386000" />
+      <workItem from="1701568017807" duration="10242000" />
+      <workItem from="1701606979807" duration="234000" />
+      <workItem from="1701923249780" duration="830000" />
+      <workItem from="1701947000444" duration="536000" />
+      <workItem from="1701959413619" duration="23000" />
+      <workItem from="1703312606355" duration="208000" />
+      <workItem from="1703314818542" duration="642000" />
+      <workItem from="1704010569668" duration="1680000" />
+      <workItem from="1704025447987" duration="129000" />
+      <workItem from="1705111985254" duration="54000" />
+      <workItem from="1705590331240" duration="14000" />
+      <workItem from="1706852766695" duration="107000" />
+      <workItem from="1711424435331" duration="1505000" />
+      <workItem from="1712325972899" duration="307000" />
+      <workItem from="1712411592897" duration="662000" />
+      <workItem from="1712413115776" duration="819000" />
+      <workItem from="1712636550435" duration="942000" />
+      <workItem from="1712923326317" duration="1620000" />
+      <workItem from="1714015834633" duration="760000" />
+      <workItem from="1714370242122" duration="17127000" />
+      <workItem from="1714487366677" duration="4257000" />
+      <workItem from="1714573021367" duration="6509000" />
+      <workItem from="1715227104095" duration="3615000" />
     </task>
     <task id="LOCAL-00001" summary="fix -数据统计">
       <created>1692717658877</created>
@@ -226,7 +280,14 @@
       <option name="project" value="LOCAL" />
       <updated>1692717658877</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="fix -地图展示">
+      <created>1703315503909</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1703315503909</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -245,6 +306,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="fix -数据统计" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix -数据统计" />
+    <MESSAGE value="fix -地图展示" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix -地图展示" />
   </component>
 </project>

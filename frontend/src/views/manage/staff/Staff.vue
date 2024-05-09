@@ -173,6 +173,23 @@ export default {
           }
         }
       }, {
+        title: '员工类型',
+        dataIndex: 'type',
+        customRender: (text, row, index) => {
+          switch (text) {
+            case '1':
+              return <a-tag>外卖员</a-tag>
+            case '2':
+              return <a-tag>后厨</a-tag>
+            case '3':
+              return <a-tag>厨师长</a-tag>
+            case '4':
+              return <a-tag>收银</a-tag>
+            default:
+              return '- -'
+          }
+        }
+      }, {
         title: '商家编号',
         dataIndex: 'merchantCode',
         customRender: (text, row, index) => {
