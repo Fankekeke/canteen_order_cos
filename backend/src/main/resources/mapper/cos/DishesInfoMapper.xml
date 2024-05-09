@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.mrbird.febs.cos.dao.DishesInfoMapper">
+
+    <!-- 分页获取菜品信息 -->
+    <select id="selectDishesPage" resultType="java.util.LinkedHashMap">
+        select
+            di.id,
+            di.code,
+            di.name,
+            di.content,
+            di.raw_material,
+            di.portion,
+            di.taste,
+            di.unit_price,
+            di.sale_num,
+            di.status,
+            di.merchant_id,
+            di.create_date,
+            di.images,
+            di.heat,
+            di.protein,
+            di.fat,
+            di.lave_num,
+            mi.name as merchantName,
+            mi.principal,
+            mi.phone,
+            mi.images as merchantImages
+        from
+            dishes_info di
+                left join merchant_info mi on
+                (mi.id = di.merchant_id)
+        where
+            1 = 1
+        <if test="dishesInfo.code != null and dishesInfo.code != ''">
+            AND di.code LIKE CONCAT('%',#{dishesInfo.code},'%')
+        </if>
+        <if test="dishesInfo.name != null and dishesInfo.name != ''">
+            AND di.name LIKE CONCAT('%',#{dishesInfo.name},'%')
+        </if>
+        <if test="dishesInfo.merchantName != null and dishesInfo.merchantName != ''">
+            AND mi.name LIKE CONCAT('%',#{dishesInfo.merchantName},'%')
+        </if>
+        <if test="dishesInfo.merchantId != null and dishesInfo.merchantId != ''">
+            AND mi.user_id = #{dishesInfo.merchantId}
+        </if>
+        order by
+            di.create_date desc
+
+    </select>
+</mapper>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.mrbird.febs.cos.dao.MemberInfoMapper">
+
+    <!-- 分页获取会员积分信息 -->
+    <select id="selectMemberPage" resultType="java.util.LinkedHashMap">
+        select
+            mi.id,
+            mi.merchant_id,
+            mi.integral,
+            mei.name,
+            mei.code,
+            mei.address,
+            mei.principal,
+            mei.phone,
+            mei.images
+        from
+            member_info mi
+                left join merchant_info mei on (mei.id = mi.merchant_id)
+        where 1 = 1
+        <if test="memberInfo.name != null and memberInfo.name != ''">
+            AND mei.name LIKE CONCAT('%',#{memberInfo.name},'%')
+        </if>
+        <if test="memberInfo.code != null and memberInfo.code != ''">
+            AND mei.code LIKE CONCAT('%',#{memberInfo.code},'%')
+        </if>
+        <if test="memberInfo.merchantId != null and memberInfo.merchantId != ''">
+            AND mei.user_id = #{memberInfo.merchantId}
+        </if>
+    </select>
+</mapper>

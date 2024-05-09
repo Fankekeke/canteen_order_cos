@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.mrbird.febs.cos.dao.AddressInfoMapper">
+
+    <!-- 分页获取收货地址信息 -->
+    <select id="selectAddressPage" resultType="java.util.LinkedHashMap">
+        select
+            ai.id,
+            ai.code,
+            ai.province,
+            ai.city,
+            ai.area,
+            ai.address,
+            ai.create_date,
+            ai.contact_person,
+            ai.contact_method,
+            ai.user_id,
+            ai.longitude,
+            ai.latitude,
+            ui.name,
+            ui.code as userCode,
+            ui.images
+        from
+            address_info ai
+                left join user_info ui on
+                (ui.id = ai.user_id)
+        where
+            1 = 1
+        <if test="addressInfo.name != null and addressInfo.name != ''">
+            AND ui.name LIKE CONCAT('%',#{addressInfo.name},'%')
+        </if>
+        <if test="addressInfo.userCode != null and addressInfo.userCode != ''">
+            AND ui.code LIKE CONCAT('%',#{addressInfo.userCode},'%')
+        </if>
+        <if test="addressInfo.userId != null and addressInfo.userId != ''">
+            AND ui.user_id = #{addressInfo.userId}
+        </if>
+        order by
+            ai.create_date desc
+    </select>
+</mapper>

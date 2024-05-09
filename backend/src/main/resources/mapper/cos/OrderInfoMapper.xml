@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.mrbird.febs.cos.dao.OrderInfoMapper">
+
+    <!-- 分页获取订单信息 -->
+    <select id="selectOrderPage" resultType="java.util.LinkedHashMap">
+        select
+            oi.id,
+            oi.code,
+            oi.user_id,
+            oi.merchant_id,
+            oi.order_price,
+            oi.after_order_price,
+            oi.discount,
+            oi.integral,
+            oi.status,
+            oi.`type`,
+            oi.kilometre,
+            oi.distribution_price,
+            oi.create_date,
+            oi.pay_date,
+            oi.service_date,
+            oi.address_id,
+            oi.staff_id,
+            ui.name as userName,
+            ui.images as userImages,
+            mi.name as merchantName,
+            mi.images as merchantImages,
+            ei.id as evaluateId
+        from
+            order_info oi
+                left join user_info ui on
+                (ui.id = oi.user_id)
+                left join merchant_info mi on
+                (mi.id = oi.merchant_id)
+                left join evaluate_info ei on
+                (ei.order_id = oi.id)
+        where
+            1 = 1
+        <if test="orderInfo.code != null and orderInfo.code != ''">
+            AND oi.name LIKE CONCAT('%',#{orderInfo.code},'%')
+        </if>
+        <if test="orderInfo.userName != null and orderInfo.userName != ''">
+            AND ui.name LIKE CONCAT('%',#{orderInfo.userName},'%')
+        </if>
+        <if test="orderInfo.merchantName != null and orderInfo.merchantName != ''">
+            AND mi.name LIKE CONCAT('%',#{orderInfo.merchantName},'%')
+        </if>
+        <if test="orderInfo.userId != null and orderInfo.userId != ''">
+            AND ui.user_id = #{orderInfo.userId}
+        </if>
+        <if test="orderInfo.merchantId != null and orderInfo.merchantId != ''">
+            AND mi.user_id = #{orderInfo.merchantId}
+        </if>
+        order by
+            oi.create_date desc
+    </select>
+
+    <!-- 本月订单信息 -->
+    <select id="selectOrderByMonth" resultType="cc.mrbird.febs.cos.entity.OrderInfo">
+        select
+        oi.id,
+        oi.code,
+        oi.user_id,
+        oi.merchant_id,
+        oi.order_price,
+        oi.after_order_price,
+        oi.discount,
+        oi.integral,
+        oi.status,
+        oi.`type`,
+        oi.kilometre,
+        oi.distribution_price,
+        oi.create_date,
+        oi.pay_date,
+        oi.service_date,
+        oi.address_id,
+        oi.staff_id
+        from
+        order_info oi
+        where 1 = 1
+        <if test="merchantId != null">
+            AND oi.merchant_id = #{merchantId}
+        </if>
+        and oi.status != '0'
+        and DATE_FORMAT( oi.create_date, '%Y%m' ) = DATE_FORMAT(
+        CURDATE(),
+        '%Y%m')
+    </select>
+
+    <!-- 本年订单信息 -->
+    <select id="selectOrderByYear" resultType="cc.mrbird.febs.cos.entity.OrderInfo">
+        select
+        oi.id,
+        oi.code,
+        oi.user_id,
+        oi.merchant_id,
+        oi.order_price,
+        oi.after_order_price,
+        oi.discount,
+        oi.integral,
+        oi.status,
+        oi.`type`,
+        oi.kilometre,
+        oi.distribution_price,
+        oi.create_date,
+        oi.pay_date,
+        oi.service_date,
+        oi.address_id,
+        oi.staff_id
+        from
+        order_info oi
+        where 1 = 1
+        <if test="merchantId != null">
+            AND oi.merchant_id = #{merchantId}
+        </if>
+        and oi.status != '0'
+        and DATE_FORMAT( oi.create_date, '%Y' ) = DATE_FORMAT(
+        CURDATE(),
+        '%Y')
+    </select>
+
+    <!-- 订单销售菜品类别统计 -->
+    <select id="selectOrderDishesType" resultType="java.util.LinkedHashMap">
+        select sum(oii.amount) as count, di.name from
+        order_item_info oii
+        left join dishes_info di on
+        (di.id = oii.dishes_id)
+        where 1 = 1
+        group by oii.dishes_id
+    </select>
+
+    <!-- 十天内订单数量统计 -->
+    <select id="selectOrderNumWithinDays" resultType="java.util.LinkedHashMap">
+        SELECT
+        DATE_FORMAT( spo.days, '%m-%d' ) AS days,
+        IFNULL(COUNT(oi.id), 0) AS count
+        FROM
+        (
+        SELECT
+        DATE_SUB( curdate(), INTERVAL + 0 DAY ) days UNION
+        SELECT
+        DATE_SUB( curdate(), INTERVAL + 1 DAY ) UNION
+        SELECT
+        DATE_SUB( curdate(), INTERVAL + 2 DAY ) UNION
+        SELECT
+        DATE_SUB( curdate(), INTERVAL + 3 DAY ) UNION
+        SELECT
+        DATE_SUB( curdate(), INTERVAL + 4 DAY ) UNION
+        SELECT
+        DATE_SUB( curdate(), INTERVAL + 5 DAY ) UNION
+        SELECT
+        DATE_SUB( curdate(), INTERVAL + 6 DAY ) UNION
+        SELECT
+        DATE_SUB( curdate(), INTERVAL + 7 DAY ) UNION
+        SELECT
+        DATE_SUB( curdate(), INTERVAL + 8 DAY ) UNION
+        SELECT
+        DATE_SUB( curdate(), INTERVAL + 9 DAY )) spo
+        LEFT JOIN order_info oi ON (
+        DATE_FORMAT( oi.create_date, '%Y-%m-%d' ) = DATE_FORMAT( spo.days, '%Y-%m-%d' )
+        <if test="merchantId != null">
+            AND oi.merchant_id = #{merchantId}
+        </if>
+        AND oi.status != '0'
+        )
+        GROUP BY
+        days
+        ORDER BY
+        days ASC
+    </select>
+
+    <!-- 十天内订单收益统计 -->
+    <select id="selectOrderPriceWithinDays" resultType="java.util.LinkedHashMap">
+        SELECT
+        DATE_FORMAT( spo.days, '%m-%d' ) AS days,
+        IFNULL(SUM(oi.after_order_price), 0) AS price
+        FROM
+        (
+        SELECT
+        DATE_SUB( curdate(), INTERVAL + 0 DAY ) days UNION
+        SELECT
+        DATE_SUB( curdate(), INTERVAL + 1 DAY ) UNION
+        SELECT
+        DATE_SUB( curdate(), INTERVAL + 2 DAY ) UNION
+        SELECT
+        DATE_SUB( curdate(), INTERVAL + 3 DAY ) UNION
+        SELECT
+        DATE_SUB( curdate(), INTERVAL + 4 DAY ) UNION
+        SELECT
+        DATE_SUB( curdate(), INTERVAL + 5 DAY ) UNION
+        SELECT
+        DATE_SUB( curdate(), INTERVAL + 6 DAY ) UNION
+        SELECT
+        DATE_SUB( curdate(), INTERVAL + 7 DAY ) UNION
+        SELECT
+        DATE_SUB( curdate(), INTERVAL + 8 DAY ) UNION
+        SELECT
+        DATE_SUB( curdate(), INTERVAL + 9 DAY )) spo
+        LEFT JOIN order_info oi ON (
+        DATE_FORMAT( oi.create_date, '%Y-%m-%d' ) = DATE_FORMAT( spo.days, '%Y-%m-%d' )
+        <if test="merchantId != null">
+            AND oi.merchant_id = #{merchantId}
+        </if>
+        AND oi.status != '0'
+        )
+        GROUP BY
+        days
+        ORDER BY
+        days ASC
+    </select>
+</mapper>

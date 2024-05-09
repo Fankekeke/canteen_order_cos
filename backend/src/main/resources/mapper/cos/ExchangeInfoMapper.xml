@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.mrbird.febs.cos.dao.ExchangeInfoMapper">
+
+    <!-- 分页获取积分兑换信息 -->
+    <select id="selectExChangePage" resultType="java.util.LinkedHashMap">
+        select
+            ei.id,
+            ei.material_id,
+            ei.user_id,
+            ei.integral,
+            ei.create_date,
+            ui.code,
+            ui.images as userImages,
+            ui.name as userName,
+            ui.mail,
+            ui.address,
+            mi.name as materialName,
+            mi.images as materialImages
+        from
+            exchange_info ei
+                left join user_info ui on
+                (ui.id = ei.user_id)
+                left join material_info mi on
+                (ei.material_id = mi.id)
+        where
+            1 = 1
+        <if test="exchangeInfo.code != null and exchangeInfo.code != ''">
+            AND ui.code LIKE CONCAT('%',#{exchangeInfo.code},'%')
+        </if>
+        <if test="exchangeInfo.userName != null and exchangeInfo.userName != ''">
+            AND ui.name LIKE CONCAT('%',#{exchangeInfo.userName},'%')
+        </if>
+        <if test="exchangeInfo.materialName != null and exchangeInfo.materialName != ''">
+            AND mi.name LIKE CONCAT('%',#{exchangeInfo.materialName},'%')
+        </if>
+        <if test="exchangeInfo.userId != null and exchangeInfo.userId != ''">
+            AND ui.user_id = #{exchangeInfo.userId}
+        </if>
+        <if test="exchangeInfo.materialId != null and exchangeInfo.materialId != ''">
+            AND ei.material_id = #{exchangeInfo.materialId}
+        </if>
+        order by
+            ei.create_date desc
+
+    </select>
+</mapper>

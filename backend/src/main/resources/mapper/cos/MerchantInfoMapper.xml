@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.mrbird.febs.cos.dao.MerchantInfoMapper">
+
+    <!-- 分页获取商家信息 -->
+    <select id="selectMerchantPage" resultType="java.util.LinkedHashMap">
+        select
+            id,
+            name,
+            code,
+            address,
+            principal,
+            phone,
+            content,
+            operate_day,
+            operate_start_time,
+            operate_end_time,
+            images,
+            create_date,
+            status,
+            dishes,
+            longitude,
+            latitude
+        from
+            merchant_info
+        where 1 = 1
+        <if test="merchantInfo.code != null and merchantInfo.code != ''">
+            AND code LIKE CONCAT('%',#{merchantInfo.code},'%')
+        </if>
+        <if test="merchantInfo.name != null and merchantInfo.name != ''">
+            AND name LIKE CONCAT('%',#{merchantInfo.name},'%')
+        </if>
+        <if test="merchantInfo.principal != null and merchantInfo.principal != ''">
+            AND principal LIKE CONCAT('%',#{merchantInfo.principal},'%')
+        </if>
+        order by create_date desc
+    </select>
+
+    <!-- 根据商家获取订单评价信息 -->
+    <select id="selectEvaluateByMerchant" resultType="java.util.LinkedHashMap">
+        select
+        ei.id,
+        ei.order_id,
+        ei.user_id,
+        ei.merchant_id,
+        ei.content,
+        ei.score,
+        ei.create_date,
+        ei.images,
+        ui.name as userName,
+        ui.images as userImages,
+        oi.code as orderCode,
+        oi.after_order_price,
+        oi.order_price ,
+        oi.`type`,
+        oi.integral,
+        mi.name as merchantName
+        from
+        evaluate_info ei
+        left join user_info ui on
+        (ui.id = ei.user_id)
+        left join order_info oi on
+        (oi.id = ei.order_id)
+        inner join order_item_info oii on
+        (oii.order_id = oi.id)
+        left join merchant_info mi on
+        (mi.id = ei.merchant_id)
+        where
+        1 = 1
+        <if test="merchantId != null">
+            AND mi.id = #{merchantId}
+        </if>
+        <if test="dishesId != null">
+            AND oii.dishes_id = #{dishesId}
+        </if>
+        group by  ei.id
+        order by
+        ei.create_date desc
+    </select>
+</mapper>

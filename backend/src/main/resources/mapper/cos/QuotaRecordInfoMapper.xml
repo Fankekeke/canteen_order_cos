@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.mrbird.febs.cos.dao.QuotaRecordInfoMapper">
+
+    <!-- 分页获取用户额度信息 -->
+    <select id="selectQuotaPage" resultType="java.util.LinkedHashMap">
+        SELECT
+            qri.id,
+            qri.quota,
+            qri.type,
+            qri.user_id,
+            qri.CODE,
+            qri.create_date,
+            ui.code as userCode,
+            ui.name,
+            ui.mail,
+            ui.phone,
+            ui.province,
+            ui.city,
+            ui.area,
+            ui.address,
+            ui.user_id,
+            ui.images,
+            ui.quota,
+            ui.is_member,
+            ui.integral
+        FROM
+            quota_record_info qri
+                LEFT JOIN user_info ui ON ( ui.id = qri.user_id )
+        WHERE
+            1 = 1
+        <if test="quotaRecordInfo.name != null and quotaRecordInfo.name != ''">
+            AND ui.name LIKE CONCAT('%',#{quotaRecordInfo.name},'%')
+        </if>
+        <if test="quotaRecordInfo.code != null and quotaRecordInfo.code != ''">
+            AND ui.code LIKE CONCAT('%',#{quotaRecordInfo.code},'%')
+        </if>
+        <if test="quotaRecordInfo.phone != null and quotaRecordInfo.phone != ''">
+            AND ui.phone LIKE CONCAT('%',#{quotaRecordInfo.phone},'%')
+        </if>
+        <if test="quotaRecordInfo.userId != null">
+            AND ui.user_id = #{quotaRecordInfo.userId}
+        </if>
+        ORDER BY
+            qri.create_date DESC
+    </select>
+</mapper>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cc.mrbird.febs.cos.dao.MerchantMemberInfoMapper">
+
+    <!-- 分页获取商家会员信息 -->
+    <select id="selectMerchantMemberPage" resultType="java.util.LinkedHashMap">
+        select
+            mmi.id,
+            mmi.merchant_id,
+            mmi.user_id,
+            mmi.consumption,
+            mmi.last_date,
+            mi.name as merchantName,
+            mi.address,
+            mi.principal,
+            mi.phone,
+            mi.images,
+            ui.code as userCode,
+            ui.name as userName,
+            ui.images as userImages
+        from
+            merchant_member_info mmi
+                left join merchant_info mi on (mi.id = mmi.merchant_id)
+                left join user_info ui on (ui.id = mmi.user_id)
+        where 1 = 1
+        <if test="merchantMemberInfo.merchantName != null and merchantMemberInfo.merchantName != ''">
+            AND mi.name LIKE CONCAT('%',#{merchantMemberInfo.merchantName},'%')
+        </if>
+        <if test="merchantMemberInfo.userName != null and merchantMemberInfo.userName != ''">
+            AND ui.name LIKE CONCAT('%',#{merchantMemberInfo.userName},'%')
+        </if>
+        <if test="merchantMemberInfo.userId != null and merchantMemberInfo.userId != ''">
+            AND ui.user_id = #{merchantMemberInfo.userId}
+        </if>
+        <if test="merchantMemberInfo.merchantId != null and merchantMemberInfo.merchantId != ''">
+            AND mi.user_id = #{merchantMemberInfo.merchantId}
+        </if>
+        order by last_date desc
+
+    </select>
+</mapper>
