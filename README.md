@@ -108,7 +108,7 @@ shangjia
 |![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1701577197448.jpg) | ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1701576747695.jpg) |
 |![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1701576964791.jpg) | ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1701576725562.jpg) |
 |![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1701576913590.jpg) | ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1701576713210.jpg) |
-|![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1701576760956.jpg) |
+|![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1701576760956.jpg) | ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/work/936e9baf53eb9a217af4f89c616dc19.png) |
 
 
 #### 演示视频
