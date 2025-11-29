@@ -59,6 +59,8 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
 
     private final IQuotaRecordInfoService quizRecordInfoService;
 
+    private final IPriceRulesService priceRulesService;
+
 
     /**
      * 分页获取订单信息
@@ -233,8 +235,21 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
             double distance = LocationUtils.getDistance(merchantInfo.getLongitude().doubleValue(), merchantInfo.getLatitude().doubleValue(), addressInfo.getLongitude().doubleValue(), addressInfo.getLatitude().doubleValue());
             orderInfo.setKilometre(NumberUtil.round(NumberUtil.div(new BigDecimal(distance), 1000), 2));
 
+            BigDecimal distributionPrice = BigDecimal.ZERO;
+            List<PriceRules> distancePrice = priceRulesService.list();
+            if (CollectionUtil.isEmpty(distancePrice)) {
+                distributionPrice = NumberUtil.mul(orderInfo.getKilometre(), 2);
+            } else {
+                for (PriceRules priceRules : distancePrice) {
+                    if (priceRules.getMinValue().compareTo(orderInfo.getKilometre()) <= 0 && priceRules.getMaxValue().compareTo(orderInfo.getKilometre()) > 0) {
+                        distributionPrice = NumberUtil.mul(orderInfo.getKilometre(), priceRules.getUnitPrice());
+                        break;
+                    }
+                }
+            }
+
             // 每公里两米
-            orderInfo.setDistributionPrice(NumberUtil.mul(orderInfo.getKilometre(), 2));
+            orderInfo.setDistributionPrice(distributionPrice);
             orderInfo.setOrderPrice(NumberUtil.add(orderInfo.getOrderPrice(), orderInfo.getDistributionPrice()));
         }
 
