@@ -1,3 +1,5 @@
+<p><img align="center" src="https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/%E5%90%88%E4%BD%9C%E7%89%A9%E6%96%99%E6%A0%B7%E5%BC%8F%20(3).png" alt="fankekeke" /></p>
+
 ### 基于SpringBoot + Vue点餐配送系统.
 
 #### 安装环境
@@ -108,7 +110,7 @@ shangjia
 |![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1701577197448.jpg) | ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1701576747695.jpg) |
 |![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1701576964791.jpg) | ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1701576725562.jpg) |
 |![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1701576913590.jpg) | ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1701576713210.jpg) |
-|![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1701576760956.jpg) |
+|![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/1701576760956.jpg) | ![](https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/work/936e9baf53eb9a217af4f89c616dc19.png) |
 
 
 #### 演示视频
@@ -121,13 +123,21 @@ Email: fan1ke2ke@gmail.com
 
 WeChat: `Storm_Berserker`
 
-`附带部署与讲解服务，因为要恰饭资源非免费，伸手党勿扰，谢谢理解`
+`附带部署与讲解服务，因为要恰饭资源非免费，伸手党勿扰，谢谢理解😭`
+
+> 1.项目纯原创，不做二手贩子 2.一次购买终身有效 3.项目讲解持续到答辩结束 4.非常负责的答辩指导 5.**黑奴价格**
+
+> 项目部署调试不好包退！功能逻辑没讲明白包退！
 
 #### 其它资源
 
-[2023年答辩顺利通过](https://berserker287.github.io/2023/06/14/2023%E5%B9%B4%E7%AD%94%E8%BE%A9%E9%A1%BA%E5%88%A9%E9%80%9A%E8%BF%87/)
+[2025年-答辩顺利通过-客户评价🍜](https://berserker287.github.io/2025/06/18/2025%E5%B9%B4%E7%AD%94%E8%BE%A9%E9%A1%BA%E5%88%A9%E9%80%9A%E8%BF%87/)
 
-[2022年答辩通过率100%](https://berserker287.github.io/2022/05/25/%E9%A1%B9%E7%9B%AE%E4%BA%A4%E6%98%93%E8%AE%B0%E5%BD%95/)
+[2024年-答辩顺利通过-客户评价👻](https://berserker287.github.io/2024/06/06/2024%E5%B9%B4%E7%AD%94%E8%BE%A9%E9%A1%BA%E5%88%A9%E9%80%9A%E8%BF%87/)
+
+[2023年-答辩顺利通过-客户评价🐢](https://berserker287.github.io/2023/06/14/2023%E5%B9%B4%E7%AD%94%E8%BE%A9%E9%A1%BA%E5%88%A9%E9%80%9A%E8%BF%87/)
+
+[2022年-答辩通过率100%-客户评价🐣](https://berserker287.github.io/2022/05/25/%E9%A1%B9%E7%9B%AE%E4%BA%A4%E6%98%93%E8%AE%B0%E5%BD%95/)
 
 [毕业答辩导师提问的高频问题](https://berserker287.github.io/2023/06/13/%E6%AF%95%E4%B8%9A%E7%AD%94%E8%BE%A9%E5%AF%BC%E5%B8%88%E6%8F%90%E9%97%AE%E7%9A%84%E9%AB%98%E9%A2%91%E9%97%AE%E9%A2%98/)
 
@@ -139,5 +149,7 @@ WeChat: `Storm_Berserker`
 
 
 #### 接JAVAWEB毕设，纯原创，价格公道，诚信第一
+
+`网站建设、小程序、H5、APP、各种系统 选题+开题报告+任务书+程序定制+安装调试+项目讲解+论文+答辩PPT`
 
 More info: [悲伤的橘子树](https://berserker287.github.io/)
