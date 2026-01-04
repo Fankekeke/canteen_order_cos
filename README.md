@@ -1,34 +1,6 @@
-<p><img align="center" src="https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/%E5%90%88%E4%BD%9C%E7%89%A9%E6%96%99%E6%A0%B7%E5%BC%8F%20(3).png" alt="fankekeke" /></p>
-
 ### 基于SpringBoot + Vue点餐配送系统.
 
-#### 安装环境
-
-JAVA 环境 
-
-Node.js环境 [https://nodejs.org/en/] 选择14.17
-
-Yarn 打开cmd， 输入npm install -g yarn !!!必须安装完毕nodejs
-
-Mysql 数据库 [https://blog.csdn.net/qq_40303031/article/details/88935262] 一定要把账户和密码记住
-
-redis
-
-Idea 编译器 [https://blog.csdn.net/weixin_44505194/article/details/104452880]
-
-WebStorm OR VScode 编译器 [https://www.jianshu.com/p/d63b5bae9dff]
-
-#### 采用技术及功能
-
-后端：SpringBoot、MybatisPlus、MySQL、Redis、
-前端：Vue、Apex、Antd、Axios
-
-平台前端：vue(框架) + vuex(全局缓存) + rue-router(路由) + axios(请求插件) + apex(图表)  + antd-ui(ui组件)
-
-平台后台：springboot(框架) + redis(缓存中间件) + shiro(权限中间件) + mybatisplus(orm) + restful风格接口 + mysql(数据库)
-
-开发环境：windows10 or windows7 ， vscode or webstorm ， idea + lambok
-
+点餐配送系统 外卖点餐系统 餐厅点餐系统 智能配送系统
 
 > 管理员端功能模块：
 1. 商家管理模块：商家信息的查询、增加、修改、删除等
@@ -71,7 +43,32 @@ WebStorm OR VScode 编译器 [https://www.jianshu.com/p/d63b5bae9dff]
 10. 订单支付支付宝沙盒支付，支付后邮件通知
 11. 积分物品兑换记录管理
 
+#### 安装环境
 
+JAVA 环境 
+
+Node.js环境 [https://nodejs.org/en/] 选择14.17
+
+Yarn 打开cmd， 输入npm install -g yarn !!!必须安装完毕nodejs
+
+Mysql 数据库 [https://blog.csdn.net/qq_40303031/article/details/88935262] 一定要把账户和密码记住
+
+redis
+
+Idea 编译器 [https://blog.csdn.net/weixin_44505194/article/details/104452880]
+
+WebStorm OR VScode 编译器 [https://www.jianshu.com/p/d63b5bae9dff]
+
+#### 采用技术及功能
+
+后端：SpringBoot、MybatisPlus、MySQL、Redis、
+前端：Vue、Apex、Antd、Axios
+
+平台前端：vue(框架) + vuex(全局缓存) + rue-router(路由) + axios(请求插件) + apex(图表)  + antd-ui(ui组件)
+
+平台后台：springboot(框架) + redis(缓存中间件) + shiro(权限中间件) + mybatisplus(orm) + restful风格接口 + mysql(数据库)
+
+开发环境：windows10 or windows7 ， vscode or webstorm ， idea + lambok
 
 #### 前台启动方式
 安装所需文件 yarn install 
@@ -153,3 +150,5 @@ WeChat: `Storm_Berserker`
 `网站建设、小程序、H5、APP、各种系统 选题+开题报告+任务书+程序定制+安装调试+项目讲解+论文+答辩PPT`
 
 More info: [悲伤的橘子树](https://berserker287.github.io/)
+
+<p><img align="center" src="https://fank-bucket-oss.oss-cn-beijing.aliyuncs.com/img/%E5%90%88%E4%BD%9C%E7%89%A9%E6%96%99%E6%A0%B7%E5%BC%8F%20(3).png" alt="fankekeke" /></p>
